@@ -34,6 +34,8 @@ public enum HTML {
         var merged = attrs; merged.merge(["src": src, "alt": alt]); return el("img", merged)
     }
     public static func br() -> any HTMLNode { el("br") }
+    public static func br(_ n: Int) -> HTMLFragment { Array(repeating: HTML.br(), count: n) }
+
     public static func hr(_ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode { el("hr", attrs) }
 
     // Lists
@@ -60,5 +62,9 @@ public enum HTML {
             out.append(contentsOf: builder())
         }
         return out
+    }
+
+    public static func `if`(_ condition: Bool, @HTMLBuilder _ content: () -> HTMLFragment) -> HTMLFragment {
+        condition ? content() : []
     }
 }
