@@ -11,7 +11,7 @@ public struct HTMLElement: HTMLNode {
         self.children = children
     }
 
-    public func _render(pretty: Bool, indent: Int, indentStep: Int) -> String {
+    public func render(pretty: Bool, indent: Int, indentStep: Int) -> String {
         let pad = pretty ? String(repeating: " ", count: indent) : ""
         let nl  = pretty ? "\n" : ""
         let attrStr = attrs.render()
@@ -28,10 +28,10 @@ public struct HTMLElement: HTMLNode {
         }
 
         if pretty {
-            let inner = children.map { $0._render(pretty: true, indent: indent + indentStep, indentStep: indentStep) }.joined()
+            let inner = children.map { $0.render(pretty: true, indent: indent + indentStep, indentStep: indentStep) }.joined()
             return "\(pad)\(open)\n\(inner)\(pad)</\(tag)>\n"
         } else {
-            let inner = children.map { $0._render(pretty: false, indent: 0, indentStep: indentStep) }.joined()
+            let inner = children.map { $0.render(pretty: false, indent: 0, indentStep: indentStep) }.joined()
             return "\(open)\(inner)</\(tag)>"
         }
     }

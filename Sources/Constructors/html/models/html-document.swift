@@ -5,7 +5,7 @@ public struct HTMLDocument {
     public init(children: [any HTMLNode]) { self.children = children }
 
     public func render(pretty: Bool = true, indentStep: Int = 2) -> String {
-        let body = children.map { $0._render(pretty: pretty, indent: 0, indentStep: indentStep) }.joined()
+        let body = children.map { $0.render(pretty: pretty, indent: 0, indentStep: indentStep) }.joined()
         return "<!DOCTYPE html>\n" + body
     }
 

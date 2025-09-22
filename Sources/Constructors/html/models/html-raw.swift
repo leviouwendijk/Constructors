@@ -5,7 +5,7 @@ public struct HTMLRaw: HTMLNode {
 
     public init(_ html: String) { self.html = html }
 
-    public func _render(pretty: Bool, indent: Int, indentStep: Int) -> String {
+    public func render(pretty: Bool, indent: Int, indentStep: Int) -> String {
         guard pretty else { return html }
         let pad = String(repeating: " ", count: indent)
         return html

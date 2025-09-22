@@ -5,7 +5,7 @@ public struct HTMLText: HTMLNode {
 
     public init(_ text: String) { self.text = text }
 
-    public func _render(pretty: Bool, indent: Int, indentStep: Int) -> String {
+    public func render(pretty: Bool, indent: Int, indentStep: Int) -> String {
         let escaped = htmlEscape(text)
         guard pretty else { return escaped }
         let pad = String(repeating: " ", count: indent)
