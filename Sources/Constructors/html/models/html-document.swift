@@ -1,6 +1,6 @@
 import Foundation
 
-public struct HTMLDocument {
+public struct HTMLDocument: Sendable {
     public var children: [any HTMLNode]
     public init(children: [any HTMLNode]) { self.children = children }
 

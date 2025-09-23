@@ -1,6 +1,6 @@
 import Foundation
 
-public struct HTMLAttribute: ExpressibleByDictionaryLiteral {
+public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
     private var storage: [(String, String?)] = []
 
     public init() {}

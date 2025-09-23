@@ -1,7 +1,7 @@
 import Foundation
 
 @resultBuilder
-public enum HTMLBuilder {
+public enum HTMLBuilder: Sendable {
     public static func buildBlock(_ parts: [any HTMLNode]...) -> [any HTMLNode] {
         parts.flatMap { $0 }
     }
