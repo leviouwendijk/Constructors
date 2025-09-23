@@ -55,6 +55,22 @@ public enum HTML {
     public static func text(_ s: String) -> any HTMLNode { HTMLText(s) }
     public static func raw(_ s: String)  -> any HTMLNode { HTMLRaw(s) }
 
+    public static func b(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("b", attrs, c)
+    }
+
+    public static func i(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("i", attrs, c)
+    }
+
+    public static func strong(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("strong", attrs, c)
+    }
+
+    public static func em(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("em", attrs, c)
+    }
+
     @inlinable
     public static func repeating(_ n: Int, @HTMLBuilder builder: () -> [any HTMLNode]) -> [any HTMLNode] {
         var out: [any HTMLNode] = []
