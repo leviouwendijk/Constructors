@@ -38,6 +38,9 @@ public enum HTML {
 
     public static func hr(_ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode { el("hr", attrs) }
 
+    public static func code(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("code", attrs, c) }
+    public static func pre(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("pre", attrs, c) }
+
     // Lists
     public static func ul(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("ul", attrs, c) }
     public static func ol(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("ol", attrs, c) }
