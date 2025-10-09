@@ -105,6 +105,10 @@ public enum HTML {
     /// Use `blank()` between major sections for readability.
     public static func blank() -> any HTMLNode { HTMLNewline(1) }
 
+    public static func inline(@HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        HTMLInlineGroup(c())
+    }
+
     public static func header(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("header", a, c) }
     public static func footer(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("footer", a, c) }
     public static func section(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("section", a, c) }
