@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol HTMLNode: Sendable {
+public protocol HTMLNode: Sendable, HTMLCommentable {
     @available(*, deprecated, message: "Use the options-aware render(_:indent:indentStep:options:) overload.")
     func render(pretty: Bool, indent: Int, indentStep: Int) -> String
 
@@ -17,5 +17,14 @@ public extension HTMLNode {
         )
 
         return render(options: opts, indent: indent)
+    }
+
+    func commented(
+        options: HTMLRenderOptions = .init(),
+        indent: Int = 0
+    ) -> any HTMLNode {
+        let rendered = self.render(options: options, indent: indent)
+            .trimmingSingleTrailingNewline()
+        return HTML.comment(sanitizeForHtmlComment(rendered))
     }
 }
