@@ -129,6 +129,26 @@ public enum HTML {
     public static func label(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("label", a, c) }
     public static func button(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("button", a, c) }
     public static func textarea(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("textarea", a, c) }
+
+    public static func type(_ value: String) -> HTMLAttribute { ["type": value] }
+    public static func name(_ value: String) -> HTMLAttribute { ["name": value] }
+    public static func value(_ value: String) -> HTMLAttribute { ["value": value] }
+    public static func placeholder(_ value: String) -> HTMLAttribute { ["placeholder": value] }
+
+    // boolean conveniences
+    public static func checked(_ enabled: Bool = true) -> HTMLAttribute { .bool("checked", enabled) }
+    public static func disabled(_ enabled: Bool = true) -> HTMLAttribute { .bool("disabled", enabled) }
+    public static func readonly(_ enabled: Bool = true) -> HTMLAttribute { .bool("readonly", enabled) }
+    public static func required(_ enabled: Bool = true) -> HTMLAttribute { .bool("required", enabled) }
+}
+
+public extension HTML {
+    @inlinable
+    static func attrs(_ parts: HTMLAttribute...) -> HTMLAttribute {
+        var out = HTMLAttribute()
+        for p in parts { out.merge(p) }
+        return out
+    }
 }
 
 public extension HTML {

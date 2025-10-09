@@ -818,7 +818,7 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
 +-------------------------------------------------------------+
 import Foundation
 
-public protocol HTMLNode: Sendable {
+public protocol HTMLNode: Sendable, HTMLCommentable {
     @available(*, deprecated, message: "Use the options-aware render(_:indent:indentStep:options:) overload.")
     func render(pretty: Bool, indent: Int, indentStep: Int) -> String
 
@@ -835,6 +835,15 @@ public extension HTMLNode {
         )
 
         return render(options: opts, indent: indent)
+    }
+
+    func commented(
+        options: HTMLRenderOptions = .init(),
+        indent: Int = 0
+    ) -> any HTMLNode {
+        let rendered = self.render(options: options, indent: indent)
+            .trimmingSingleTrailingNewline()
+        return HTML.comment(sanitizeForHtmlComment(rendered))
     }
 }
 
@@ -864,6 +873,33 @@ public enum HTMLBuilder: Sendable {
 (!): 1 blank lines
 
 
++--------------------------------------------------------+
+| Sources/Constructors/html/funcs/html-commentable.swift |
++--------------------------------------------------------+
+import Foundation
+
+public protocol HTMLCommentable {
+    func commented(
+        options: HTMLRenderOptions,
+        indent: Int
+    ) -> any HTMLNode
+}
+
+public extension HTMLCommentable {
+    func commented(
+        node: any HTMLNode,
+        options: HTMLRenderOptions = .init(),
+        indent: Int = 0
+    ) -> any HTMLNode {
+        let rendered = node.render(options: options, indent: indent)
+            .trimmingSingleTrailingNewline()
+        return HTML.comment(sanitizeForHtmlComment(rendered))
+    }
+}
+
+(!): 1 blank lines
+
+
 +---------------------------------------------------+
 | Sources/Constructors/html/funcs/html-escape.swift |
 +---------------------------------------------------+
@@ -884,6 +920,59 @@ public func htmlEscape(_ s: String) -> String {
         }
     }
     return out
+}
+
+(!): 1 blank lines
+
+
++------------------------------------------------------+
+| Sources/Constructors/html/funcs/html-commented.swift |
++------------------------------------------------------+
+import Foundation
+
+@inline(__always)
+public func sanitizeForHtmlComment(_ s: String) -> String {
+    // HTML comments must not contain "--" anywhere.
+    // Replace with an em dash to keep it visibly similar but valid.
+    s.replacingOccurrences(of: "--", with: "—")
+}
+
+public extension String {
+    func trimmingSingleTrailingNewline() -> String {
+        guard last == "\n" else { return self }
+        return String(dropLast(1))
+    }
+}
+
+public extension HTML {
+    /// Renders `node` with the given options and wraps the result in an HTML comment.
+    /// - Parameters:
+    ///   - node: Any HTMLNode to be commented out.
+    ///   - options: Render options (pretty/indent/order). Defaults to your global defaults.
+    ///   - indent: Starting indent (spaces) for the comment line(s).
+    /// - Returns: `<!-- ...render(node)... -->`
+    static func commented(
+        _ node: any HTMLNode,
+        options: HTMLRenderOptions = .init(),
+        indent: Int = 0
+    ) -> any HTMLNode {
+        let rendered = node.render(options: options, indent: indent)
+            .trimmingSingleTrailingNewline()
+        return HTML.comment(sanitizeForHtmlComment(rendered))
+    }
+
+    /// Builder variant: render multiple nodes, join them, and wrap in a single comment block.
+    static func commented(
+        options: HTMLRenderOptions = .init(),
+        indent: Int = 0,
+        @HTMLBuilder _ content: () -> [any HTMLNode]
+    ) -> any HTMLNode {
+        let joined = content()
+            .map { $0.render(options: options, indent: indent) }
+            .joined()
+            .trimmingSingleTrailingNewline()
+        return HTML.comment(sanitizeForHtmlComment(joined))
+    }
 }
 
 (!): 1 blank lines
@@ -1204,59 +1293,6 @@ public enum LinkSpec: Sendable {
             let a: HTMLAttribute = ["rel":"manifest", "href": href]
             return a
         }
-    }
-}
-
-(!): 1 blank lines
-
-
-+----------------------------------------------------------+
-| Sources/Constructors/html/funcs/html-commented-out.swift |
-+----------------------------------------------------------+
-import Foundation
-
-@inline(__always)
-private func sanitizeForHtmlComment(_ s: String) -> String {
-    // HTML comments must not contain "--" anywhere.
-    // Replace with an em dash to keep it visibly similar but valid.
-    s.replacingOccurrences(of: "--", with: "—")
-}
-
-private extension String {
-    func trimmingSingleTrailingNewline() -> String {
-        guard last == "\n" else { return self }
-        return String(dropLast(1))
-    }
-}
-
-public extension HTML {
-    /// Renders `node` with the given options and wraps the result in an HTML comment.
-    /// - Parameters:
-    ///   - node: Any HTMLNode to be commented out.
-    ///   - options: Render options (pretty/indent/order). Defaults to your global defaults.
-    ///   - indent: Starting indent (spaces) for the comment line(s).
-    /// - Returns: `<!-- ...render(node)... -->`
-    static func commentedOut(
-        _ node: any HTMLNode,
-        options: HTMLRenderOptions = .init(),
-        indent: Int = 0
-    ) -> any HTMLNode {
-        let rendered = node.render(options: options, indent: indent)
-            .trimmingSingleTrailingNewline()
-        return HTML.comment(sanitizeForHtmlComment(rendered))
-    }
-
-    /// Builder variant: render multiple nodes, join them, and wrap in a single comment block.
-    static func commentedOut(
-        options: HTMLRenderOptions = .init(),
-        indent: Int = 0,
-        @HTMLBuilder _ content: () -> [any HTMLNode]
-    ) -> any HTMLNode {
-        let joined = content()
-            .map { $0.render(options: options, indent: indent) }
-            .joined()
-            .trimmingSingleTrailingNewline()
-        return HTML.comment(sanitizeForHtmlComment(joined))
     }
 }
 

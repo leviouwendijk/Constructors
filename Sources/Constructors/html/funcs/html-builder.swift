@@ -14,3 +14,15 @@ public enum HTMLBuilder: Sendable {
     public static func buildExpression(_ text: String) -> [any HTMLNode] { [HTMLText(text)] }
     public static func buildLimitedAvailability(_ part: [any HTMLNode]) -> [any HTMLNode] { part }
 }
+
+@resultBuilder
+public enum HTMLAttrBuilder {
+    public static func buildBlock(_ parts: HTMLAttribute...) -> HTMLAttribute {
+        var out = HTMLAttribute(); parts.forEach { out.merge($0) }; return out
+    }
+    public static func buildExpression(_ part: HTMLAttribute) -> HTMLAttribute { part }
+}
+
+public extension HTML {
+    static func attrs(@HTMLAttrBuilder _ c: () -> HTMLAttribute) -> HTMLAttribute { c() }
+}
