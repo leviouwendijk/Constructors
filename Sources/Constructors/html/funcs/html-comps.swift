@@ -35,6 +35,13 @@ public enum HTML {
     public static func a(_ href: String, _ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
         var merged = attrs; merged.merge(["href": href]); return el("a", merged, c)
     }
+    // without href requirement
+    public static func a(_ attrs: HTMLAttribute = [:],
+                  @HTMLBuilder _ children: () -> [any HTMLNode]) -> any HTMLNode
+    {
+        el("a", attrs, children)
+    }
+
     public static func img(src: String, alt: String = "", _ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode {
         var merged = attrs; merged.merge(["src": src, "alt": alt]); return el("img", merged)
     }
