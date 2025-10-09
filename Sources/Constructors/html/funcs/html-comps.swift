@@ -154,7 +154,7 @@ public extension HTML {
 public extension HTML {
     static func script(
         src: String,
-       defer: Bool = true,
+       defer: Bool = false,
        `async`: Bool = false,
        type: String? = nil,
        integrity: String? = nil,

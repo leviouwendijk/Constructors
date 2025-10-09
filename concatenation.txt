@@ -1,3 +1,9 @@
++-------------------+
+| concatenation.txt |
++-------------------+
+(!): 1 blank lines
+
+
 +-------------------------------------------------+
 | Tests/ConstructorsTests/ConstructorsTests.swift |
 +-------------------------------------------------+
@@ -870,6 +876,18 @@ public enum HTMLBuilder: Sendable {
     public static func buildLimitedAvailability(_ part: [any HTMLNode]) -> [any HTMLNode] { part }
 }
 
+@resultBuilder
+public enum HTMLAttrBuilder {
+    public static func buildBlock(_ parts: HTMLAttribute...) -> HTMLAttribute {
+        var out = HTMLAttribute(); parts.forEach { out.merge($0) }; return out
+    }
+    public static func buildExpression(_ part: HTMLAttribute) -> HTMLAttribute { part }
+}
+
+public extension HTML {
+    static func attrs(@HTMLAttrBuilder _ c: () -> HTMLAttribute) -> HTMLAttribute { c() }
+}
+
 (!): 1 blank lines
 
 
@@ -1112,6 +1130,26 @@ public enum HTML {
     public static func label(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("label", a, c) }
     public static func button(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("button", a, c) }
     public static func textarea(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("textarea", a, c) }
+
+    public static func type(_ value: String) -> HTMLAttribute { ["type": value] }
+    public static func name(_ value: String) -> HTMLAttribute { ["name": value] }
+    public static func value(_ value: String) -> HTMLAttribute { ["value": value] }
+    public static func placeholder(_ value: String) -> HTMLAttribute { ["placeholder": value] }
+
+    // boolean conveniences
+    public static func checked(_ enabled: Bool = true) -> HTMLAttribute { .bool("checked", enabled) }
+    public static func disabled(_ enabled: Bool = true) -> HTMLAttribute { .bool("disabled", enabled) }
+    public static func readonly(_ enabled: Bool = true) -> HTMLAttribute { .bool("readonly", enabled) }
+    public static func required(_ enabled: Bool = true) -> HTMLAttribute { .bool("required", enabled) }
+}
+
+public extension HTML {
+    @inlinable
+    static func attrs(_ parts: HTMLAttribute...) -> HTMLAttribute {
+        var out = HTMLAttribute()
+        for p in parts { out.merge(p) }
+        return out
+    }
 }
 
 public extension HTML {
