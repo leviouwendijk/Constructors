@@ -86,4 +86,19 @@ public enum HTML {
     public static func `if`(_ condition: Bool, @HTMLBuilder _ content: () -> HTMLFragment) -> HTMLFragment {
         condition ? content() : []
     }
+
+    public static func comment(_ s: String) -> any HTMLNode { HTMLComment(text: s) }
+
+    public static func elSC(_ tag: String, _ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode {
+        HTMLElement(tag, attrs: attrs, children: [], selfClosing: true)
+    }
+
+    /// Insert `count` line breaks at this point in the output (pretty mode only).
+    public static func newline(_ count: Int = 1) -> any HTMLNode { HTMLNewline(count) }
+
+    /// Convenience: adds a *blank line* (i.e., one empty line between blocks).
+    /// Use `blank()` between major sections for readability.
+    public static func blank() -> any HTMLNode { HTMLNewline(1) }
 }
+
+

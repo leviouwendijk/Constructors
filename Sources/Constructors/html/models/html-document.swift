@@ -4,9 +4,20 @@ public struct HTMLDocument: Sendable {
     public var children: [any HTMLNode]
     public init(children: [any HTMLNode]) { self.children = children }
 
-    public func render(pretty: Bool = true, indentStep: Int = 2) -> String {
+    @available(*, message: "Deprecated, instead of 'indentStep', use 'options: HTMLRenderOptions()'")
+    public func render(pretty: Bool = true, indentStep: Int = 4) -> String {
         let body = children.map { $0.render(pretty: pretty, indent: 0, indentStep: indentStep) }.joined()
         return "<!DOCTYPE html>\n" + body
+    }
+
+    public func render(options: HTMLRenderOptions = .init(), pretty: Bool = true) -> String {
+        let body = children.map {
+            $0.render(pretty: pretty, indent: 0, indentStep: options.indentStep)
+        }.joined()
+
+        var out = "<!DOCTYPE html>\n" + body
+        if options.ensureTrailingNewline, !out.hasSuffix("\n") { out.append("\n") }
+        return out
     }
 
     public static func basic(
