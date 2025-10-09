@@ -144,6 +144,16 @@ public enum HTML {
     public static func disabled(_ enabled: Bool = true) -> HTMLAttribute { .bool("disabled", enabled) }
     public static func readonly(_ enabled: Bool = true) -> HTMLAttribute { .bool("readonly", enabled) }
     public static func required(_ enabled: Bool = true) -> HTMLAttribute { .bool("required", enabled) }
+
+    static func select(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("select", a, c)
+    }
+    static func option(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("option", a, c)
+    }
+    static func optgroup(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("optgroup", a, c)
+    }
 }
 
 public extension HTML {
