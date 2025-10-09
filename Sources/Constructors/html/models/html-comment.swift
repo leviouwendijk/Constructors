@@ -2,8 +2,14 @@ import Foundation
 
 public struct HTMLComment: HTMLNode {
     public let text: String
-    public func render(pretty: Bool, indent: Int, indentStep: Int) -> String {
-        let pad = pretty ? String(repeating: " ", count: indent) : ""
-        return pretty ? "\(pad)<!-- \(text) -->\n" : "<!-- \(text) -->"
+
+    public func render(options: HTMLRenderOptions, indent: Int) -> String {
+        // let space = " "
+        // let indentation = String(repeating: space, count: (indent * options.indentStep))
+        let indentation = String(repeating: " ", count: indent)
+        let pad = options.pretty ? indentation : ""
+        let newline  = options.pretty ? "\n" : ""
+
+        return "\(pad)<!-- \(text) -->\(newline)"
     }
 }

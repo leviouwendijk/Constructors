@@ -134,4 +134,6 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
         }
         return parts.joined(separator: " ")
     }
+
+    public static func `class`(_ s: String) -> HTMLAttribute { ["class": s] }
 }
