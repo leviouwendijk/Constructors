@@ -8,14 +8,17 @@ public protocol HTMLNode: Sendable, HTMLCommentable {
 }
 
 public extension HTMLNode {
-    func render(pretty: Bool, indent: Int, indentStep: Int) -> String {
+    func render(
+        pretty: Bool,
+        indent: Int,
+        indentStep: Int
+    ) -> String {
         let opts = HTMLRenderOptions(
             pretty: pretty,
             indentStep: indentStep,
             attributeOrder: .ranked,
             ensureTrailingNewline: false
         )
-
         return render(options: opts, indent: indent)
     }
 

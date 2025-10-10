@@ -18,14 +18,26 @@ public struct HTMLText: HTMLNode {
 
     public func render(options: HTMLRenderOptions, indent: Int) -> String {
         let escaped = htmlEscape(text)
-        guard options.pretty else { return escaped }
-        // let space = " "
-        // let indentation = String(repeating: space, count: (indent * options.indentStep))
-        let pad = String(repeating: " ", count: indent)
+        // guard options.pretty else { return escaped }
+        // // let space = " "
+        // // let indentation = String(repeating: space, count: (indent * options.indentStep))
+        // let pad = String(repeating: " ", count: indent)
 
-        return escaped
+        // return escaped
+        //     .split(separator: "\n", omittingEmptySubsequences: false)
+        //     .map { pad + String($0) }
+        //     .joined(separator: "\n") + "\n"
+        let pad = options.indentation ? String(repeating: " ", count: indent) : ""
+
+        if !options.newlineSeparated {
+            // Indent without adding a newline (your requested behavior)
+            return pad + escaped
+        }
+        var out = escaped
             .split(separator: "\n", omittingEmptySubsequences: false)
             .map { pad + String($0) }
-            .joined(separator: "\n") + "\n"
+            .joined(separator: "\n")
+        if options.ensureTrailingNewline { out.append("\n") }
+        return out
     }
 }
