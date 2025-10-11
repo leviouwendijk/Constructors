@@ -9,7 +9,7 @@ struct HTMLInlineGroup: HTMLNode {
         var tight = options
         tight.indentation = false
         tight.newlineSeparated = false
-        tight.ensureTrailingNewline = false
+        tight.ensureTrailingNewline = true
         return children.map { $0.render(options: tight, indent: indent) }.joined()
     }
 }
