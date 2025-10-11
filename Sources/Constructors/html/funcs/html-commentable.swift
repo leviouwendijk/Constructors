@@ -10,7 +10,7 @@ public protocol HTMLCommentable {
 public extension HTMLCommentable {
     func commented(
         node: any HTMLNode,
-        options: HTMLRenderOptions = .init(),
+        options: HTMLRenderOptions = .init(indentation: false, newlineSeparated: false, ensureTrailingNewline: false),
         indent: Int = 0
     ) -> any HTMLNode {
         let rendered = node.render(options: options, indent: indent)
