@@ -7,13 +7,29 @@ public protocol HTMLCommentable {
     ) -> any HTMLNode
 }
 
-public extension HTMLCommentable {
+// public extension HTMLCommentable {
+//     func commented(
+//         node: any HTMLNode,
+//         options: HTMLRenderOptions = .init(indentation: false, newlineSeparated: false, ensureTrailingNewline: false),
+//         indent: Int = 0
+//     ) -> any HTMLNode {
+//         let rendered = node.render(options: options, indent: indent)
+//             .trimmingSingleTrailingNewline()
+//         return HTML.comment(sanitizeForHtmlComment(rendered))
+//     }
+// }
+
+public extension HTMLCommentable where Self: HTMLNode {
     func commented(
-        node: any HTMLNode,
-        options: HTMLRenderOptions = .init(indentation: false, newlineSeparated: false, ensureTrailingNewline: false),
+        options: HTMLRenderOptions = .init(
+            indentation: false,
+            newlineSeparated: false,
+            ensureTrailingNewline: false
+        ),
         indent: Int = 0
     ) -> any HTMLNode {
-        let rendered = node.render(options: options, indent: indent)
+        let rendered = self
+            .render(options: options, indent: indent)
             .trimmingSingleTrailingNewline()
         return HTML.comment(sanitizeForHtmlComment(rendered))
     }
