@@ -304,4 +304,22 @@ struct PSQLDSLTests {
         _ = PSQL.unsafeRawInjection("price > 100", strict: false)
         _ = PSQL.unsafeRawInjection(#"-- comment ok when strict:false"#, strict: false)
     }
+
+    @Test
+    func analytics_examples_smoke() {
+        let q = PSQL.Select.make([
+            PSQL.As(PSQL.func_("COUNT",[PSQL.Lit("*")]), as: "pageviews"),
+            PSQL.As(PSQL.countDistinct(PSQL.col("session_id")), as: "sessions")
+        ], from: "events")
+        .where {
+            PSQL.equals(PSQL.col("site_id"), PSQL.val(UUID()))
+            PSQL.between(PSQL.col("ts"), PSQL.val(Date()), PSQL.val(Date()))
+            PSQL.equals(PSQL.col("type"), PSQL.val("pageview"))
+        }
+        .build()
+
+        #expect(q.sql.contains("COUNT(*) AS \"pageviews\""))
+        #expect(q.sql.contains("COUNT(DISTINCT \"session_id\") AS \"sessions\""))
+        #expect(q.binds.count == 4)
+    }
 }

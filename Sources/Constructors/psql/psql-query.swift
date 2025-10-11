@@ -10,6 +10,7 @@ extension PSQL {
         public let table: String
         public var joins: [Join] = []
         public var predicate: (any SQLRenderable)?
+        public var group: [any SQLRenderable] = []
         public var order: [any SQLRenderable] = []
         public var limitValue: Int?
         public var offsetValue: Int?
@@ -35,6 +36,9 @@ extension PSQL {
             orderBy(items as [any SQLRenderable])
         }
 
+        public func groupBy(_ items: [any SQLRenderable]) -> Select { var c = self; c.group = items; return c }
+        public func groupBy(_ items: any SQLRenderable...) -> Select { groupBy(items) }
+
         public func limit(_ n: Int) -> Select { var c = self; c.limitValue = n; return c }
         public func offset(_ n: Int) -> Select { var c = self; c.offsetValue = n; return c }
         public func distinct(_ d: Bool = true) -> Select { var c = self; c.distinct = d; return c }
@@ -54,6 +58,7 @@ extension PSQL {
             parts.append("FROM \"\(table)\"")
             if !joins.isEmpty { parts.append(joins.map { $0.render(&ctx) }.joined(separator: " ")) }
             if let p = predicate { parts.append("WHERE \(p.render(&ctx))") }
+            if !group.isEmpty { parts.append(" GROUP BY \(group.joined(", ", &ctx))") }
             if !order.isEmpty { parts.append("ORDER BY " + order.joined(", ", &ctx)) }
             if let l = limitValue { parts.append("LIMIT \(l)") }
             if let o = offsetValue { parts.append("OFFSET \(o)") }

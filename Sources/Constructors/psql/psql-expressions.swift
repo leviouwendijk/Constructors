@@ -207,4 +207,52 @@ extension PSQL {
     // Order helpers
     @inline(__always) public static func asc(_ id: Ident) -> Order { .asc(id) }
     @inline(__always) public static func desc(_ id: Ident) -> Order { .desc(id) }
+
+    public struct As: SQLRenderable {
+        let expr: any SQLRenderable
+        let alias: Ident
+        public init(_ expr: any SQLRenderable, as alias: String) {
+            self.expr = expr; self.alias = Ident.alias(alias)
+        }
+        public func render(_ ctx: inout SQLRenderContext) -> String {
+            "\(expr.render(&ctx)) AS \(alias.render(&ctx))"
+        }
+    }
+
+    public struct Cast: SQLRenderable {
+        let expr: any SQLRenderable
+        let type: String // validate if you want
+        public init(_ expr: any SQLRenderable, _ type: String) { self.expr = expr; self.type = type }
+        public func render(_ ctx: inout SQLRenderContext) -> String {
+            "\(expr.render(&ctx))::\(type)"
+        }
+    }
+
+    @inline(__always) public static func add(_ l: any SQLRenderable, _ r: any SQLRenderable) -> Op { .bin(l, "+", r) }
+    @inline(__always) public static func sub(_ l: any SQLRenderable, _ r: any SQLRenderable) -> Op { .bin(l, "-", r) }
+    @inline(__always) public static func mul(_ l: any SQLRenderable, _ r: any SQLRenderable) -> Op { .bin(l, "*", r) }
+    @inline(__always) public static func div(_ l: any SQLRenderable, _ r: any SQLRenderable) -> Op { .bin(l, "/", r) }
+
+    public static func countStar() -> Func { Func("COUNT", [Lit("*")]) }
+
+    public struct AggDistinct: SQLRenderable {
+        let name: String; let expr: any SQLRenderable
+        public func render(_ ctx: inout SQLRenderContext) -> String {
+            "\(name)(DISTINCT \(expr.render(&ctx)))"
+        }
+    }
+    @inline(__always) public static func countDistinct(_ e: any SQLRenderable) -> AggDistinct { .init(name: "COUNT", expr: e) }
+    @inline(__always) public static func sum(_ e: any SQLRenderable) -> Func { Func("SUM", [e]) }
+    @inline(__always) public static func min(_ e: any SQLRenderable) -> Func { Func("MIN", [e]) }
+    @inline(__always) public static func max(_ e: any SQLRenderable) -> Func { Func("MAX", [e]) }
+
+    public struct AggFilter: SQLRenderable {
+        let agg: any SQLRenderable; let predicate: any SQLRenderable
+        public func render(_ ctx: inout SQLRenderContext) -> String {
+            "\(agg.render(&ctx)) FILTER (WHERE \(predicate.render(&ctx)))"
+        }
+    }
+    @inline(__always) public static func filter(_ agg: any SQLRenderable, where p: any SQLRenderable) -> AggFilter {
+        .init(agg: agg, predicate: p)
+    }
 }
