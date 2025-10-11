@@ -59,7 +59,8 @@ public struct HTMLElement: HTMLNode {
             let pad2 = options.indentation ? String(repeating: " ", count: childIndent) : ""
             // Ensure first inner line is padded even if the first child didn’t add it
             let innerIndented = (options.indentation && !inner.hasPrefix(pad2)) ? (pad2 + inner) : inner
-            let body = "\(pad)\(open)\n\(innerIndented)\(pad)</\(tag)>"
+            let innerWithTerminatingNewline = innerIndented.hasSuffix("\n") ? innerIndented : (innerIndented + "\n")
+            let body = "\(pad)\(open)\n\(innerWithTerminatingNewline)\(pad)</\(tag)>"
             return options.ensureTrailingNewline ? (body + "\n") : body
         } else {
             // Single-line inner content; still respect indentation for first inner line
