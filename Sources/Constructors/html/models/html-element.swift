@@ -52,15 +52,6 @@ public struct HTMLElement: HTMLNode {
             return options.ensureTrailingNewline ? (body + nl) : body
         }
 
-        // // With children
-        // if options.pretty {
-        //     let inner = children.map { $0.render(options: options, indent: indent + options.indentStep) }.joined()
-        //     return "\(pad)\(open)\n\(inner)\(pad)</\(tag)>\n"
-        // } else {
-        //     let inner = children.map { $0.render(options: options, indent: indent) }.joined()
-        //     return "\(open)\(inner)</\(tag)>"
-        // }
-
         // With children
         if options.newlineSeparated {
             let childIndent = indent + options.indentStep
