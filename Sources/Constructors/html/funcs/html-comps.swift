@@ -180,6 +180,7 @@ public extension HTML {
        type: String? = nil,
        integrity: String? = nil,
        crossorigin: String? = nil,
+        nonce: String? = nil,
        _ extra: HTMLAttribute = HTMLAttribute()
     ) -> any HTMLNode {
         var a = extra
@@ -187,14 +188,28 @@ public extension HTML {
         if let type { a.merge(["type": type]) }
         if let integrity { a.merge(["integrity": integrity]) }
         if let crossorigin { a.merge(["crossorigin": crossorigin]) }
+        if let nonce { a.merge(["nonce": nonce]) }
         if `defer` { a.merge(.bool("defer", true)) }
         if async { a.merge(.bool("async", true)) }
         return el("script", a)
     }
 
-    static func scriptInline(_ js: String, type: String? = nil) -> any HTMLNode {
-        let a = type.map { HTMLAttribute(dictionaryLiteral: ("type",$0)) } ?? HTMLAttribute()
+    static func scriptInline(_ js: String, type: String? = nil, nonce: String? = nil) -> any HTMLNode {
+        var a: HTMLAttribute = [:]
+        if let type { a.merge(["type": type]) }
+        if let nonce { a.merge(["nonce": nonce]) }
         return el("script", a) { [HTML.raw(js)] }
+    }
+
+    static func scriptCall(_ fn: String, args: [JSValue], type: String? = "module") -> any HTMLNode {
+        HTML.scriptInline(JS.call(fn, args), type: type)
+    }
+
+    /// Emit `<script type="application/json" id="...">…</script>` for props
+    static func jsonProps(id: String, _ value: JSValue) -> any HTMLNode {
+        HTML.el("script", ["type":"application/json","id": id]) {
+            HTML.raw(value.render()) // contents are JSON, not escaped text
+        }
     }
 
     static func link(_ spec: LinkSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
