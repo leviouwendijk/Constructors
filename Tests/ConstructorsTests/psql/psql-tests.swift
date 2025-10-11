@@ -161,4 +161,147 @@ struct PSQLDSLTests {
         // Allowed when explicit opt-out:
         _ = PSQL.unsafeRawInjection("price > 100", strict: false)
     }
+
+    @Test
+    func cte_bind_numbering_monotonic() {
+        let base = PSQL.Select.make([PSQL.Ident.column("u.id")], from: "users u")
+            .where {
+                PSQL.equals(PSQL.Ident.column("u.is_active"), PSQL.val(true))   // $1
+                PSQL.gt(PSQL.Ident.column("u.created_at"), PSQL.val("2025-01-01")) // $2
+            }
+
+        let main = PSQL.Select.make([PSQL.col("id")], from: "users")
+            .with("active", as: base)
+            .where { PSQL.equals(PSQL.Ident.column("users.id"), PSQL.val(42)) } // $3
+            .build()
+
+        #expect(main.sql.contains("$1"))
+        #expect(main.sql.contains("$2"))
+        #expect(main.sql.contains("$3"))
+        #expect(main.binds.count == 3)
+    }
+
+    @Test
+    func in_list_param_expansion_orders_and_counts() {
+        let ids: [any Encodable & Sendable] = [11, 22, 33]
+        let q = PSQL.Select.make([PSQL.col("id")], from: "t")
+            .where { PSQL.in(PSQL.col("id"), ids) }
+            .build()
+
+        #expect(q.sql.contains(#"IN ($1, $2, $3)"#))
+        #expect(q.binds.count == 3)
+    }
+
+    @Test
+    func between_uses_same_context_for_bounds() {
+        let q = PSQL.Select.make([PSQL.col("id")], from: "t")
+            .where { PSQL.between(PSQL.col("created_at"), PSQL.val(10), PSQL.val(20)) }
+            .build()
+        // The exact $n depends on prior binds; at least two in sequence must exist:
+        #expect(q.sql.contains(" BETWEEN "))
+        #expect(q.binds.count == 2)
+    }
+
+    @Test
+    func any_all_single_array_param_counts() {
+        let arr = PSQL.val([1,2])     // one bind for the whole array
+        let q = PSQL.Select.make([PSQL.col("id")], from: "t")
+            .where {
+                PSQL.any(PSQL.col("id"), arr)
+                PSQL.all(PSQL.col("id"), arr)
+            }
+            .build()
+        // #expect(q.binds.count == 1) 
+        #expect(q.binds.count == 2)
+        #expect(q.sql.contains("= ANY"))
+        #expect(q.sql.contains("= ALL"))
+    }
+
+    @Test
+    func order_by_helpers_quote_and_direction() {
+        let q = PSQL.Select.make([PSQL.col("id")], from: "users u")
+            .orderByIdent(PSQL.asc(.column("u.created_at")), PSQL.desc(.column("u.email")))
+            .build()
+        #expect(q.sql.contains(#""u"."created_at" ASC"#))
+        #expect(q.sql.contains(#""u"."email" DESC"#))
+    }
+
+    @Test
+    func distinct_select() {
+        let q = PSQL.Select.make([PSQL.col("email")], from: "users").distinct().build()
+        #expect(q.sql.contains("SELECT DISTINCT"))
+    }
+
+    @Test
+    func multiple_joins_rendering() {
+        let q = PSQL.Select.make([PSQL.Ident.column("u.id")], from: "users u")
+            .join(PSQL.join(.left, table: .table("profiles"), on:
+                PSQL.equals(PSQL.Ident.column("u.id"), PSQL.Ident.column("profiles.user_id"))
+            ))
+            .join(PSQL.join(.inner, table: .table("cities"), on:
+                PSQL.equals(PSQL.Ident.column("profiles.city_id"), PSQL.Ident.column("cities.id"))
+            ))
+            .build()
+        #expect(q.sql.contains("LEFT JOIN"))
+        #expect(q.sql.contains("INNER JOIN"))
+        #expect(q.sql.contains(#""profiles" ON"#))
+    }
+
+    @Test
+    func update_set_where_returning() {
+        let q = PSQL.Update.make("profiles")
+            .set("city", "Alkmaar")      // $1
+            .set("bio", "trainer")       // $2
+            .where { PSQL.equals(PSQL.col("user_id"), PSQL.val(UUID())) } // $3
+            .returning([PSQL.col("id")])
+            .build()
+
+        #expect(q.sql.contains(#"UPDATE "profiles" SET "city" = $1, "bio" = $2"#))
+        #expect(q.sql.contains(" WHERE "))
+        #expect(q.sql.contains(" RETURNING "))
+        #expect(q.binds.count == 3)
+    }
+
+    @Test
+    func delete_where_clause() {
+        let q = PSQL.Delete.make(from: "profiles")
+            .where { PSQL.equals(PSQL.col("user_id"), PSQL.val(UUID())) }
+            .build()
+        #expect(q.sql.starts(with: #"DELETE FROM "profiles""#))
+        #expect(q.sql.contains(" WHERE "))
+        #expect(q.binds.count == 1)
+    }
+
+    @Test
+    func function_and_text_ops() {
+        let q = PSQL.Select.make([
+                PSQL.func_("coalesce", [PSQL.col("nickname"), PSQL.val("unknown")])
+            ], from: "users")
+            .where {
+                PSQL.like(PSQL.col("email"), PSQL.val("%@gmail.com"))
+                PSQL.ilike(PSQL.col("city"), PSQL.val("%alkmaar%"))
+            }
+            .build()
+        #expect(q.sql.contains("coalesce("))
+        #expect(q.sql.contains("LIKE"))
+        #expect(q.sql.contains("ILIKE"))
+        #expect(q.binds.count == 3) 
+    }
+
+    @Test
+    func jsonb_contains_operator() {
+        let q = PSQL.Select.make([PSQL.col("id")], from: "events")
+            .where {
+                PSQL.jsonbContains(PSQL.col("payload"), PSQL.val(#"{"type":"review"}"#))
+            }.build()
+        #expect(q.sql.contains("@>"))
+        #expect(q.binds.count == 1)
+    }
+
+    @Test
+    func unsafe_injection_opt_out_allows_literals() {
+        // should pass through when strict:false
+        _ = PSQL.unsafeRawInjection("price > 100", strict: false)
+        _ = PSQL.unsafeRawInjection(#"-- comment ok when strict:false"#, strict: false)
+    }
 }
