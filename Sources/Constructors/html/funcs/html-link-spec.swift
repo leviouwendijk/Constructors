@@ -1,6 +1,6 @@
 import Foundation
 
-public enum LinkSpec: Sendable {
+public enum HTMLLinkSpec: Sendable {
     case preconnect(href: String)
     case preloadImage(
             href: String,

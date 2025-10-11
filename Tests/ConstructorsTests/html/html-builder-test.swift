@@ -5,7 +5,6 @@ import Testing
 
 @Suite("HTML DSL")
 struct HTMLDSLTests {
-// final class HTMLDSLTests: XCTestCase {
     var HMFooter: HTMLFragment {
         [
             HTML.div(.class(["footer"])) {
@@ -32,13 +31,7 @@ struct HTMLDSLTests {
         var r: [TestModel] = []
         for i in 0..<4 {
             let x = i + 1
-            r.append(
-                .init(
-                    "Appointment #\(x)",
-                    "Here we do \(x * 2) things",
-                    "Address for number \(x)",
-                )
-            )
+            r.append(.init("Appointment #\(x)", "Here we do \(x * 2) things", "Address for number \(x)"))
         }
         return r
     }()
@@ -76,9 +69,7 @@ struct HTMLDSLTests {
                     HTML.raw("<br>")             // deliberate raw to test mixing
                 }
                 HTML.ul {
-                    for i in 1...3 {
-                        HTML.li { HTML.text("punt \(i)") }
-                    }
+                    for i in 1...3 { HTML.li { HTML.text("punt \(i)") } }
                 }
                 HTML.p(.aria("live", "polite")) {
                     HTML.a("https://hondenmeesters.nl/support") { HTML.text("Geef jouw feedback") }
@@ -106,15 +97,16 @@ struct HTMLDSLTests {
             }
         }
 
-        // compact vs pretty render
-        let prettyHTML  = doc.render(pretty: true,  indentStep: 4)
-        let compactHTML = doc.render(pretty: false, indentStep: 0)
+        // Use new options API; keep attribute order .ranked so expectations stay the same.
+        let prettyHTML = doc.render(options: .init(pretty: true, indentStep: 4, attributeOrder: .ranked))
+        let compactHTML = doc.render(options: .init(pretty: false, indentStep: 0, attributeOrder: .ranked))
 
         // head/doc bits
         #expect(prettyHTML.contains(#"<html lang="nl">"#))
         #expect(prettyHTML.contains("body{font-family:-apple-system"))
 
-        #expect(compactHTML.contains("<title>Bevestiging</title>"))
+        // With ranked order, href sorts before rel:
+        #expect(compactHTML.contains(#"<title>Bevestiging</title>"#))
         #expect(compactHTML.contains(#"<link href="/assets/mail.css" rel="stylesheet">"#))
 
         // void elements
@@ -143,10 +135,9 @@ struct HTMLDSLTests {
 
     @Test
     func bodyOnlyConvenience() {
-        let bodyOnly = HTML.body {
-            HTML.p { HTML.text("Body only mode") }
-        }
-        let bodyDoc = HTMLDocument(children: [bodyOnly]).render(pretty: false)
+        let bodyOnly = HTML.body { HTML.p { HTML.text("Body only mode") } }
+        let bodyDoc = HTMLDocument(children: [bodyOnly])
+            .render(options: .init(pretty: false, attributeOrder: .ranked))
         #expect(bodyDoc.contains("<p>Body only mode</p>"))
         #expect(bodyDoc.contains("<body>"))
     }

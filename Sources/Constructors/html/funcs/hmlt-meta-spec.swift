@@ -1,6 +1,6 @@
 import Foundation
 
-public enum MetaSpec: Sendable {
+public enum HTMLMetaSpec: Sendable {
     case charset(String = "UTF-8")
     case viewport(String = "width=device-width, initial-scale=1.0")
     case robots(String = "index, follow")

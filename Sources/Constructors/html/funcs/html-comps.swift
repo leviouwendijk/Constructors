@@ -212,13 +212,13 @@ public extension HTML {
         }
     }
 
-    static func link(_ spec: LinkSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
+    static func link(_ spec: HTMLLinkSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
         var a = spec.attributes()
         a.merge(extra) 
         return el("link", a)
     }
 
-    static func meta(_ spec: MetaSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
+    static func meta(_ spec: HTMLMetaSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
         var a = spec.attributes()
         a.merge(extra)
         return el("meta", a)
