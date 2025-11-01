@@ -7,6 +7,13 @@ public enum BuildEnvironment: Sendable {
     case `public`
 }
 
+public struct GateEvent: Sendable {
+    public let id: String?
+    public let allowed: Set<BuildEnvironment>
+    public let environment: BuildEnvironment
+    public let rendered: Bool
+}
+
 public struct HTMLRenderOptions: Sendable {
     // @avialable(*, message: "replaced by indentation: and newline: and trailingNewline:") public var pretty: Bool
     public var indentation: Bool
@@ -16,12 +23,15 @@ public struct HTMLRenderOptions: Sendable {
     public var ensureTrailingNewline: Bool
     public var environment: BuildEnvironment
 
+    public var onGate: (@Sendable (GateEvent) -> Void)?
+
     public init(
         pretty: Bool = true,
         indentStep: Int = 4,
         attributeOrder: HTMLAttributeOrder = .preserve,
         ensureTrailingNewline: Bool = true,
-        environment: BuildEnvironment = .local
+        environment: BuildEnvironment = .local,
+        onGate: (@Sendable (GateEvent) -> Void)? = nil
     ) {
         self.indentation = pretty
         self.newlineSeparated = pretty
@@ -31,6 +41,7 @@ public struct HTMLRenderOptions: Sendable {
         self.ensureTrailingNewline = ensureTrailingNewline
 
         self.environment = environment
+        self.onGate = onGate
     }
     
     public init(
@@ -40,7 +51,8 @@ public struct HTMLRenderOptions: Sendable {
         indentStep: Int = 4,
         attributeOrder: HTMLAttributeOrder = .preserve,
         ensureTrailingNewline: Bool = true,
-        environment: BuildEnvironment = .local
+        environment: BuildEnvironment = .local,
+        onGate: (@Sendable (GateEvent) -> Void)? = nil
     ) {
         self.indentation = indentation
         self.newlineSeparated = newlineSeparated
@@ -48,5 +60,6 @@ public struct HTMLRenderOptions: Sendable {
         self.attributeOrder = attributeOrder
         self.ensureTrailingNewline = ensureTrailingNewline
         self.environment = environment
+        self.onGate = onGate
     }
 }

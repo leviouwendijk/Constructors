@@ -224,21 +224,3 @@ public extension HTML {
         return el("meta", a)
     }
 }
-
-@inlinable
-public func experimental(
-    allow: Set<BuildEnvironment> = [.local, .test],
-    @HTMLBuilder _ body: () -> [any HTMLNode]
-) -> any HTMLNode {
-    HTMLGate(allow: allow, children: body())
-}
-
-@inlinable public func onlyPublic(@HTMLBuilder _ body: () -> [any HTMLNode]) -> any HTMLNode {
-    experimental(allow: [.public], body)
-}
-@inlinable public func onlyTest(@HTMLBuilder _ body: () -> [any HTMLNode]) -> any HTMLNode {
-    experimental(allow: [.test], body)
-}
-@inlinable public func notPublic(@HTMLBuilder _ body: () -> [any HTMLNode]) -> any HTMLNode {
-    experimental(allow: [.local, .test], body)
-}
