@@ -6,22 +6,27 @@ extension PSQL {
     public struct Ident: SQLRenderable {
         public let value: String
         public let kind: IdentKind
-        static let rx = try! NSRegularExpression(
-            pattern: #"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?$"#
-        )
+        // static let rx = try! NSRegularExpression(
+        //     pattern: #"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?$"#
+        // )
+
+        // public init(_ value: String, kind: IdentKind) {
+        //     precondition(
+        //         Self.rx
+        //             .firstMatch(
+        //                 in: value,
+        //                 range: NSRange(
+        //                         location: 0,
+        //                         length: value.utf16.count
+        //                     )
+        //                 ) != nil,
+        //                 "Unsafe identifier: \(value)"
+        //             )
+        //     self.value = value; self.kind = kind
+        // }
 
         public init(_ value: String, kind: IdentKind) {
-            precondition(
-                Self.rx
-                    .firstMatch(
-                        in: value,
-                        range: NSRange(
-                                location: 0,
-                                length: value.utf16.count
-                            )
-                        ) != nil,
-                        "Unsafe identifier: \(value)"
-                    )
+            PSQLScan.Ident.preconditionValid(value, "Unsafe identifier: \(value)")
             self.value = value; self.kind = kind
         }
 
@@ -118,22 +123,27 @@ extension PSQL {
     /// that should be parameters (single-quoted strings, numeric literals, or inline casts).
     @inline(__always)
     public static func unsafeRawInjection(_ s: String, strict: Bool = true) -> Lit {
-        if strict {
-            // Heuristic: single-quoted literal, numeric bare literal, ::type cast, or comment marker.
-            let patterns = [
-                #"'.*?'"#,                 // single-quoted literals
-                #"\b\d+(\.\d+)?\b"#,       // plain numbers
-                #"::[A-Za-z_][A-Za-z0-9_]*"#, // explicit casts
-                #"--"#,                    // line comment
-                #"/\*"#                    // block comment
-            ]
-            let rx = try! NSRegularExpression(pattern: "(" + patterns.joined(separator: "|") + ")", options: [.dotMatchesLineSeparators])
-            if rx.firstMatch(in: s, range: NSRange(location: 0, length: s.utf16.count)) != nil {
-                preconditionFailure("unsafeRawInjection(strict:true) blocked likely unparameterized literal. Use PSQL.val(...) binds instead or pass strict:false explicitly.")
-            }
-        }
+        PSQLScan.assertSafeRaw(s, strict: strict)
         return Lit(s)
     }
+    // @inline(__always)
+    // public static func unsafeRawInjection(_ s: String, strict: Bool = true) -> Lit {
+    //     if strict {
+    //         // Heuristic: single-quoted literal, numeric bare literal, ::type cast, or comment marker.
+    //         let patterns = [
+    //             #"'.*?'"#,                 // single-quoted literals
+    //             #"\b\d+(\.\d+)?\b"#,       // plain numbers
+    //             #"::[A-Za-z_][A-Za-z0-9_]*"#, // explicit casts
+    //             #"--"#,                    // line comment
+    //             #"/\*"#                    // block comment
+    //         ]
+    //         let rx = try! NSRegularExpression(pattern: "(" + patterns.joined(separator: "|") + ")", options: [.dotMatchesLineSeparators])
+    //         if rx.firstMatch(in: s, range: NSRange(location: 0, length: s.utf16.count)) != nil {
+    //             preconditionFailure("unsafeRawInjection(strict:true) blocked likely unparameterized literal. Use PSQL.val(...) binds instead or pass strict:false explicitly.")
+    //         }
+    //     }
+    //     return Lit(s)
+    // }
 
     // Comparisons
     public static func equals(_ l: any SQLRenderable, _ r: any SQLRenderable) -> Op { .bin(l, "=", r) }
