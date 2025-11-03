@@ -85,56 +85,86 @@ extension PSQL {
         //     return parts.joined(separator: " ")
         // }
 
+        // public func render(_ ctx: inout SQLRenderContext) -> String {
+        //     var parts: [String] = []
+
+        //     // WITH …
+        //     if !ctes.isEmpty {
+        //         let cteSQL = ctes.map { name, sel -> String in
+        //             var c = SQLRenderContext()
+        //             let s = sel.render(&c)
+        //             ctx.binds.append(contentsOf: c.binds)
+        //             return #""\#(name)" AS (\#(s))"#
+        //         }.joined(separator: ", ")
+        //         parts.append("WITH \(cteSQL)")
+        //     }
+
+        //     // SELECT …
+        //     parts.append("SELECT \(distinct ? "DISTINCT " : "")\(columns.joined(", ", &ctx))")
+
+        //     // FROM …  (schema-safe)
+        //     let from = Ident.table(table).render(&ctx)
+        //     if let a = fromAlias {
+        //         parts.append("FROM \(from) AS \(a.render(&ctx))")
+        //     } else {
+        //         parts.append("FROM \(from)")
+        //     }
+
+        //     // JOIN …
+        //     if !joins.isEmpty {
+        //         parts.append(joins.map { $0.render(&ctx) }.joined(separator: " "))
+        //     }
+
+        //     // WHERE …
+        //     if let p = predicate {
+        //         parts.append("WHERE \(p.render(&ctx))")
+        //     }
+
+        //     // GROUP BY …
+        //     if !group.isEmpty {
+        //         parts.append(" GROUP BY \(group.joined(", ", &ctx))")
+        //     }
+
+        //     // ORDER BY …
+        //     if !order.isEmpty {
+        //         parts.append("ORDER BY " + order.joined(", ", &ctx))
+        //     }
+
+        //     // LIMIT/OFFSET/LOCK
+        //     if let l = limitValue { parts.append("LIMIT \(l)") }
+        //     if let o = offsetValue { parts.append("OFFSET \(o)") }
+        //     if forUpdate { parts.append("FOR UPDATE") }
+
+        //     return parts.joined(separator: " ")
+        // }
+
         public func render(_ ctx: inout SQLRenderContext) -> String {
             var parts: [String] = []
-
-            // WITH …
             if !ctes.isEmpty {
                 let cteSQL = ctes.map { name, sel -> String in
-                    var c = SQLRenderContext()
-                    let s = sel.render(&c)
+                    var c = SQLRenderContext(); let s = sel.render(&c)
                     ctx.binds.append(contentsOf: c.binds)
                     return #""\#(name)" AS (\#(s))"#
                 }.joined(separator: ", ")
                 parts.append("WITH \(cteSQL)")
             }
 
-            // SELECT …
             parts.append("SELECT \(distinct ? "DISTINCT " : "")\(columns.joined(", ", &ctx))")
 
-            // FROM …  (schema-safe)
-            let from = Ident.table(table).render(&ctx)
+            let base = Ident.table(table).render(&ctx)
             if let a = fromAlias {
-                parts.append("FROM \(from) AS \(a.render(&ctx))")
+                parts.append("FROM \(base) AS \(a.render(&ctx))")
             } else {
-                parts.append("FROM \(from)")
+                parts.append("FROM \(base)")
             }
 
-            // JOIN …
-            if !joins.isEmpty {
-                parts.append(joins.map { $0.render(&ctx) }.joined(separator: " "))
-            }
-
-            // WHERE …
-            if let p = predicate {
-                parts.append("WHERE \(p.render(&ctx))")
-            }
-
-            // GROUP BY …
-            if !group.isEmpty {
-                parts.append(" GROUP BY \(group.joined(", ", &ctx))")
-            }
-
-            // ORDER BY …
-            if !order.isEmpty {
-                parts.append("ORDER BY " + order.joined(", ", &ctx))
-            }
-
-            // LIMIT/OFFSET/LOCK
+            if !joins.isEmpty { parts.append(joins.map { $0.render(&ctx) }.joined(separator: " ")) }
+            if let p = predicate { parts.append("WHERE \(p.render(&ctx))") }
+            if !group.isEmpty { parts.append(" GROUP BY \(group.joined(", ", &ctx))") }
+            if !order.isEmpty { parts.append("ORDER BY " + order.joined(", ", &ctx)) }
             if let l = limitValue { parts.append("LIMIT \(l)") }
             if let o = offsetValue { parts.append("OFFSET \(o)") }
             if forUpdate { parts.append("FOR UPDATE") }
-
             return parts.joined(separator: " ")
         }
 
@@ -189,26 +219,47 @@ extension PSQL {
         //     return sql
         // }
 
+        // public func render(_ ctx: inout SQLRenderContext) -> String {
+        //     let cols = columns.map { #""\#($0)""# }.joined(separator: ", ")
+
+        //     let vals: String
+        //     if !renderRows.isEmpty {
+        //         vals =
+        //             renderRows
+        //             .map { rr in "(" + rr.map { $0.render(&ctx) }.joined(separator: ", ") + ")" }
+        //             .joined(separator: ", ")
+        //     } else {
+        //         vals =
+        //             rows
+        //             .map { r in "(" + r.map { ctx.bind($0) }.joined(separator: ", ") + ")" }
+        //             .joined(separator: ", ")
+        //     }
+
+        //     // var sql = "INSERT INTO \"\(table)\" (\(cols)) VALUES \(vals)"
+        //     let into = Ident.table(table).render(&ctx)
+        //     var sql = "INSERT INTO \(into) (\(cols)) VALUES \(vals)"
+
+        //     if let oc = onConflictSpec { sql += " " + oc.render(&ctx) }
+        //     if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
+        //     return sql
+        // }
+
         public func render(_ ctx: inout SQLRenderContext) -> String {
             let cols = columns.map { #""\#($0)""# }.joined(separator: ", ")
+            let base = Ident.table(table).render(&ctx)
 
             let vals: String
             if !renderRows.isEmpty {
-                vals =
-                    renderRows
+                vals = renderRows
                     .map { rr in "(" + rr.map { $0.render(&ctx) }.joined(separator: ", ") + ")" }
                     .joined(separator: ", ")
             } else {
-                vals =
-                    rows
+                vals = rows
                     .map { r in "(" + r.map { ctx.bind($0) }.joined(separator: ", ") + ")" }
                     .joined(separator: ", ")
             }
 
-            // var sql = "INSERT INTO \"\(table)\" (\(cols)) VALUES \(vals)"
-            let into = Ident.table(table).render(&ctx)
-            var sql = "INSERT INTO \(into) (\(cols)) VALUES \(vals)"
-
+            var sql = "INSERT INTO \(base) (\(cols)) VALUES \(vals)"
             if let oc = onConflictSpec { sql += " " + oc.render(&ctx) }
             if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
             return sql
@@ -233,19 +284,31 @@ extension PSQL {
         public func `where`(@BoolExprBuilder _ b: () -> [any SQLRenderable]) -> Update { var c = self; c.predicate = Op.group(b()); return c }
         public func returning(_ cols: [any SQLRenderable]) -> Update { var c = self; c.returningCols = cols; return c }
 
+        // public func render(_ ctx: inout SQLRenderContext) -> String {
+        //     var assigns: [String] = []
+        //     if !sets.isEmpty {
+        //         assigns.append(contentsOf: sets.map { #""\#($0.0)" = \#(ctx.bind($0.1))"# })
+        //     }
+        //     if !setsExpr.isEmpty {
+        //         assigns.append(contentsOf: setsExpr.map { #""\#($0.0)" = \#($0.1.render(&ctx))"# })
+        //     }
+
+        //     // var sql = "UPDATE \"\(table)\" SET \(assigns.joined(separator: ", "))"
+        //     let tgt = Ident.table(table).render(&ctx)
+        //     var sql = "UPDATE \(tgt) SET \(assigns.joined(separator: ", "))"
+
+        //     if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
+        //     if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
+        //     return sql
+        // }
+
         public func render(_ ctx: inout SQLRenderContext) -> String {
             var assigns: [String] = []
-            if !sets.isEmpty {
-                assigns.append(contentsOf: sets.map { #""\#($0.0)" = \#(ctx.bind($0.1))"# })
-            }
-            if !setsExpr.isEmpty {
-                assigns.append(contentsOf: setsExpr.map { #""\#($0.0)" = \#($0.1.render(&ctx))"# })
-            }
+            if !sets.isEmpty { assigns.append(contentsOf: sets.map { #""\#($0.0)" = \#(ctx.bind($0.1))"# }) }
+            if !setsExpr.isEmpty { assigns.append(contentsOf: setsExpr.map { #""\#($0.0)" = \#($0.1.render(&ctx))"# }) }
 
-            // var sql = "UPDATE \"\(table)\" SET \(assigns.joined(separator: ", "))"
             let tgt = Ident.table(table).render(&ctx)
             var sql = "UPDATE \(tgt) SET \(assigns.joined(separator: ", "))"
-
             if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
             if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
             return sql
@@ -290,11 +353,21 @@ extension PSQL {
             return c
         }
 
-        public func render(_ ctx: inout SQLRenderContext) -> String {
-            // var sql = "DELETE FROM \"\(table)\""
-            let from = Ident.table(table).render(&ctx)
-            var sql = "DELETE FROM \(from)"
+        // public func render(_ ctx: inout SQLRenderContext) -> String {
+        //     // var sql = "DELETE FROM \"\(table)\""
+        //     let from = Ident.table(table).render(&ctx)
+        //     var sql = "DELETE FROM \(from)"
 
+        //     if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
+        //     if !returningCols.isEmpty {
+        //         sql += " RETURNING " + returningCols.map { $0.render(&ctx) }.joined(separator: ", ")
+        //     }
+        //     return sql
+        // }
+
+        public func render(_ ctx: inout SQLRenderContext) -> String {
+            let base = Ident.table(table).render(&ctx)
+            var sql = "DELETE FROM \(base)"
             if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
             if !returningCols.isEmpty {
                 sql += " RETURNING " + returningCols.map { $0.render(&ctx) }.joined(separator: ", ")
