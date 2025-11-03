@@ -141,22 +141,54 @@ extension PSQL {
         public func build() -> RenderedSQL { var c = SQLRenderContext(); return .init(render(&c), c.binds) }
     }
 
+    // public struct Delete: SQLQuery {
+    //     public let table: String
+    //     public var predicate: (any SQLRenderable)?
+
+    //     public init(from table: String) { self.table = table }
+    //     public static func make(from table: String) -> Delete { .init(from: table) }
+
+    //     public func `where`(@BoolExprBuilder _ b: () -> [any SQLRenderable]) -> Delete { var c = self; c.predicate = Op.group(b()); return c }
+
+    //     public func render(_ ctx: inout SQLRenderContext) -> String {
+    //         var sql = "DELETE FROM \"\(table)\""
+    //         if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
+    //         return sql
+    //     }
+
+    //     public func build() -> RenderedSQL { var c = SQLRenderContext(); return .init(render(&c), c.binds) }
+    // }
+
     public struct Delete: SQLQuery {
         public let table: String
         public var predicate: (any SQLRenderable)?
+        public var returningCols: [any SQLRenderable] = []
 
         public init(from table: String) { self.table = table }
         public static func make(from table: String) -> Delete { .init(from: table) }
 
-        public func `where`(@BoolExprBuilder _ b: () -> [any SQLRenderable]) -> Delete { var c = self; c.predicate = Op.group(b()); return c }
+        public func `where`(@BoolExprBuilder _ b: () -> [any SQLRenderable]) -> Delete {
+            var c = self; c.predicate = Op.group(b()); return c
+        }
+
+        public func returning(_ cols: [any SQLRenderable]) -> Delete {
+            var c = self
+            c.returningCols = cols
+            return c
+        }
 
         public func render(_ ctx: inout SQLRenderContext) -> String {
             var sql = "DELETE FROM \"\(table)\""
             if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
+            if !returningCols.isEmpty {
+                sql += " RETURNING " + returningCols.map { $0.render(&ctx) }.joined(separator: ", ")
+            }
             return sql
         }
 
-        public func build() -> RenderedSQL { var c = SQLRenderContext(); return .init(render(&c), c.binds) }
+        public func build() -> RenderedSQL {
+            var c = SQLRenderContext(); return .init(render(&c), c.binds)
+        }
     }
 
     public enum OnConflict: SQLRenderable {
