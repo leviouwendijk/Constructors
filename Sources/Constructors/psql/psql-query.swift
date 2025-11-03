@@ -28,9 +28,16 @@ extension PSQL {
             self.fromAlias = alias.map(Ident.alias)
         }
 
-        public static func make(_ cols: [any SQLRenderable], from table: String) -> Select {
-            // .init(cols, from: table)
-            .init(cols, from: table, as: nil)
+        // public static func make(_ cols: [any SQLRenderable], from table: String) -> Select {
+        //     // .init(cols, from: table)
+        //     .init(cols, from: table, as: nil)
+        // }
+        public static func make(
+            _ cols: [any SQLRenderable],
+            from table: String,
+            as alias: String
+        ) -> Select {
+            .init(cols, from: table, as: alias)
         }
 
         public func with(_ name: String, as sel: Select) -> Select { var c = self; c.ctes.append((name, sel)); return c }
