@@ -11,7 +11,8 @@ extension PSQL {
             self.kind = kind; self.table = table; self.on = on
         }
         public func render(_ ctx: inout SQLRenderContext) -> String {
-            "\(kind.rawValue) \"\(table)\" ON \(on.render(&ctx))"
+            // "\(kind.rawValue) \"\(table)\" ON \(on.render(&ctx))"
+            "\(kind.rawValue) \(Ident.table(table).render(&ctx)) ON \(on.render(&ctx))"
         }
     }
 

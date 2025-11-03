@@ -322,4 +322,27 @@ struct PSQLDSLTests {
         #expect(q.sql.contains("COUNT(DISTINCT \"session_id\") AS \"sessions\""))
         #expect(q.binds.count == 4)
     }
+
+    // @Test("insert into schema-qualified table")
+    // func insert_schema_qualified() throws {
+    //     let req = DatamanRequest(
+    //         operation: .create,
+    //         database: "analytics",
+    //         table: "web.events", // <- the important part
+    //         criteria: nil,
+    //         values: try JSONValue.parse(#"""
+    //         {"site_id":"hondenmeesters.lan","type":"pageview"}
+    //         """#),
+    //         fieldTypes: try JSONValue.parse(#"""
+    //         {"site_id":{"text":{}},"type":{"text":{}}}
+    //         """#).objectValue.reduce(into: [:]) { dict, kv in
+    //             dict[kv.key] = .text
+    //         },
+    //         order: nil,
+    //         limit: nil
+    //     )
+    //     let legacy = Legacy.render(req)
+    //     let newer  = try New.render(req)
+    //     Diff.assertEqual(legacy, newer, label: #function)
+    // }
 }
