@@ -77,6 +77,7 @@ extension PSQL {
         public let table: String
         public let columns: [String]
         public var rows: [[any Encodable & Sendable]] = []
+        public var renderRows: [[any SQLRenderable]] = []
         public var onConflictSpec: (any SQLRenderable)? = nil   // <- typed
 
         // @available(*, deprecated, message: "Use typed OnConflict instead")
@@ -90,6 +91,8 @@ extension PSQL {
         public static func make(into table: String, columns: [String]) -> Insert { .init(into: table, columns: columns) }
 
         public func values(_ row: [any Encodable & Sendable]) -> Insert { var c = self; c.rows.append(row); return c }
+        public func valuesExpr(_ row: [any SQLRenderable]) -> Insert { var c = self; c.renderRows.append(row); return c }
+
         public func onConflict(_ spec: OnConflict) -> Insert { var c = self; c.onConflictSpec = spec; return c }
 
         // @available(*, deprecated, message: "Use typed OnConflict instead")
@@ -97,19 +100,41 @@ extension PSQL {
 
         public func returning(_ cols: [any SQLRenderable]) -> Insert { var c = self; c.returningCols = cols; return c }
 
+        // public func render(_ ctx: inout SQLRenderContext) -> String {
+        //     let cols = columns.map { #""\#($0)""# }.joined(separator: ", ")
+        //     let vals = rows.map { r -> String in
+        //         let params = r.map { ctx.bind($0) }.joined(separator: ", ")
+        //         return "(\(params))"
+        //     }.joined(separator: ", ")
+        //     var sql = "INSERT INTO \"\(table)\" (\(cols)) VALUES \(vals)"
+        //     if let oc = onConflictSpec {
+        //         sql += " " + oc.render(&ctx)
+        //     } 
+        //     // else if let legacy = onConflictString {
+        //     //     sql += " ON CONFLICT \(legacy)"
+        //     // }
+        //     if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
+        //     return sql
+        // }
+
         public func render(_ ctx: inout SQLRenderContext) -> String {
             let cols = columns.map { #""\#($0)""# }.joined(separator: ", ")
-            let vals = rows.map { r -> String in
-                let params = r.map { ctx.bind($0) }.joined(separator: ", ")
-                return "(\(params))"
-            }.joined(separator: ", ")
+
+            let vals: String
+            if !renderRows.isEmpty {
+                vals =
+                    renderRows
+                    .map { rr in "(" + rr.map { $0.render(&ctx) }.joined(separator: ", ") + ")" }
+                    .joined(separator: ", ")
+            } else {
+                vals =
+                    rows
+                    .map { r in "(" + r.map { ctx.bind($0) }.joined(separator: ", ") + ")" }
+                    .joined(separator: ", ")
+            }
+
             var sql = "INSERT INTO \"\(table)\" (\(cols)) VALUES \(vals)"
-            if let oc = onConflictSpec {
-                sql += " " + oc.render(&ctx)
-            } 
-            // else if let legacy = onConflictString {
-            //     sql += " ON CONFLICT \(legacy)"
-            // }
+            if let oc = onConflictSpec { sql += " " + oc.render(&ctx) }
             if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
             return sql
         }
@@ -120,6 +145,7 @@ extension PSQL {
     public struct Update: SQLQuery {
         public let table: String
         public var sets: [(String, any Encodable & Sendable)] = []
+        public var setsExpr: [(String, any SQLRenderable)] = []
         public var predicate: (any SQLRenderable)?
         public var returningCols: [any SQLRenderable] = []
 
@@ -127,12 +153,21 @@ extension PSQL {
         public static func make(_ table: String) -> Update { .init(table) }
 
         public func set(_ k: String, _ v: any Encodable & Sendable) -> Update { var c = self; c.sets.append((k, v)); return c }
+        public func setExpr(_ k: String, _ v: any SQLRenderable) -> Update { var c = self; c.setsExpr.append((k, v)); return c }
+
         public func `where`(@BoolExprBuilder _ b: () -> [any SQLRenderable]) -> Update { var c = self; c.predicate = Op.group(b()); return c }
         public func returning(_ cols: [any SQLRenderable]) -> Update { var c = self; c.returningCols = cols; return c }
 
         public func render(_ ctx: inout SQLRenderContext) -> String {
-            let assigns = sets.map { #""\#($0.0)" = \#(ctx.bind($0.1))"# }.joined(separator: ", ")
-            var sql = "UPDATE \"\(table)\" SET \(assigns)"
+            var assigns: [String] = []
+            if !sets.isEmpty {
+                assigns.append(contentsOf: sets.map { #""\#($0.0)" = \#(ctx.bind($0.1))"# })
+            }
+            if !setsExpr.isEmpty {
+                assigns.append(contentsOf: setsExpr.map { #""\#($0.0)" = \#($0.1.render(&ctx))"# })
+            }
+
+            var sql = "UPDATE \"\(table)\" SET \(assigns.joined(separator: ", "))"
             if let p = predicate { sql += " WHERE \(p.render(&ctx))" }
             if !returningCols.isEmpty { sql += " RETURNING \(returningCols.joined(", ", &ctx))" }
             return sql

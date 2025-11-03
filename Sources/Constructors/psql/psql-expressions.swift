@@ -46,11 +46,26 @@ extension PSQL {
         public func render(_ ctx: inout SQLRenderContext) -> String { #""\#(name)""# }
     }
 
+    // public struct Param: SQLRenderable {
+    //     public let encode: @Sendable (inout SQLRenderContext) -> String
+    //     public init<T: Encodable & Sendable>(_ value: T) {
+    //         self.encode = { ctx in ctx.bind(value) }
+    //     }
+    //     public func render(_ ctx: inout SQLRenderContext) -> String { encode(&ctx) }
+    // }
+
     public struct Param: SQLRenderable {
         public let encode: @Sendable (inout SQLRenderContext) -> String
+
         public init<T: Encodable & Sendable>(_ value: T) {
             self.encode = { ctx in ctx.bind(value) }
         }
+
+        // casted param, e.g. $1::timestamptz
+        public init<T: Encodable & Sendable>(_ value: T, cast: String) {
+            self.encode = { ctx in "\(ctx.bind(value))\(cast)" }
+        }
+
         public func render(_ ctx: inout SQLRenderContext) -> String { encode(&ctx) }
     }
 
@@ -93,7 +108,10 @@ extension PSQL {
 
     // MARK: Namespace helpers (mirror HTML.* style)
     @inline(__always) public static func col(_ n: String) -> Col { Col(n) }
+
     @inline(__always) public static func val<T: Encodable & Sendable>(_ v: T) -> Param { Param(v) }
+    @inline(__always) public static func val<T: Encodable & Sendable>(_ v: T, cast: String) -> Param { Param(v, cast: cast) }
+
     @inline(__always) public static func func_(_ name: String, _ args: [any SQLRenderable]) -> Func { Func(name, args) }
 
     /// Escape hatch. If `strict` is true (default), we **precondition-fail** when we detect likely literals
@@ -255,4 +273,13 @@ extension PSQL {
     @inline(__always) public static func filter(_ agg: any SQLRenderable, where p: any SQLRenderable) -> AggFilter {
         .init(agg: agg, predicate: p)
     }
+
+    @inline(__always) public static func `null`() -> Lit { Lit("NULL") }
+    @inline(__always) public static func `true`() -> Lit { Lit("TRUE") }
+    @inline(__always) public static func `false`() -> Lit { Lit("FALSE") }
+
+    @inline(__always) public static func isNull(_ l: any SQLRenderable) -> Op    { .bin(l, "IS", null()) }
+    @inline(__always) public static func isNotNull(_ l: any SQLRenderable) -> Op { .bin(l, "IS NOT", null()) }
+    @inline(__always) public static func eqNull(_ l: any SQLRenderable) -> Op { isNull(l) }
+    @inline(__always) public static func neNull(_ l: any SQLRenderable) -> Op { isNotNull(l) }
 }
