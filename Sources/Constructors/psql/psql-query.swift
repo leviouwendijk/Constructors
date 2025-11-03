@@ -8,6 +8,7 @@ extension PSQL {
     public struct Select: SQLQuery {
         public let columns: [any SQLRenderable]
         public let table: String
+        public let fromAlias: Ident?
         public var joins: [Join] = []
         public var predicate: (any SQLRenderable)?
         public var group: [any SQLRenderable] = []
@@ -18,12 +19,18 @@ extension PSQL {
         public var ctes: [(String, Select)] = []
         public var forUpdate: Bool = false
 
-        public init(_ cols: [any SQLRenderable], from table: String) {
-            self.columns = cols; self.table = table
+        // public init(_ cols: [any SQLRenderable], from table: String) {
+        //     self.columns = cols; self.table = table
+        // }
+        public init(_ cols: [any SQLRenderable], from table: String, as alias: String? = nil) {
+            self.columns = cols
+            self.table = table
+            self.fromAlias = alias.map(Ident.alias)
         }
 
         public static func make(_ cols: [any SQLRenderable], from table: String) -> Select {
-            .init(cols, from: table)
+            // .init(cols, from: table)
+            .init(cols, from: table, as: nil)
         }
 
         public func with(_ name: String, as sel: Select) -> Select { var c = self; c.ctes.append((name, sel)); return c }
@@ -55,7 +62,12 @@ extension PSQL {
                 parts.append("WITH \(cteSQL)")
             }
             parts.append("SELECT \(distinct ? "DISTINCT " : "")\(columns.joined(", ", &ctx))")
-            parts.append("FROM \"\(table)\"")
+            // parts.append("FROM \"\(table)\"")
+            if let a = fromAlias {
+                parts.append("FROM \"\(table)\" AS \(a.render(&ctx))")
+            } else {
+                parts.append("FROM \"\(table)\"")
+            }
             if !joins.isEmpty { parts.append(joins.map { $0.render(&ctx) }.joined(separator: " ")) }
             if let p = predicate { parts.append("WHERE \(p.render(&ctx))") }
             if !group.isEmpty { parts.append(" GROUP BY \(group.joined(", ", &ctx))") }
