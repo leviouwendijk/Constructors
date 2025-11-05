@@ -84,6 +84,30 @@ public enum PSQL {
         }
 
         public func encode(to e: Encoder) throws { try _encode(e) }
+
+        // convenience
+        static func text(_ s: String, hint: PSQLType? = .text) -> Self {
+            .init(.text(s), hint: hint)
+        }
+        static func bool(_ b: Bool, hint: PSQLType? = .boolean) -> Self {
+            .init(.bool(b), hint: hint)
+        }
+        static func int64(_ i: Int64, hint: PSQLType? = .bigInt) -> Self {
+            .init(.int64(i), hint: hint)
+        }
+        static func double(_ d: Double, hint: PSQLType? = .doublePrecision) -> Self {
+            .init(.double(d), hint: hint)
+        }
+        static func date(_ d: Date, hint: PSQLType? = .timestamptz) -> Self {
+            .init(.date(d), hint: hint)
+        }
+        static func uuid(_ u: UUID, hint: PSQLType? = .uuid) -> Self { .init(.uuid(u), hint: hint) }
+        static func json(_ data: Data, hint: PSQLType? = .jsonb) -> Self {
+            .init(.jsonb(data), hint: hint)
+        }
+        static func array(_ xs: [PSQL.SQLBindValue], element: PSQLType) -> Self {
+            .init(.array(xs, element: element), hint: .array(of: element))
+        }
     }
 
     public struct RenderedSQL: Sendable {
