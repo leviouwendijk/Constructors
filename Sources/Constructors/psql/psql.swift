@@ -36,6 +36,7 @@ public enum PSQL {
                 f.formatOptions = [
                     .withInternetDateTime, .withFractionalSeconds, .withColonSeparatorInTimeZone,
                 ]
+                f.timeZone = TimeZone(secondsFromGMT: 0)  // UTC
                 try c.encode(f.string(from: d))
             case .uuid(let u):
                 try c.encode(u.uuidString)
