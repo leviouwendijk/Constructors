@@ -68,19 +68,21 @@ public enum PSQL {
 
     public struct SQLBind: Encodable, Sendable {
         private let _encode: @Sendable (Encoder) throws -> Void
-        let value: SQLBindValue?
-        let hint: PSQLType?  // optional cast/type info for the boundary
+        public let value: SQLBindValue?
+        public let hint: PSQLType?  // optional cast/type info for the boundary
 
         public init<T: Encodable & Sendable>(_ v: T, hint: PSQLType? = nil) {
             self._encode = { enc in try v.encode(to: enc) }
             self.value = nil
             self.hint = hint
         }
+
         public init(_ v: SQLBindValue, hint: PSQLType? = nil) {
             self._encode = { enc in try v.encode(to: enc) }  // trivial Encodable shim if you like
             self.value = v
             self.hint = hint
         }
+
         public func encode(to e: Encoder) throws { try _encode(e) }
     }
 
