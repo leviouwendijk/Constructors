@@ -1,9 +1,10 @@
 import Foundation
 import Structures
 
-public typealias PSQLFieldTypeRegistry = FieldTypeRegistry<PSQLType>
+// public typealias PSQLFieldTypeRegistry = FieldTypeRegistry<PSQLType>
 
-public enum PSQLFieldTypes {
+// public enum PSQLFieldTypes {
+public enum PSQLFieldTypeRegistry {
     public static let shared = FieldTypeRegistry<PSQLType>()
 
     public static func register(
