@@ -16,7 +16,7 @@ public enum PSQLTypeInferenceStrategy<Row: Decodable> {
     case inferred(prototype: Row, overrides: [String: PSQLType] = [:])
     case auto(overrides: [String: PSQLType] = [:])
 
-    func resolve() throws -> [String: PSQLType] {
+    public func resolve() throws -> [String: PSQLType] {
         switch self {
         case .manual(let map):
             return map
