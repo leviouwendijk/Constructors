@@ -2,61 +2,7 @@ import Foundation
 import Structures
 
 public enum PSQLInfer {
-    public enum InferenceError: Error, LocalizedError {
-        case noPrototypeProvided(type: String)
-        case unsupportedShape(field: String, valueType: Any.Type)
-        case ambiguousOptional(field: String)               // Optional.none and we can't infer inner type
-        case ambiguousEmptyArray(field: String)             // [] → unknown element type
-        case heterogeneousArray(field: String, types: [String])
-
-        public var errorDescription: String? {
-            switch self {
-            case .noPrototypeProvided(let type):
-                return "No prototype provided for \(type)."
-            case .unsupportedShape(let field, let t):
-                return "Unsupported field '\(field)' with value type \(t)."
-            case .ambiguousOptional(let field):
-                return "Cannot infer PSQL type for '\(field)' from nil Optional."
-            case .ambiguousEmptyArray(let field):
-                return "Cannot infer PSQL array type for '\(field)' from an empty array."
-            case .heterogeneousArray(let field, let types):
-                return
-                    "Cannot infer PSQL array type for '\(field)' because element types vary: \(types.map { String(describing: $0) }.joined(separator: ", "))."
-            }
-        }
-
-        public var failureReason: String? {
-            switch self {
-            case .noPrototypeProvided:
-                return "Automatic inference requires a prototype instance."
-            case .unsupportedShape:
-                return "The value’s Swift type has no default PSQL mapping."
-            case .ambiguousOptional:
-                return "The Optional has no wrapped value at runtime."
-            case .ambiguousEmptyArray:
-                return "Arrays need at least one element to infer the element type."
-            case .heterogeneousArray:
-                return "Arrays must contain a single, consistent element type."
-            }
-        }
-
-        public var recoverySuggestion: String? {
-            switch self {
-            case .noPrototypeProvided:
-                return "Implement psqlTypes() manually, or provide psqlInferencePrototype() on your DTO."
-            case .unsupportedShape(let field, _):
-                return "Add an override for '\(field)' in psqlTypeOverrides(), or change the DTO field type."
-            case .ambiguousOptional(let field):
-                return "Provide a non-nil value in the prototype for '\(field)', or add an override."
-            case .ambiguousEmptyArray(let field):
-                return "Populate the prototype array for '\(field)' with a representative element, or add an override."
-            case .heterogeneousArray(let field, _):
-                return "Ensure the prototype array for '\(field)' contains elements of a single type, or add an override."
-            }
-        }
-    }
-
-    // MARK: - Public API
+    // Public API
     /// Build a [field: PSQLType] by reflecting a prototype instance.
     public static func types<Row>(from prototype: Row) throws -> [String: PSQLType] {
         var out: [String: PSQLType] = [:]
@@ -69,7 +15,7 @@ public enum PSQLInfer {
         return out
     }
 
-    // MARK: - Mapping
+    // Mapping
     /// Map a runtime value (possibly Optional/Array) to a PSQLType.
     private static func map(field: String, value: Any) throws -> PSQLType {
         let m = Mirror(reflecting: value)
@@ -154,6 +100,62 @@ public enum PSQLInfer {
         default:
             // Strict by default: no silent jsonb fallback here.
             throw InferenceError.unsupportedShape(field: "<unknown>", valueType: t)
+        }
+    }
+}
+
+extension PSQLInfer {
+    public enum InferenceError: Error, LocalizedError {
+        case noPrototypeProvided(type: String)
+        case unsupportedShape(field: String, valueType: Any.Type)
+        case ambiguousOptional(field: String)               // Optional.none and we can't infer inner type
+        case ambiguousEmptyArray(field: String)             // [] → unknown element type
+        case heterogeneousArray(field: String, types: [String])
+
+        public var errorDescription: String? {
+            switch self {
+            case .noPrototypeProvided(let type):
+                return "No prototype provided for \(type)."
+            case .unsupportedShape(let field, let t):
+                return "Unsupported field '\(field)' with value type \(t)."
+            case .ambiguousOptional(let field):
+                return "Cannot infer PSQL type for '\(field)' from nil Optional."
+            case .ambiguousEmptyArray(let field):
+                return "Cannot infer PSQL array type for '\(field)' from an empty array."
+            case .heterogeneousArray(let field, let types):
+                return
+                    "Cannot infer PSQL array type for '\(field)' because element types vary: \(types.map { String(describing: $0) }.joined(separator: ", "))."
+            }
+        }
+
+        public var failureReason: String? {
+            switch self {
+            case .noPrototypeProvided:
+                return "Automatic inference requires a prototype instance."
+            case .unsupportedShape:
+                return "The value’s Swift type has no default PSQL mapping."
+            case .ambiguousOptional:
+                return "The Optional has no wrapped value at runtime."
+            case .ambiguousEmptyArray:
+                return "Arrays need at least one element to infer the element type."
+            case .heterogeneousArray:
+                return "Arrays must contain a single, consistent element type."
+            }
+        }
+
+        public var recoverySuggestion: String? {
+            switch self {
+            case .noPrototypeProvided:
+                return "Implement psqlTypes() manually, or provide psqlInferencePrototype() on your DTO."
+            case .unsupportedShape(let field, _):
+                return "Add an override for '\(field)' in psqlTypeOverrides(), or change the DTO field type."
+            case .ambiguousOptional(let field):
+                return "Provide a non-nil value in the prototype for '\(field)', or add an override."
+            case .ambiguousEmptyArray(let field):
+                return "Populate the prototype array for '\(field)' with a representative element, or add an override."
+            case .heterogeneousArray(let field, _):
+                return "Ensure the prototype array for '\(field)' contains elements of a single type, or add an override."
+            }
         }
     }
 }
