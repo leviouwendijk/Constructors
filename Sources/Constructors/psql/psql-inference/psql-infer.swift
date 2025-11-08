@@ -93,6 +93,9 @@ public enum PSQLInfer {
         case is Data.Type:
             return .bytea
 
+        case is Bool.Type:
+            return .boolean
+
         // JSON representations
         case is JSONValue.Type, is [String: JSONValue].Type:
             return .jsonb
