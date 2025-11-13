@@ -1,5 +1,5 @@
 {
-  "originHash" : "8c431d0789d6812e755c31440f58515c8fa3690cead06adfe410cce0ffd55456",
+  "originHash" : "5820d286470fe72b5442eff8fff45aa64885674a68795656a2d3a4c69b6ebb79",
   "pins" : [
     {
       "identity" : "plate",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/leviouwendijk/plate.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f4cf11247dd02274ff5161f77dd8e664b67eabae"
+        "revision" : "a0e4570ad7fbaacd3bd80d81ee447475f1139cd1"
       }
     },
     {
@@ -17,24 +17,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "19b0de73ee7cdedf6f6b2641716cb239527034de"
-      }
-    },
-    {
-      "identity" : "swift-syntax",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-syntax.git",
-      "state" : {
-        "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
-        "version" : "602.0.0"
-      }
-    },
-    {
-      "identity" : "swift-testing",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-testing.git",
-      "state" : {
-        "revision" : "c9d57c83568b06da229ed24339a6228e8e3b438b",
-        "version" : "6.2.1"
       }
     }
   ],
