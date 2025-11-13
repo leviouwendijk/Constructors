@@ -224,3 +224,11 @@ public extension HTML {
         return el("meta", a)
     }
 }
+
+public extension HTML {
+    static func style(_ sheet: CSSStyleSheet) -> any HTMLNode {
+        HTML.el("style") {
+            HTML.raw(sheet.render())
+        }
+    }
+}
