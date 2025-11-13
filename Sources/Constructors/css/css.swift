@@ -22,29 +22,32 @@ import plate
 //     }
 // }
 
+
 public struct CSSStyleSheet: Sendable, Equatable {
-    public var blocks: [CSSBlock]
+    public var rules: [CSSRule]
+    public var media: [CSSMedia]
 
-    public init(blocks: [CSSBlock]) {
-        self.blocks = blocks
-    }
-
-    // Backwards-compatible: existing callsites keep working
-    @available(*, message: "Use init(blocks:) with CSSBlock.rule / CSSBlock.media instead.")
-    public init(rules: [CSSRule]) {
-        self.blocks = rules.map(CSSBlock.rule)
+    public init(
+        rules: [CSSRule],
+        media: [CSSMedia] = []
+    ) {
+        self.rules = rules
+        self.media = media
     }
 
     public func render(indentation: Int = 4) -> String {
         var out = ""
-        for block in blocks {
-            switch block {
-            case .rule(let rule):
-                out += renderRule(rule, indentation: indentation, times: 0)
-            case .media(let media):
-                out += renderMedia(media, indentation: indentation)
-            }
+
+        // top-level rules
+        for rule in rules {
+            out += renderRule(rule, indentation: indentation, times: 0)
         }
+
+        // media blocks
+        for m in media {
+            out += renderMedia(m, indentation: indentation)
+        }
+
         return out
     }
 
@@ -85,7 +88,7 @@ public struct CSSStyleSheet: Sendable, Equatable {
     }
 
     private func renderMedia(
-        _ media: CSSMediaBlock,
+        _ media: CSSMedia,
         indentation: Int
     ) -> String {
         var out = ""

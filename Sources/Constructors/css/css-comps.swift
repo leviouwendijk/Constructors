@@ -25,11 +25,11 @@ public enum CSS {
     }
 
     // Media
-    public static func media(_ query: String, _ rules: [CSSRule]) -> CSSMediaBlock {
-        CSSMediaBlock(query: query, rules: rules)
+    public static func media(_ query: String, _ rules: [CSSRule]) -> CSSMedia {
+        CSSMedia(query: query, rules: rules)
     }
 
-    public static func media(_ query: String, _ rules: CSSRule...) -> CSSMediaBlock {
-        CSSMediaBlock(query: query, rules: rules)
+    public static func media(_ query: String, _ rules: CSSRule...) -> CSSMedia {
+        CSSMedia(query: query, rules: rules)
     }
 }
