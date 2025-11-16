@@ -11,7 +11,7 @@ extension Array where Element == any HTMLNode {
         htmlDocument.render(options: options)
     }
 
-    public func renderFragment(options: HTMLRenderOptions = .Defaults.pretty(doctype: false)) -> String {
+    public func snippet(options: HTMLRenderOptions = .Defaults.pretty(doctype: false)) -> String {
         var opts = options
         opts.doctype = false
         return render(options: opts)
