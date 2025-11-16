@@ -239,4 +239,28 @@ public extension HTML {
             HTML.raw(sheet.render())
         }
     }
+
+    static func style(
+        rules: [CSSRule],
+        media: [CSSMedia] = []
+    ) -> any HTMLNode {
+        let sheet = CSSStyleSheet(rules: rules, media: media)
+        return style(sheet)
+    }
+
+    static func style(@CSSBuilder _ css: () -> [CSSBlock]) -> any HTMLNode {
+        var rules: [CSSRule] = []
+        var media: [CSSMedia] = []
+
+        for block in css() {
+            switch block {
+            case .rule(let r):
+                rules.append(r)
+            case .media(let m):
+                media.append(m)
+            }
+        }
+
+        return style(rules: rules, media: media)
+    }
 }
