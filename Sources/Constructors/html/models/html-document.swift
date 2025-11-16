@@ -11,7 +11,11 @@ public struct HTMLDocument: Sendable {
     }
 
     public func render(options: HTMLRenderOptions = .init()) -> String {
-        var out = HTMLDoctype(.html5).render(options: options)
+        var out: String = ""
+
+        if options.doctype {
+            out += HTMLDoctype(.html5).render(options: options)
+        }
 
         let content = children
             .map { $0.render(options: options, indent: 0) }
@@ -39,6 +43,7 @@ public struct HTMLDocument: Sendable {
                 HTML.head {
                     // <meta charset="UTF-8">
                     HTML.meta(.charset())
+                    HTML.meta(.viewport())
 
                     if let title {
                         HTML.title(title)
@@ -70,6 +75,7 @@ extension HTMLDocument {
 
     public func render(
         default: RenderDefault = .pretty,
+        doctype: Bool? = nil,
         indentStep: Int? = nil,
         attributeOrder: HTMLAttributeOrder? = nil,
         ensureTrailingNewline: Bool? = nil,
@@ -83,6 +89,10 @@ extension HTMLDocument {
             opts = HTMLRenderOptions.Defaults.pretty()
         case .minified:
             opts = HTMLRenderOptions.Defaults.minified()
+        }
+
+        doctype.ifNotNil { value in 
+            opts.doctype = value 
         }
 
         indentStep.ifNotNil { value in 

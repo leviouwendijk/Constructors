@@ -3,11 +3,17 @@ import Foundation
 public typealias HTMLFragment = [any HTMLNode]
 
 extension Array where Element == any HTMLNode {
-    var htmlDocument: HTMLDocument {
+    public var htmlDocument: HTMLDocument {
         HTMLDocument(children: self)
     }
 
-    func render(options: HTMLRenderOptions = .init()) -> String {
+    public func render(options: HTMLRenderOptions = .Defaults.pretty()) -> String {
         htmlDocument.render(options: options)
+    }
+
+    public func renderFragment(options: HTMLRenderOptions = .Defaults.pretty(doctype: false)) -> String {
+        var opts = options
+        opts.doctype = false
+        return render(options: opts)
     }
 }

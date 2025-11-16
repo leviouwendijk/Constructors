@@ -15,7 +15,7 @@ public struct GateEvent: Sendable {
 }
 
 public struct HTMLRenderOptions: Sendable {
-    // @avialable(*, message: "replaced by indentation: and newline: and trailingNewline:") public var pretty: Bool
+    public var doctype: Bool
     public var indentation: Bool
     public var newlineSeparated: Bool
     public var indentStep: Int
@@ -26,6 +26,7 @@ public struct HTMLRenderOptions: Sendable {
     public var onGate: (@Sendable (GateEvent) -> Void)?
 
     public init(
+        doctype: Bool = true,
         pretty: Bool = true,
         indentStep: Int = 4,
         attributeOrder: HTMLAttributeOrder = .preserve,
@@ -33,6 +34,7 @@ public struct HTMLRenderOptions: Sendable {
         environment: BuildEnvironment = .local,
         onGate: (@Sendable (GateEvent) -> Void)? = nil
     ) {
+        self.doctype = doctype
         self.indentation = pretty
         self.newlineSeparated = pretty
 
@@ -45,6 +47,7 @@ public struct HTMLRenderOptions: Sendable {
     }
     
     public init(
+        doctype: Bool = true,
         // pretty: Bool = true,
         indentation: Bool = true,
         newlineSeparated: Bool = true,
@@ -54,6 +57,7 @@ public struct HTMLRenderOptions: Sendable {
         environment: BuildEnvironment = .local,
         onGate: (@Sendable (GateEvent) -> Void)? = nil
     ) {
+        self.doctype = doctype
         self.indentation = indentation
         self.newlineSeparated = newlineSeparated
         self.indentStep = indentStep
@@ -68,6 +72,7 @@ extension HTMLRenderOptions {
     public enum Defaults {
         /// Pretty, indented output with sane defaults and environment/gate hook.
         public static func pretty(
+            doctype: Bool = true,
             indentStep: Int = 4,
             attributeOrder: HTMLAttributeOrder = .preserve,
             ensureTrailingNewline: Bool = true,
@@ -75,6 +80,7 @@ extension HTMLRenderOptions {
             onGate: (@Sendable (GateEvent) -> Void)? = nil
         ) -> HTMLRenderOptions {
             return HTMLRenderOptions(
+                doctype: doctype,
                 pretty: true,
                 indentStep: indentStep,
                 attributeOrder: attributeOrder,
@@ -86,12 +92,14 @@ extension HTMLRenderOptions {
 
         /// Compact/minified-ish rendering, useful for emails or prod assets.
         public static func minified(
+            doctype: Bool = true,
             attributeOrder: HTMLAttributeOrder = .preserve,
             ensureTrailingNewline: Bool = false,
             environment: BuildEnvironment = .public,
             onGate: (@Sendable (GateEvent) -> Void)? = nil
         ) -> HTMLRenderOptions {
             return HTMLRenderOptions(
+                doctype: doctype,
                 indentation: false,
                 newlineSeparated: false,
                 indentStep: 0,

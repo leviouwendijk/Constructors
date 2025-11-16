@@ -32,7 +32,7 @@ public enum HTML {
     @available(*, deprecated, message: "Use HTML.link(.stylesheet(href:))")
     public static func linkStylesheet(href: String) -> any HTMLNode { el("link", ["rel":"stylesheet","href": href]) }
 
-    public static func stylsheet(href: String) -> any HTMLNode { el("link", ["rel":"stylesheet","href": href]) }
+    public static func stylesheet(href: String) -> any HTMLNode { el("link", ["rel":"stylesheet","href": href]) }
 
     public static func style(_ css: String) -> any HTMLNode { HTMLElement("style", children: [HTMLRaw(css)]) }
 
