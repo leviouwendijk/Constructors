@@ -63,3 +63,43 @@ public struct HTMLRenderOptions: Sendable {
         self.onGate = onGate
     }
 }
+
+extension HTMLRenderOptions {
+    public enum Defaults {
+        /// Pretty, indented output with sane defaults and environment/gate hook.
+        public static func pretty(
+            indentStep: Int = 4,
+            attributeOrder: HTMLAttributeOrder = .preserve,
+            ensureTrailingNewline: Bool = true,
+            environment: BuildEnvironment = .local,
+            onGate: (@Sendable (GateEvent) -> Void)? = nil
+        ) -> HTMLRenderOptions {
+            return HTMLRenderOptions(
+                pretty: true,
+                indentStep: indentStep,
+                attributeOrder: attributeOrder,
+                ensureTrailingNewline: ensureTrailingNewline,
+                environment: environment,
+                onGate: onGate
+            )
+        }
+
+        /// Compact/minified-ish rendering, useful for emails or prod assets.
+        public static func minified(
+            attributeOrder: HTMLAttributeOrder = .preserve,
+            ensureTrailingNewline: Bool = false,
+            environment: BuildEnvironment = .public,
+            onGate: (@Sendable (GateEvent) -> Void)? = nil
+        ) -> HTMLRenderOptions {
+            return HTMLRenderOptions(
+                indentation: false,
+                newlineSeparated: false,
+                indentStep: 0,
+                attributeOrder: attributeOrder,
+                ensureTrailingNewline: ensureTrailingNewline,
+                environment: environment,
+                onGate: onGate
+            )
+        }
+    }
+}

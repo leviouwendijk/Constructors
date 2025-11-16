@@ -13,6 +13,14 @@ public enum HTML {
         HTMLDocument(children: body())
     }
 
+    public static func document(nodes: [any HTMLNode]) -> HTMLDocument {
+        HTMLDocument(children: nodes)
+    }
+
+    public static func document(fragment: HTMLFragment) -> HTMLDocument {
+        HTMLDocument(children: fragment)
+    }
+
     public static func html(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("html", attrs, c) }
     public static func head(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("head", attrs, c) }
     public static func body(_ attrs: HTMLAttribute = HTMLAttribute(), @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("body", attrs, c) }

@@ -1,8 +1,14 @@
 import Foundation
+import plate
 
 public struct HTMLDocument: Sendable {
     public var children: [any HTMLNode]
-    public init(children: [any HTMLNode]) { self.children = children }
+
+    public init(
+        children: [any HTMLNode]
+    ) { 
+        self.children = children 
+    }
 
     // @available(*, message: "Deprecated, instead of 'indentStep', use 'options: HTMLRenderOptions()'")
     // public func render(pretty: Bool = true, indentStep: Int = 4) -> String {
@@ -22,9 +28,17 @@ public struct HTMLDocument: Sendable {
     // }
 
     public func render(options: HTMLRenderOptions = .init()) -> String {
-        let body = children.map { $0.render(options: options, indent: 0) }.joined()
-        var out = "<!DOCTYPE html>\n" + body
-        if options.ensureTrailingNewline, !out.hasSuffix("\n") { out.append("\n") }
+        var out = HTMLDoctype(.html5).render(options: options)
+
+        let content = children
+            .map { $0.render(options: options, indent: 0) }
+            .joined()
+
+        out += content
+
+        if options.ensureTrailingNewline, !out.hasSuffix("\n") {
+            out.append("\n")
+        }
         return out
     }
 
@@ -85,5 +99,49 @@ public struct HTMLDocument: Sendable {
                 }
             }
         }
+    }
+}
+
+extension HTMLDocument {
+    public enum RenderDefault {
+        case pretty
+        case minified
+    }
+
+    public func render(
+        default: RenderDefault = .pretty,
+        indentStep: Int? = nil,
+        attributeOrder: HTMLAttributeOrder? = nil,
+        ensureTrailingNewline: Bool? = nil,
+        environment: BuildEnvironment? = nil,
+        onGate: (@Sendable (GateEvent) -> Void)? = nil
+    ) -> String {
+        var opts = HTMLRenderOptions()
+
+        switch `default` {
+        case .pretty:
+            opts = HTMLRenderOptions.Defaults.pretty()
+        case .minified:
+            opts = HTMLRenderOptions.Defaults.minified()
+        }
+
+        indentStep.ifNotNil { value in 
+            opts.indentStep = value 
+        }
+
+        attributeOrder.ifNotNil { value in 
+            opts.attributeOrder = value
+        }
+
+        ensureTrailingNewline.ifNotNil { value in 
+            opts.ensureTrailingNewline = value
+        }
+        environment.ifNotNil { value in
+            opts.environment = value
+        }
+
+        opts.onGate = onGate
+
+        return render(options: opts)
     }
 }
