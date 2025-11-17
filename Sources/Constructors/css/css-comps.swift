@@ -32,4 +32,14 @@ public enum CSS {
     public static func media(_ query: String, _ rules: CSSRule...) -> CSSMedia {
         CSSMedia(query: query, rules: rules)
     }
+
+    public static func inline(_ declarations: [CSSDeclaration]) -> String {
+        declarations
+            .map { "\($0.property): \($0.value);" }
+            .joined(separator: " ")
+    }
+
+    public static func inline(_ declarations: CSSDeclaration...) -> String {
+        inline(declarations)
+    }
 }
