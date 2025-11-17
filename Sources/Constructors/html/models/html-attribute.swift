@@ -9,6 +9,10 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
         self.storage = elements.map { ($0.0, $0.1) }
     }
 
+    // public init(_ elements: [String: String]) {
+    //     self.storage = elements.map { ($0.0, $0.1) }
+    // }
+
     public static func id(_ value: String) -> HTMLAttribute { ["id": value] }
     public static func `class`(_ classes: [String]) -> HTMLAttribute { ["class": classes.joined(separator: " ")] }
     public static func data(_ key: String, _ value: String) -> HTMLAttribute { ["data-\(key)": value] }
@@ -18,6 +22,8 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
         if enabled { a.storage.append((key, nil)) }
         return a
     }
+
+    public static func type(_ value: String) -> HTMLAttribute { ["type": value] }
 
     public mutating func merge(_ other: HTMLAttribute) {
         storage.append(contentsOf: other.storage)
