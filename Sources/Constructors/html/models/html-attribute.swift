@@ -24,6 +24,7 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
     }
 
     public static func type(_ value: String) -> HTMLAttribute { ["type": value] }
+    public static func href(_ value: String) -> HTMLAttribute { ["href": value] }
 
     public mutating func merge(_ other: HTMLAttribute) {
         storage.append(contentsOf: other.storage)
