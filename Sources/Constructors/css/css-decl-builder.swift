@@ -1,3 +1,5 @@
+import Foundation
+
 @resultBuilder
 public enum CSSDeclBuilder {
     public static func buildBlock(_ parts: CSSDeclaration...) -> [CSSDeclaration] {
