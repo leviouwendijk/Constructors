@@ -49,6 +49,17 @@ public struct CSSStyleSheet: Sendable, Equatable {
     public init(_ sheets: CSSStyleSheet...) {
         self = CSSStyleSheet.merged(sheets)
     }
+
+    /// Convenience: array overload
+    public init(_ sheets: [[CSSStyleSheet]]) {
+        let s = sheets.flatMap { $0 }
+        self = CSSStyleSheet.merged(s)
+    }
+
+    public init(_ sheets: [CSSStyleSheet]...) {
+        let s = sheets.flatMap { $0 }
+        self = CSSStyleSheet.merged(s)
+    }
 }
 
 // extension CSSStyleSheet {
