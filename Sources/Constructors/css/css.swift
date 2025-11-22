@@ -593,6 +593,13 @@ extension CSSStyleSheet {
     }
 }
 
+extension Array where Element == [CSSStyleSheet] {
+    public func merged() -> CSSStyleSheet {
+        let flat = self.flatMap { $0 }
+        return CSSStyleSheet.merged(flat)
+    }
+}
+
 extension Array where Element == CSSStyleSheet {
     /// Merge an array of stylesheets into a single one, preserving order.
     public func merged() -> CSSStyleSheet {
