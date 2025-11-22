@@ -124,12 +124,27 @@ public enum HTML {
         HTMLInlineGroup(c())
     }
 
-    public static func header(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("header", a, c) }
-    public static func footer(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("footer", a, c) }
-    public static func section(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("section", a, c) }
-    public static func figure(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("figure", a, c) }
-    public static func figcaption(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("figcaption", a, c) }
-    public static func blockquote(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("blockquote", a, c) }
+    public static func header(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("header", a, c) }
+    public static func main(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("main", a, c) }
+    public static func footer(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("footer", a, c) }
+    public static func section(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("section", a, c) }
+    public static func figure(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("figure", a, c) }
+    public static func figcaption(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("figcaption", a, c) }
+    public static func blockquote(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
+        -> any HTMLNode
+    { el("blockquote", a, c) }
 
     public static func h1(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("h1", a, c) }
     public static func h2(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("h2", a, c) }
