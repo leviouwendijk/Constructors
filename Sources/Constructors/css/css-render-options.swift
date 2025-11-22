@@ -37,8 +37,37 @@ public struct CSSRenderOptions: Sendable {
     }
 }
 
-public extension CSSRenderOptions {
-    static func forDocument(
+extension CSSRenderOptions {
+    public static func forNodes(
+        _ nodes: HTMLFragment,
+        indentStep: Int = 4,
+        ensureTrailingNewline: Bool = false,
+        unreferenced: CSSUnreferenced = .keep
+    ) -> CSSRenderOptions {
+        let symbols = HTMLSymbolCollector.collect(from: nodes)
+        return CSSRenderOptions(
+            indentStep: indentStep,
+            ensureTrailingNewline: ensureTrailingNewline,
+            usedClassNames: symbols.classes,
+            usedIDs: symbols.ids,
+            unreferenced: unreferenced
+        )
+    }
+
+    public static func forNode(
+        _ node: any HTMLNode,
+        indentStep: Int = 4,
+        ensureTrailingNewline: Bool = false,
+        unreferenced: CSSUnreferenced = .keep
+    ) -> CSSRenderOptions {
+        forNodes([node], indentStep: indentStep,
+                 ensureTrailingNewline: ensureTrailingNewline,
+                 unreferenced: unreferenced)
+    }
+}
+
+extension CSSRenderOptions {
+    public static func forDocument(
         _ document: HTMLDocument,
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,

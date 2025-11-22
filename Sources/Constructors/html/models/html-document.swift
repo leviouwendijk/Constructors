@@ -118,74 +118,10 @@ extension HTMLDocument {
 
 extension HTMLDocument {
     public func collectedClassNames() -> Set<String> {
-        var result = Set<String>()
-        for node in children {
-            collectClasses(from: node, into: &result)
-        }
-        return result
+        HTMLSymbolCollector.collect(from: children).classes
     }
 
     public func collectedIDs() -> Set<String> {
-        var result = Set<String>()
-        for node in children {
-            collectIDs(from: node, into: &result)
-        }
-        return result
-    }
-
-    private func collectClasses(
-        from node: any HTMLNode,
-        into result: inout Set<String>
-    ) {
-        switch node {
-        case let el as HTMLElement:
-            for name in el.attrs.classList {
-                result.insert(name)
-            }
-            for child in el.children {
-                collectClasses(from: child, into: &result)
-            }
-
-        case let inline as HTMLInlineGroup:
-            for child in inline.children {
-                collectClasses(from: child, into: &result)
-            }
-
-        case let gate as HTMLGate:
-            for child in gate.children {
-                collectClasses(from: child, into: &result)
-            }
-
-        default:
-            break
-        }
-    }
-
-    private func collectIDs(
-        from node: any HTMLNode,
-        into result: inout Set<String>
-    ) {
-        switch node {
-        case let el as HTMLElement:
-            if let id = el.attrs.value(for: "id"), !id.isEmpty {
-                result.insert(id)
-            }
-            for child in el.children {
-                collectIDs(from: child, into: &result)
-            }
-
-        case let inline as HTMLInlineGroup:
-            for child in inline.children {
-                collectIDs(from: child, into: &result)
-            }
-
-        case let gate as HTMLGate:
-            for child in gate.children {
-                collectIDs(from: child, into: &result)
-            }
-
-        default:
-            break
-        }
+        HTMLSymbolCollector.collect(from: children).ids
     }
 }
