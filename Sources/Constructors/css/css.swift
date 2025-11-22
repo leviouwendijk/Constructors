@@ -658,4 +658,19 @@ extension CSSStyleSheet {
             unreferenced: unreferenced
         )
     }
+
+    public func rendered(
+        forDocuments documents: [HTMLDocument],
+        indentStep: Int = 0,
+        ensureTrailingNewline: Bool = true,
+        unreferenced: CSSUnreferenced = .drop
+    ) -> String {
+        let options = CSSRenderOptions.forDocuments(
+            documents,
+            indentStep: indentStep,
+            ensureTrailingNewline: ensureTrailingNewline,
+            unreferenced: unreferenced
+        )
+        return render(options: options)
+    }
 }

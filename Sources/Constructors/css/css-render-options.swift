@@ -81,4 +81,27 @@ extension CSSRenderOptions {
             unreferenced: unreferenced
         )
     }
+
+    public static func forDocuments(
+        _ documents: [HTMLDocument],
+        indentStep: Int = 4,
+        ensureTrailingNewline: Bool = false,
+        unreferenced: CSSUnreferenced = .keep
+    ) -> CSSRenderOptions {
+        var usedClasses = Set<String>()
+        var usedIDs = Set<String>()
+
+        for doc in documents {
+            usedClasses.formUnion(doc.collectedClassNames())
+            usedIDs.formUnion(doc.collectedIDs())
+        }
+
+        return CSSRenderOptions(
+            indentStep: indentStep,
+            ensureTrailingNewline: ensureTrailingNewline,
+            usedClassNames: usedClasses,
+            usedIDs: usedIDs,
+            unreferenced: unreferenced
+        )
+    }
 }
