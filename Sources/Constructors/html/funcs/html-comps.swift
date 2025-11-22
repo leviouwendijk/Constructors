@@ -287,9 +287,14 @@ public extension HTML {
     static func style(
         rules: [CSSRule],
         media: [CSSMedia] = [],
+        keyframes: [CSSKeyframes] = [],
         options: CSSRenderOptions = CSSRenderOptions()
     ) -> any HTMLNode {
-        let sheet = CSSStyleSheet(rules: rules, media: media)
+        let sheet = CSSStyleSheet(
+            rules: rules,
+            media: media,
+            keyframes: keyframes
+        )
         return style(sheet, options: options)
     }
 
@@ -299,6 +304,7 @@ public extension HTML {
     ) -> any HTMLNode {
         var rules: [CSSRule] = []
         var media: [CSSMedia] = []
+        var keyframes: [CSSKeyframes] = []
 
         for block in css() {
             switch block {
@@ -306,9 +312,16 @@ public extension HTML {
                 rules.append(r)
             case .media(let m):
                 media.append(m)
+            case .keyframes(let k):
+                keyframes.append(k)
             }
         }
 
-        return style(rules: rules, media: media, options: options)
+        return style(
+            rules: rules,
+            media: media,
+            keyframes: keyframes,
+            options: options
+        )
     }
 }

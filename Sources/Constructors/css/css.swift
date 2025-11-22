@@ -4,29 +4,40 @@ import plate
 public struct CSSStyleSheet: Sendable, Equatable {
     public var rules: [CSSRule]
     public var media: [CSSMedia]
+    public var keyframes: [CSSKeyframes]
 
     public init(
         rules: [CSSRule],
-        media: [CSSMedia] = []
+        media: [CSSMedia] = [],
+        keyframes: [CSSKeyframes] = []
     ) {
         self.rules = rules
         self.media = media
+        self.keyframes = keyframes
     }
+
 
     /// Merge multiple stylesheets into a single sheet, preserving order.
     public static func merged(_ sheets: [CSSStyleSheet]) -> CSSStyleSheet {
         var allRules: [CSSRule] = []
         var allMedia: [CSSMedia] = []
+        var allKeyframes: [CSSKeyframes] = []
 
         allRules.reserveCapacity(sheets.reduce(0) { $0 + $1.rules.count })
         allMedia.reserveCapacity(sheets.reduce(0) { $0 + $1.media.count })
+        allKeyframes.reserveCapacity(sheets.reduce(0) { $0 + $1.keyframes.count })
 
         for sheet in sheets {
             allRules.append(contentsOf: sheet.rules)
             allMedia.append(contentsOf: sheet.media)
+            allKeyframes.append(contentsOf: sheet.keyframes)
         }
 
-        return CSSStyleSheet(rules: allRules, media: allMedia)
+        return CSSStyleSheet(
+            rules: allRules,
+            media: allMedia,
+            keyframes: allKeyframes
+        )
     }
 
     /// Convenience: create a stylesheet by merging several others.
@@ -113,18 +124,10 @@ public struct CSSStyleSheet: Sendable, Equatable {
 // }
 
 extension CSSStyleSheet {
-    // Back-compat: same signature as before, just delegates into options-based render.
-    // public func render(indentation: Int = 4) -> String {
-    //     let opts = CSSRenderOptions(indentStep: indentation)
-    //     return render(options: opts)
-    // }
-
-    /// New: render with richer options (indentation + unreferenced pruning).
     public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
         var out = ""
 
-        // Helper to append a single rule at a given indent "times" level.
-        func appendRule(_ rule: CSSRule,_ baseIndentTimes: Int) {
+        func appendRule(_ rule: CSSRule, _ baseIndentTimes: Int) {
             let decision = decide(rule: rule, options: options)
 
             switch decision {
@@ -145,6 +148,11 @@ extension CSSStyleSheet {
         // top-level rules
         for rule in rules {
             appendRule(rule, 0)
+        }
+
+        // keyframes (never pruned for now)
+        for kf in keyframes {
+            out += renderKeyframes(kf, options: options)
         }
 
         // media blocks
@@ -171,7 +179,6 @@ extension CSSStyleSheet {
         let indentation = options.indentStep
         var out = ""
 
-        // selector line
         let selectorLine = "\(rule.selector) {"
         if times > 0 {
             out += selectorLine.indent(indentation, times: times)
@@ -180,14 +187,12 @@ extension CSSStyleSheet {
         }
         out += "\n"
 
-        // declarations
         let declTimes = times + 1
         for decl in rule.declarations {
             out += "\(decl.property): \(decl.value);".indent(indentation, times: declTimes)
             out += "\n"
         }
 
-        // closing brace
         let closing = "}"
         if times > 0 {
             out += closing.indent(indentation, times: times)
@@ -195,6 +200,57 @@ extension CSSStyleSheet {
             out += closing
         }
         out += "\n\n"
+
+        return out
+    }
+
+    private func renderKeyframes(
+        _ keyframes: CSSKeyframes,
+        options: CSSRenderOptions
+    ) -> String {
+        let indentation = options.indentStep
+        var out = ""
+
+        // @keyframes line
+        out += "@keyframes \(keyframes.name) {\n"
+
+        for step in keyframes.steps {
+            out += renderKeyframeStep(step, indentation: indentation, times: 1)
+        }
+
+        out += "}\n\n"
+        return out
+    }
+
+    private func renderKeyframeStep(
+        _ step: CSSKeyframeStep,
+        indentation: Int,
+        times: Int
+    ) -> String {
+        var out = ""
+
+        // selector line, e.g. "from {" or "50% {"
+        let selectorLine = "\(step.selector) {"
+        if times > 0 {
+            out += selectorLine.indent(indentation, times: times)
+        } else {
+            out += selectorLine
+        }
+        out += "\n"
+
+        let declTimes = times + 1
+        for decl in step.declarations {
+            out += "\(decl.property): \(decl.value);".indent(indentation, times: declTimes)
+            out += "\n"
+        }
+
+        let closing = "}"
+        if times > 0 {
+            out += closing.indent(indentation, times: times)
+        } else {
+            out += closing
+        }
+        out += "\n"
 
         return out
     }
@@ -222,8 +278,6 @@ extension CSSStyleSheet {
             }
         }
 
-        // If nothing survived inside this media block, omit it entirely
-        // when using a dropping policy.
         guard !inner.isEmpty else { return "" }
 
         var out = ""
@@ -233,6 +287,126 @@ extension CSSStyleSheet {
         return out
     }
 
+// extension CSSStyleSheet {
+//     // Back-compat: same signature as before, just delegates into options-based render.
+//     // public func render(indentation: Int = 4) -> String {
+//     //     let opts = CSSRenderOptions(indentStep: indentation)
+//     //     return render(options: opts)
+//     // }
+
+//     /// New: render with richer options (indentation + unreferenced pruning).
+//     public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
+//         var out = ""
+
+//         // Helper to append a single rule at a given indent "times" level.
+//         func appendRule(_ rule: CSSRule,_ baseIndentTimes: Int) {
+//             let decision = decide(rule: rule, options: options)
+
+//             switch decision {
+//             case .keep:
+//                 out += renderRule(rule, options: options, times: baseIndentTimes)
+
+//             case .commented:
+//                 let rendered = renderRule(rule, options: options, times: baseIndentTimes)
+//                 out += "/* UNUSED RULE START */\n"
+//                 out += rendered
+//                 out += "/* UNUSED RULE END */\n\n"
+
+//             case .drop:
+//                 break
+//             }
+//         }
+
+//         // top-level rules
+//         for rule in rules {
+//             appendRule(rule, 0)
+//         }
+
+//         // media blocks
+//         for m in media {
+//             let renderedMedia = renderMedia(m, options: options)
+//             if !renderedMedia.isEmpty {
+//                 out += renderedMedia
+//             }
+//         }
+
+//         if options.ensureTrailingNewline, !out.hasSuffix("\n") {
+//             out.append("\n")
+//         }
+
+//         return out
+//     }
+
+//     /// Render a rule with an indent *level* (times).
+//     private func renderRule(
+//         _ rule: CSSRule,
+//         options: CSSRenderOptions,
+//         times: Int
+//     ) -> String {
+//         let indentation = options.indentStep
+//         var out = ""
+
+//         // selector line
+//         let selectorLine = "\(rule.selector) {"
+//         if times > 0 {
+//             out += selectorLine.indent(indentation, times: times)
+//         } else {
+//             out += selectorLine
+//         }
+//         out += "\n"
+
+//         // declarations
+//         let declTimes = times + 1
+//         for decl in rule.declarations {
+//             out += "\(decl.property): \(decl.value);".indent(indentation, times: declTimes)
+//             out += "\n"
+//         }
+
+//         // closing brace
+//         let closing = "}"
+//         if times > 0 {
+//             out += closing.indent(indentation, times: times)
+//         } else {
+//             out += closing
+//         }
+//         out += "\n\n"
+
+//         return out
+//     }
+
+//     private func renderMedia(
+//         _ media: CSSMedia,
+//         options: CSSRenderOptions
+//     ) -> String {
+//         var inner = ""
+
+//         for rule in media.rules {
+//             let decision = decide(rule: rule, options: options)
+//             switch decision {
+//             case .keep:
+//                 inner += renderRule(rule, options: options, times: 1)
+
+//             case .commented:
+//                 let rendered = renderRule(rule, options: options, times: 1)
+//                 inner += "/* UNUSED RULE START */\n"
+//                 inner += rendered
+//                 inner += "/* UNUSED RULE END */\n\n"
+
+//             case .drop:
+//                 break
+//             }
+//         }
+
+//         // If nothing survived inside this media block, omit it entirely
+//         // when using a dropping policy.
+//         guard !inner.isEmpty else { return "" }
+
+//         var out = ""
+//         out += "@media \(media.query) {\n"
+//         out += inner
+//         out += "}\n\n"
+//         return out
+//     }
     private enum RuleDecision {
         case keep
         case drop

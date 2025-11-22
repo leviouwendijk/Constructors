@@ -31,4 +31,8 @@ public enum CSSBuilder {
     public static func buildExpression(_ blocks: [CSSBlock]) -> [CSSBlock] {
         blocks
     }
+
+    public static func buildExpression(_ keyframes: CSSKeyframes) -> [CSSBlock] {
+        [.keyframes(keyframes)]
+    }
 }
