@@ -119,3 +119,22 @@ extension HTMLAttribute {
         .style(c())
     }
 }
+
+extension HTMLAttribute {
+    /// Return the last value for a given attribute key, if any.
+    public func value(for key: String) -> String? {
+        for (k, v) in storage.reversed() where k == key {
+            return v ?? ""
+        }
+        return nil
+    }
+
+    /// Convenience: split the `class` attribute into individual class names.
+    public var classList: [String] {
+        guard let raw = value(for: "class") else { return [] }
+        return raw
+            .split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" || $0 == "\r" })
+            .map(String.init)
+            .filter { !$0.isEmpty }
+    }
+}

@@ -249,21 +249,46 @@ public extension HTML {
 }
 
 public extension HTML {
-    static func style(_ sheet: CSSStyleSheet) -> any HTMLNode {
+    // Base: single sheet, with optional options (default = plain render)
+    static func style(
+        _ sheet: CSSStyleSheet,
+        options: CSSRenderOptions = CSSRenderOptions()
+    ) -> any HTMLNode {
         HTML.el("style") {
-            HTML.raw(sheet.render())
+            HTML.raw(sheet.render(options: options))
         }
     }
 
+    // Array of sheets
     static func style(
-        rules: [CSSRule],
-        media: [CSSMedia] = []
+        _ sheets: [CSSStyleSheet],
+        options: CSSRenderOptions = CSSRenderOptions()
     ) -> any HTMLNode {
-        let sheet = CSSStyleSheet(rules: rules, media: media)
-        return style(sheet)
+        style(CSSStyleSheet.merged(sheets), options: options)
     }
 
-    static func style(@CSSBuilder _ css: () -> [CSSBlock]) -> any HTMLNode {
+    // Varargs sheets
+    static func style(
+        _ sheets: CSSStyleSheet...,
+        options: CSSRenderOptions = CSSRenderOptions()
+    ) -> any HTMLNode {
+        style(CSSStyleSheet.merged(sheets), options: options)
+    }
+
+    // Rules + media → sheet
+    static func style(
+        rules: [CSSRule],
+        media: [CSSMedia] = [],
+        options: CSSRenderOptions = CSSRenderOptions()
+    ) -> any HTMLNode {
+        let sheet = CSSStyleSheet(rules: rules, media: media)
+        return style(sheet, options: options)
+    }
+
+    static func style(
+        @CSSBuilder _ css: () -> [CSSBlock],
+        options: CSSRenderOptions = CSSRenderOptions()
+    ) -> any HTMLNode {
         var rules: [CSSRule] = []
         var media: [CSSMedia] = []
 
@@ -276,6 +301,6 @@ public extension HTML {
             }
         }
 
-        return style(rules: rules, media: media)
+        return style(rules: rules, media: media, options: options)
     }
 }
