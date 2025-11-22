@@ -51,12 +51,12 @@ public struct CSSStyleSheet: Sendable, Equatable {
     }
 
     /// Convenience: array overload
-    public init(_ sheets: [[CSSStyleSheet]]) {
+    public init(nested sheets: [[CSSStyleSheet]]) {
         let s = sheets.flatMap { $0 }
         self = CSSStyleSheet.merged(s)
     }
 
-    public init(_ sheets: [CSSStyleSheet]...) {
+    public init(nested sheets: [CSSStyleSheet]...) {
         let s = sheets.flatMap { $0 }
         self = CSSStyleSheet.merged(s)
     }
