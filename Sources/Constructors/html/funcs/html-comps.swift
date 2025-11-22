@@ -130,6 +130,14 @@ public enum HTML {
     public static func main(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
         -> any HTMLNode
     { el("main", a, c) }
+
+    public static func article(
+        _ a: HTMLAttribute = [:],
+        @HTMLBuilder _ c: () -> [any HTMLNode]
+    ) -> any HTMLNode {
+        el("article", a, c)
+    }
+
     public static func footer(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode])
         -> any HTMLNode
     { el("footer", a, c) }
