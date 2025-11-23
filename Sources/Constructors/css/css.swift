@@ -620,7 +620,7 @@ extension CSSStyleSheet {
     /// Render this stylesheet, pruned against a single HTML fragment.
     public func rendered(
         forNodes nodes: HTMLFragment,
-        indentStep: Int = 0,
+        indentStep: Int = 4,
         ensureTrailingNewline: Bool = true,
         unreferenced: CSSUnreferenced = .drop
     ) -> String {
@@ -637,7 +637,7 @@ extension CSSStyleSheet {
     /// Useful if you already have several node collections (pages, components, etc.).
     public func rendered(
         forNodeCollections collections: [HTMLFragment],
-        indentStep: Int = 0,
+        indentStep: Int = 4,
         ensureTrailingNewline: Bool = true,
         unreferenced: CSSUnreferenced = .drop
     ) -> String {
@@ -665,7 +665,7 @@ extension CSSStyleSheet {
     public static func renderedMerged(
         _ sheets: [CSSStyleSheet],
         forNodeCollections collections: [HTMLFragment],
-        indentStep: Int = 0,
+        indentStep: Int = 4,
         ensureTrailingNewline: Bool = true,
         unreferenced: CSSUnreferenced = .drop
     ) -> String {
@@ -679,7 +679,7 @@ extension CSSStyleSheet {
 
     public func rendered(
         forDocuments documents: [HTMLDocument],
-        indentStep: Int = 0,
+        indentStep: Int = 4,
         ensureTrailingNewline: Bool = true,
         unreferenced: CSSUnreferenced = .drop
     ) -> String {
