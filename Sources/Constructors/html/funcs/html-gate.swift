@@ -38,6 +38,15 @@ public func experimental(
 }
 
 @inlinable
+public func scoped(
+    id: String? = nil,
+    allow: Set<BuildEnvironment> = [.local, .test],
+    @HTMLBuilder _ body: () -> [any HTMLNode]
+) -> any HTMLNode {
+    HTMLGate(id: id, allow: allow, children: body())
+}
+
+@inlinable
 public func onlyPublic(
     id: String? = nil,
     @HTMLBuilder _ body: () -> [any HTMLNode]
