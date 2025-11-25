@@ -172,6 +172,14 @@ public enum HTML {
     public static func button(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("button", a, c) }
     public static func textarea(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode { el("textarea", a, c) }
 
+    public static func fieldset(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("fieldset", a, c)
+    }
+
+    public static func legend(_ a: HTMLAttribute = [:], @HTMLBuilder _ c: () -> [any HTMLNode]) -> any HTMLNode {
+        el("legend", a, c)
+    }
+
     public static func type(_ value: String) -> HTMLAttribute { ["type": value] }
     public static func name(_ value: String) -> HTMLAttribute { ["name": value] }
     public static func value(_ value: String) -> HTMLAttribute { ["value": value] }
