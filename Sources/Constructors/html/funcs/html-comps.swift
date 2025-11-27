@@ -1,6 +1,17 @@
 import Foundation
+import plate
 
 public enum HTML {
+    public static func node_or_comment(
+        _ closure: () throws -> any HTMLNode,
+    ) -> any HTMLNode {
+        do {
+            return try closure()
+        } catch {
+            return HTML.comment("Failed to create throwing node: \(error.localizedDescription)")
+        }
+    }
+
     public static func el(
         _ tag: String,
         _ attrs: HTMLAttribute = HTMLAttribute(),
@@ -53,6 +64,42 @@ public enum HTML {
     public static func img(src: String, alt: String = "", _ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode {
         var merged = attrs; merged.merge(["src": src, "alt": alt]); return el("img", merged)
     }
+
+    public static func img(
+        src_closure: @autoclosure () throws -> String,
+        alt: String = "",
+        _ attrs: HTMLAttribute = HTMLAttribute()
+    ) rethrows -> any HTMLNode {
+        var merged = attrs
+        let resolvedSrc = try src_closure()
+        merged.merge(["src": resolvedSrc, "alt": alt])
+        return el("img", merged)
+    }
+
+    public static func img(
+        from src_key: EnvironmentExtractableKey,
+        alt: String = "",
+        _ attrs: HTMLAttribute = HTMLAttribute()
+    ) throws -> any HTMLNode {
+        return try img(
+            src: EnvironmentExtractor.base64_html_src(src_key),
+            alt: alt,
+            attrs
+        )
+    }
+
+    // public static func img(
+    //     from src_key: EnvironmentExtractableKey,
+    //     alt: String = "",
+    //     _ attrs: HTMLAttribute = HTMLAttribute()
+    // ) throws -> (any HTMLNode)? {
+    //     return try? img(
+    //         src: EnvironmentExtractor.base64_html_src(src_key),
+    //         alt: alt,
+    //         attrs
+    //     )
+    // }
+
     public static func br() -> any HTMLNode { el("br") }
     public static func br(_ n: Int) -> HTMLFragment { Array(repeating: HTML.br(), count: n) }
 
