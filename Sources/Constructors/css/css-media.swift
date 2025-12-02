@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CSSMedia: Sendable, Equatable {
+public struct CSSMedia: Sendable, Equatable, CSSNode {
     public var query: String          // e.g. "(prefers-color-scheme: dark)"
     public var rules: [CSSRule]
 
@@ -9,3 +9,5 @@ public struct CSSMedia: Sendable, Equatable {
         self.rules = rules
     }
 }
+
+public typealias CSSMediaMetaSection = CSSMetaSection<CSSMedia>

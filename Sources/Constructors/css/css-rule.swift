@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CSSRule: Sendable, Equatable {
+public struct CSSRule: Sendable, Equatable, CSSNode {
     public var selector: String           // ".container", "body", "@media ...", etc.
     public var declarations: [CSSDeclaration]
 
@@ -9,3 +9,5 @@ public struct CSSRule: Sendable, Equatable {
         self.declarations = declarations
     }
 }
+
+public typealias CSSRuleMetaSection = CSSMetaSection<CSSRule>

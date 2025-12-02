@@ -16,6 +16,15 @@ public struct CSSStyleSheet: Sendable, Equatable {
         self.keyframes = keyframes
     }
 
+    public init(
+        rules: [CSSRuleMetaSection],
+        media: [CSSMediaMetaSection] = [],
+        keyframes: [CSSKeyframesMetaSection] = []
+    ) {
+        self.rules = rules.flatMap(\.items)
+        self.media = media.flatMap(\.items)
+        self.keyframes = keyframes.flatMap(\.items)
+    }
 
     /// Merge multiple stylesheets into a single sheet, preserving order.
     public static func merged(_ sheets: [CSSStyleSheet]) -> CSSStyleSheet {
