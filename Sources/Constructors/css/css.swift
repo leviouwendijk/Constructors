@@ -6,6 +6,10 @@ public struct CSSStyleSheet: Sendable, Equatable {
     public var media: [CSSMedia]
     public var keyframes: [CSSKeyframes]
 
+    public var rules_metasection: [CSSRuleMetaSection]? = nil
+    public var media_metasection: [CSSMediaMetaSection]? = nil
+    public var keyframes_metasection: [CSSKeyframesMetaSection]? = nil
+
     public init(
         rules: [CSSRule],
         media: [CSSMedia] = [],
@@ -21,13 +25,39 @@ public struct CSSStyleSheet: Sendable, Equatable {
         media: [CSSMediaMetaSection] = [],
         keyframes: [CSSKeyframesMetaSection] = []
     ) {
+        self.rules_metasection = rules
+        self.media_metasection = media
+        self.keyframes_metasection = keyframes
+
         self.rules = rules.flatMap(\.items)
         self.media = media.flatMap(\.items)
         self.keyframes = keyframes.flatMap(\.items)
     }
 
     /// Merge multiple stylesheets into a single sheet, preserving order.
-    public static func merged(_ sheets: [CSSStyleSheet]) -> CSSStyleSheet {
+    // public static func merged(_ sheets: [CSSStyleSheet]) -> CSSStyleSheet {
+    //     var allRules: [CSSRule] = []
+    //     var allMedia: [CSSMedia] = []
+    //     var allKeyframes: [CSSKeyframes] = []
+
+    //     allRules.reserveCapacity(sheets.reduce(0) { $0 + $1.rules.count })
+    //     allMedia.reserveCapacity(sheets.reduce(0) { $0 + $1.media.count })
+    //     allKeyframes.reserveCapacity(sheets.reduce(0) { $0 + $1.keyframes.count })
+
+    //     for sheet in sheets {
+    //         allRules.append(contentsOf: sheet.rules)
+    //         allMedia.append(contentsOf: sheet.media)
+    //         allKeyframes.append(contentsOf: sheet.keyframes)
+    //     }
+
+    //     return CSSStyleSheet(
+    //         rules: allRules,
+    //         media: allMedia,
+    //         keyframes: allKeyframes
+    //     )
+    // }
+
+    static func merged(_ sheets: [CSSStyleSheet]) -> CSSStyleSheet {
         var allRules: [CSSRule] = []
         var allMedia: [CSSMedia] = []
         var allKeyframes: [CSSKeyframes] = []
@@ -36,17 +66,52 @@ public struct CSSStyleSheet: Sendable, Equatable {
         allMedia.reserveCapacity(sheets.reduce(0) { $0 + $1.media.count })
         allKeyframes.reserveCapacity(sheets.reduce(0) { $0 + $1.keyframes.count })
 
+        var allRuleMeta: [CSSRuleMetaSection] = []
+        var allMediaMeta: [CSSMediaMetaSection] = []
+        var allKeyframesMeta: [CSSKeyframesMetaSection] = []
+
+        var hasRuleMeta = true
+        var hasMediaMeta = true
+        var hasKeyframesMeta = true
+
         for sheet in sheets {
             allRules.append(contentsOf: sheet.rules)
             allMedia.append(contentsOf: sheet.media)
             allKeyframes.append(contentsOf: sheet.keyframes)
+
+            if let meta = sheet.rules_metasection {
+                allRuleMeta.append(contentsOf: meta)
+            } else {
+                hasRuleMeta = false
+            }
+
+            if let meta = sheet.media_metasection {
+                allMediaMeta.append(contentsOf: meta)
+            } else {
+                hasMediaMeta = false
+            }
+
+            if let meta = sheet.keyframes_metasection {
+                allKeyframesMeta.append(contentsOf: meta)
+            } else {
+                hasKeyframesMeta = false
+            }
         }
 
-        return CSSStyleSheet(
+        var merged = CSSStyleSheet(
             rules: allRules,
             media: allMedia,
             keyframes: allKeyframes
         )
+
+        merged.rules_metasection =
+            hasRuleMeta ? allRuleMeta : nil
+        merged.media_metasection =
+            hasMediaMeta ? allMediaMeta : nil
+        merged.keyframes_metasection =
+            hasKeyframesMeta ? allKeyframesMeta : nil
+
+        return merged
     }
 
     /// Convenience: create a stylesheet by merging several others.
@@ -699,5 +764,36 @@ extension CSSStyleSheet {
             unreferenced: unreferenced
         )
         return render(options: options)
+    }
+}
+
+extension CSSStyleSheet {
+    /// Returns all custom properties (`--foo`) from rules matching `selector`.
+    ///
+    /// - Parameters:
+    ///   - selector: CSS selector to match rules on (defaults to `:root`).
+    ///   - filter:   Optional filter on the resulting tokens.
+    public func customProperties(
+        selector: String = ":root",
+        filter: ((CSSCustomProperty) -> Bool)? = nil
+    ) -> [CSSCustomProperty] {
+        _extractCustomCSSProperties(from: rules, selector: selector, filter: filter)
+    }
+
+    public func renderedStyleProfile(
+        title: String,
+        subtitle: String? = nil,
+        selector: String = ":root",
+        includeUngroupedGroup: Bool = true,
+        ungroupedTitle: String = "Other tokens"
+    ) -> RenderedStyleProfile {
+        RenderedStyleProfile.fromStyleSheet(
+            self,
+            title: title,
+            subtitle: subtitle,
+            selector: selector,
+            includeUngroupedGroup: includeUngroupedGroup,
+            ungroupedTitle: ungroupedTitle
+        )
     }
 }

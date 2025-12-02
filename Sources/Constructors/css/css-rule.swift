@@ -11,3 +11,12 @@ public struct CSSRule: Sendable, Equatable, CSSNode {
 }
 
 public typealias CSSRuleMetaSection = CSSMetaSection<CSSRule>
+
+extension CSSRuleMetaSection {
+    public func customProperties(
+        selector: String = ":root",
+        filter: ((CSSCustomProperty) -> Bool)? = nil
+    ) -> [CSSCustomProperty] {
+        _extractCustomCSSProperties(from: items, selector: selector, filter: filter)
+    }
+}
