@@ -70,9 +70,9 @@ public struct CSSStyleSheet: Sendable, Equatable {
         var allMediaMeta: [CSSMediaMetaSection] = []
         var allKeyframesMeta: [CSSKeyframesMetaSection] = []
 
-        var hasRuleMeta = true
-        var hasMediaMeta = true
-        var hasKeyframesMeta = true
+        var hasRuleMeta = false
+        var hasMediaMeta = false
+        var hasKeyframesMeta = false
 
         for sheet in sheets {
             allRules.append(contentsOf: sheet.rules)
@@ -80,21 +80,18 @@ public struct CSSStyleSheet: Sendable, Equatable {
             allKeyframes.append(contentsOf: sheet.keyframes)
 
             if let meta = sheet.rules_metasection {
+                hasRuleMeta = true
                 allRuleMeta.append(contentsOf: meta)
-            } else {
-                hasRuleMeta = false
             }
 
             if let meta = sheet.media_metasection {
+                hasMediaMeta = true
                 allMediaMeta.append(contentsOf: meta)
-            } else {
-                hasMediaMeta = false
             }
 
             if let meta = sheet.keyframes_metasection {
+                hasKeyframesMeta = true
                 allKeyframesMeta.append(contentsOf: meta)
-            } else {
-                hasKeyframesMeta = false
             }
         }
 
