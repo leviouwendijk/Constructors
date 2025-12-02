@@ -210,6 +210,11 @@ public struct CSSStyleSheet: Sendable, Equatable {
 
 extension CSSStyleSheet {
     public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
+        // now optionally merge duplicate selectors before rendering
+        let sheet = options.mergeDuplicateSelectors
+            ? self.mergingDuplicateSelectors()
+            : self
+
         var out = ""
 
         func appendRule(_ rule: CSSRule, _ baseIndentTimes: Int) {
@@ -231,17 +236,17 @@ extension CSSStyleSheet {
         }
 
         // top-level rules
-        for rule in rules {
+        for rule in sheet.rules {
             appendRule(rule, 0)
         }
 
         // keyframes (never pruned for now)
-        for kf in keyframes {
+        for kf in sheet.keyframes {
             out += renderKeyframes(kf, options: options)
         }
 
         // media blocks
-        for m in media {
+        for m in sheet.media {
             let renderedMedia = renderMedia(m, options: options)
             if !renderedMedia.isEmpty {
                 out += renderedMedia
@@ -254,6 +259,52 @@ extension CSSStyleSheet {
 
         return out
     }
+
+    // public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
+    //     var out = ""
+
+    //     func appendRule(_ rule: CSSRule, _ baseIndentTimes: Int) {
+    //         let decision = decide(rule: rule, options: options)
+
+    //         switch decision {
+    //         case .keep:
+    //             out += renderRule(rule, options: options, times: baseIndentTimes)
+
+    //         case .commented:
+    //             let rendered = renderRule(rule, options: options, times: baseIndentTimes)
+    //             out += "/* UNUSED RULE START */\n"
+    //             out += rendered
+    //             out += "/* UNUSED RULE END */\n\n"
+
+    //         case .drop:
+    //             break
+    //         }
+    //     }
+
+    //     // top-level rules
+    //     for rule in rules {
+    //         appendRule(rule, 0)
+    //     }
+
+    //     // keyframes (never pruned for now)
+    //     for kf in keyframes {
+    //         out += renderKeyframes(kf, options: options)
+    //     }
+
+    //     // media blocks
+    //     for m in media {
+    //         let renderedMedia = renderMedia(m, options: options)
+    //         if !renderedMedia.isEmpty {
+    //             out += renderedMedia
+    //         }
+    //     }
+
+    //     if options.ensureTrailingNewline, !out.hasSuffix("\n") {
+    //         out.append("\n")
+    //     }
+
+    //     return out
+    // }
 
     /// Render a rule with an indent *level* (times).
     private func renderRule(
@@ -794,6 +845,47 @@ extension CSSStyleSheet {
             selector: selector,
             includeUngroupedGroup: includeUngroupedGroup,
             ungroupedTitle: ungroupedTitle
+        )
+    }
+}
+
+extension CSSStyleSheet {
+    /// Returns a new stylesheet where rules with identical selectors
+    /// are merged into a single rule, preserving selector order and
+    /// declaration order. Media blocks are merged similarly.
+    public func mergingDuplicateSelectors() -> CSSStyleSheet {
+        func mergeRules(_ rules: [CSSRule]) -> [CSSRule] {
+            var out: [CSSRule] = []
+            var indexBySelector: [String: Int] = [:]
+
+            out.reserveCapacity(rules.count)
+
+            for rule in rules {
+                if let idx = indexBySelector[rule.selector] {
+                    // Append declarations to the first occurrence
+                    out[idx].declarations.append(contentsOf: rule.declarations)
+                } else {
+                    indexBySelector[rule.selector] = out.count
+                    out.append(rule)
+                }
+            }
+
+            return out
+        }
+
+        let mergedTopLevel = mergeRules(self.rules)
+
+        let mergedMedia = self.media.map { mediaBlock in
+            CSSMedia(
+                query: mediaBlock.query,
+                rules: mergeRules(mediaBlock.rules)
+            )
+        }
+
+        return CSSStyleSheet(
+            rules: mergedTopLevel,
+            media: mergedMedia,
+            keyframes: self.keyframes
         )
     }
 }

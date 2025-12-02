@@ -22,18 +22,22 @@ public struct CSSRenderOptions: Sendable {
 
     public var unreferenced: CSSUnreferenced
 
+    public var mergeDuplicateSelectors: Bool
+
     public init(
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,
         usedClassNames: Set<String>? = nil,
         usedIDs: Set<String>? = nil,
-        unreferenced: CSSUnreferenced = .keep
+        unreferenced: CSSUnreferenced = .keep,
+        mergeDuplicateSelectors: Bool = true
     ) {
         self.indentStep = indentStep
         self.ensureTrailingNewline = ensureTrailingNewline
         self.usedClassNames = usedClassNames
         self.usedIDs = usedIDs
         self.unreferenced = unreferenced
+        self.mergeDuplicateSelectors = mergeDuplicateSelectors
     }
 }
 
@@ -42,7 +46,8 @@ extension CSSRenderOptions {
         _ nodes: HTMLFragment,
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,
-        unreferenced: CSSUnreferenced = .keep
+        unreferenced: CSSUnreferenced = .keep,
+        mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
         let symbols = HTMLSymbolCollector.collect(from: nodes)
         return CSSRenderOptions(
@@ -50,7 +55,8 @@ extension CSSRenderOptions {
             ensureTrailingNewline: ensureTrailingNewline,
             usedClassNames: symbols.classes,
             usedIDs: symbols.ids,
-            unreferenced: unreferenced
+            unreferenced: unreferenced,
+            mergeDuplicateSelectors: mergeDuplicateSelectors
         )
     }
 
@@ -58,11 +64,15 @@ extension CSSRenderOptions {
         _ node: any HTMLNode,
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,
-        unreferenced: CSSUnreferenced = .keep
+        unreferenced: CSSUnreferenced = .keep,
+        mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
-        forNodes([node], indentStep: indentStep,
-                 ensureTrailingNewline: ensureTrailingNewline,
-                 unreferenced: unreferenced)
+            forNodes([node], 
+            indentStep: indentStep,
+            ensureTrailingNewline: ensureTrailingNewline,
+            unreferenced: unreferenced,
+            mergeDuplicateSelectors: mergeDuplicateSelectors
+        )
     }
 }
 
@@ -71,14 +81,16 @@ extension CSSRenderOptions {
         _ document: HTMLDocument,
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,
-        unreferenced: CSSUnreferenced = .keep
+        unreferenced: CSSUnreferenced = .keep,
+        mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
         CSSRenderOptions(
             indentStep: indentStep,
             ensureTrailingNewline: ensureTrailingNewline,
             usedClassNames: document.collectedClassNames(),
             usedIDs: document.collectedIDs(),
-            unreferenced: unreferenced
+            unreferenced: unreferenced,
+            mergeDuplicateSelectors: mergeDuplicateSelectors
         )
     }
 
@@ -86,7 +98,8 @@ extension CSSRenderOptions {
         _ documents: [HTMLDocument],
         indentStep: Int = 4,
         ensureTrailingNewline: Bool = false,
-        unreferenced: CSSUnreferenced = .keep
+        unreferenced: CSSUnreferenced = .keep,
+        mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
         var usedClasses = Set<String>()
         var usedIDs = Set<String>()
@@ -101,7 +114,8 @@ extension CSSRenderOptions {
             ensureTrailingNewline: ensureTrailingNewline,
             usedClassNames: usedClasses,
             usedIDs: usedIDs,
-            unreferenced: unreferenced
+            unreferenced: unreferenced,
+            mergeDuplicateSelectors: mergeDuplicateSelectors
         )
     }
 }
