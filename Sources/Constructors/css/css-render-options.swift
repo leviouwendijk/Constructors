@@ -84,11 +84,15 @@ extension CSSRenderOptions {
         unreferenced: CSSUnreferenced = .keep,
         mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
-        CSSRenderOptions(
+        let symbols = document.collectedSymbols()
+        let classes = symbols.classes
+        let ids = symbols.ids
+
+        return CSSRenderOptions(
             indentStep: indentStep,
             ensureTrailingNewline: ensureTrailingNewline,
-            usedClassNames: document.collectedClassNames(),
-            usedIDs: document.collectedIDs(),
+            usedClassNames: classes,
+            usedIDs: ids,
             unreferenced: unreferenced,
             mergeDuplicateSelectors: mergeDuplicateSelectors
         )
@@ -105,8 +109,9 @@ extension CSSRenderOptions {
         var usedIDs = Set<String>()
 
         for doc in documents {
-            usedClasses.formUnion(doc.collectedClassNames())
-            usedIDs.formUnion(doc.collectedIDs())
+            let symbols = doc.collectedSymbols()
+            usedClasses.formUnion(symbols.classes)
+            usedIDs.formUnion(symbols.ids)
         }
 
         return CSSRenderOptions(

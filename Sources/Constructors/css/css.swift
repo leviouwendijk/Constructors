@@ -133,89 +133,18 @@ public struct CSSStyleSheet: Sendable, Equatable {
     }
 }
 
-// extension CSSStyleSheet {
-//     public func render(indentation: Int = 4) -> String {
-//         var out = ""
-
-//         // top-level rules
-//         for rule in rules {
-//             out += renderRule(rule, indentation: indentation, times: 0)
-//         }
-
-//         // media blocks
-//         for m in media {
-//             out += renderMedia(m, indentation: indentation)
-//         }
-
-//         return out
-//     }
-
-//     /// Render a rule with an indent *level* (times).
-//     private func renderRule(
-//         _ rule: CSSRule,
-//         indentation: Int,
-//         times: Int
-//     ) -> String {
-//         var out = ""
-
-//         // selector line
-//         let selectorLine = "\(rule.selector) {"
-//         if times > 0 {
-//             out += selectorLine.indent(indentation, times: times)
-//         } else {
-//             out += selectorLine
-//         }
-//         out += "\n"
-
-//         // declarations
-//         let declTimes = times + 1
-//         for decl in rule.declarations {
-//             out += "\(decl.property): \(decl.value);".indent(indentation, times: declTimes)
-//             out += "\n"
-//         }
-
-//         // closing brace
-//         let closing = "}"
-//         if times > 0 {
-//             out += closing.indent(indentation, times: times)
-//         } else {
-//             out += closing
-//         }
-//         out += "\n\n"
-
-//         return out
-//     }
-
-//     private func renderMedia(
-//         _ media: CSSMedia,
-//         indentation: Int
-//     ) -> String {
-//         var out = ""
-
-//         // @media line (no indent, like top-level rules)
-//         out += "@media \(media.query) {\n"
-
-//         // Inner rules, one indent level inside the media block
-//         for rule in media.rules {
-//             out += renderRule(rule, indentation: indentation, times: 1)
-//         }
-
-//         out += "}\n\n"
-//         return out
-//     }
-// }
-
 extension CSSStyleSheet {
-    public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
-        // now optionally merge duplicate selectors before rendering
-        let sheet = options.mergeDuplicateSelectors
-            ? self.mergingDuplicateSelectors()
-            : self
+    public func render(
+        options: CSSRenderOptions = CSSRenderOptions()
+    ) -> String {
+        let sheet = 
+            options.mergeDuplicateSelectors ? self.mergingDuplicateSelectors() : self
 
         var out = ""
+        var used_selector_cache: [String: SelectorUsage] = [:]
 
         func appendRule(_ rule: CSSRule, _ baseIndentTimes: Int) {
-            let decision = decide(rule: rule, options: options)
+            let decision = decide(rule: rule, options: options, cache: &used_selector_cache)
 
             switch decision {
             case .keep:
@@ -223,9 +152,10 @@ extension CSSStyleSheet {
 
             case .commented:
                 let rendered = renderRule(rule, options: options, times: baseIndentTimes)
-                out += "/* UNUSED RULE START */\n"
+                out += "/* @pruneable */\n"
+                out += "/* __UNUSED_RULE_START__ */\n"
                 out += rendered
-                out += "/* UNUSED RULE END */\n\n"
+                out += "/* __UNUSED_RULE_END__ */\n\n"
 
             case .drop:
                 break
@@ -244,7 +174,7 @@ extension CSSStyleSheet {
 
         // media blocks
         for m in sheet.media {
-            let renderedMedia = renderMedia(m, options: options)
+            let renderedMedia = renderMedia(m, options: options, cache: &used_selector_cache)
             if !renderedMedia.isEmpty {
                 out += renderedMedia
             }
@@ -257,53 +187,6 @@ extension CSSStyleSheet {
         return out
     }
 
-    // public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
-    //     var out = ""
-
-    //     func appendRule(_ rule: CSSRule, _ baseIndentTimes: Int) {
-    //         let decision = decide(rule: rule, options: options)
-
-    //         switch decision {
-    //         case .keep:
-    //             out += renderRule(rule, options: options, times: baseIndentTimes)
-
-    //         case .commented:
-    //             let rendered = renderRule(rule, options: options, times: baseIndentTimes)
-    //             out += "/* UNUSED RULE START */\n"
-    //             out += rendered
-    //             out += "/* UNUSED RULE END */\n\n"
-
-    //         case .drop:
-    //             break
-    //         }
-    //     }
-
-    //     // top-level rules
-    //     for rule in rules {
-    //         appendRule(rule, 0)
-    //     }
-
-    //     // keyframes (never pruned for now)
-    //     for kf in keyframes {
-    //         out += renderKeyframes(kf, options: options)
-    //     }
-
-    //     // media blocks
-    //     for m in media {
-    //         let renderedMedia = renderMedia(m, options: options)
-    //         if !renderedMedia.isEmpty {
-    //             out += renderedMedia
-    //         }
-    //     }
-
-    //     if options.ensureTrailingNewline, !out.hasSuffix("\n") {
-    //         out.append("\n")
-    //     }
-
-    //     return out
-    // }
-
-    /// Render a rule with an indent *level* (times).
     private func renderRule(
         _ rule: CSSRule,
         options: CSSRenderOptions,
@@ -390,12 +273,13 @@ extension CSSStyleSheet {
 
     private func renderMedia(
         _ media: CSSMedia,
-        options: CSSRenderOptions
+        options: CSSRenderOptions,
+        cache: inout [String: SelectorUsage]
     ) -> String {
         var inner = ""
 
         for rule in media.rules {
-            let decision = decide(rule: rule, options: options)
+            let decision = decide(rule: rule, options: options, cache: &cache)
             switch decision {
             case .keep:
                 inner += renderRule(rule, options: options, times: 1)
@@ -420,126 +304,6 @@ extension CSSStyleSheet {
         return out
     }
 
-// extension CSSStyleSheet {
-//     // Back-compat: same signature as before, just delegates into options-based render.
-//     // public func render(indentation: Int = 4) -> String {
-//     //     let opts = CSSRenderOptions(indentStep: indentation)
-//     //     return render(options: opts)
-//     // }
-
-//     /// New: render with richer options (indentation + unreferenced pruning).
-//     public func render(options: CSSRenderOptions = CSSRenderOptions()) -> String {
-//         var out = ""
-
-//         // Helper to append a single rule at a given indent "times" level.
-//         func appendRule(_ rule: CSSRule,_ baseIndentTimes: Int) {
-//             let decision = decide(rule: rule, options: options)
-
-//             switch decision {
-//             case .keep:
-//                 out += renderRule(rule, options: options, times: baseIndentTimes)
-
-//             case .commented:
-//                 let rendered = renderRule(rule, options: options, times: baseIndentTimes)
-//                 out += "/* UNUSED RULE START */\n"
-//                 out += rendered
-//                 out += "/* UNUSED RULE END */\n\n"
-
-//             case .drop:
-//                 break
-//             }
-//         }
-
-//         // top-level rules
-//         for rule in rules {
-//             appendRule(rule, 0)
-//         }
-
-//         // media blocks
-//         for m in media {
-//             let renderedMedia = renderMedia(m, options: options)
-//             if !renderedMedia.isEmpty {
-//                 out += renderedMedia
-//             }
-//         }
-
-//         if options.ensureTrailingNewline, !out.hasSuffix("\n") {
-//             out.append("\n")
-//         }
-
-//         return out
-//     }
-
-//     /// Render a rule with an indent *level* (times).
-//     private func renderRule(
-//         _ rule: CSSRule,
-//         options: CSSRenderOptions,
-//         times: Int
-//     ) -> String {
-//         let indentation = options.indentStep
-//         var out = ""
-
-//         // selector line
-//         let selectorLine = "\(rule.selector) {"
-//         if times > 0 {
-//             out += selectorLine.indent(indentation, times: times)
-//         } else {
-//             out += selectorLine
-//         }
-//         out += "\n"
-
-//         // declarations
-//         let declTimes = times + 1
-//         for decl in rule.declarations {
-//             out += "\(decl.property): \(decl.value);".indent(indentation, times: declTimes)
-//             out += "\n"
-//         }
-
-//         // closing brace
-//         let closing = "}"
-//         if times > 0 {
-//             out += closing.indent(indentation, times: times)
-//         } else {
-//             out += closing
-//         }
-//         out += "\n\n"
-
-//         return out
-//     }
-
-//     private func renderMedia(
-//         _ media: CSSMedia,
-//         options: CSSRenderOptions
-//     ) -> String {
-//         var inner = ""
-
-//         for rule in media.rules {
-//             let decision = decide(rule: rule, options: options)
-//             switch decision {
-//             case .keep:
-//                 inner += renderRule(rule, options: options, times: 1)
-
-//             case .commented:
-//                 let rendered = renderRule(rule, options: options, times: 1)
-//                 inner += "/* UNUSED RULE START */\n"
-//                 inner += rendered
-//                 inner += "/* UNUSED RULE END */\n\n"
-
-//             case .drop:
-//                 break
-//             }
-//         }
-
-//         // If nothing survived inside this media block, omit it entirely
-//         // when using a dropping policy.
-//         guard !inner.isEmpty else { return "" }
-
-//         var out = ""
-//         out += "@media \(media.query) {\n"
-//         out += inner
-//         out += "}\n\n"
-//         return out
-//     }
     private enum RuleDecision {
         case keep
         case drop
@@ -552,7 +316,11 @@ extension CSSStyleSheet {
         case unknown
     }
 
-    private func decide(rule: CSSRule, options: CSSRenderOptions) -> RuleDecision {
+    private func decide(
+        rule: CSSRule,
+        options: CSSRenderOptions,
+        cache: inout [String: SelectorUsage]
+    ) -> RuleDecision {
         guard
             (options.usedClassNames?.isEmpty == false) ||
             (options.usedIDs?.isEmpty == false)
@@ -564,22 +332,27 @@ extension CSSStyleSheet {
             return .keep
         }
 
-        switch isSelectorUsed(
-            rule.selector,
-            usedClasses: options.usedClassNames ?? [],
-            usedIDs: options.usedIDs ?? []
-        ) {
+        let usage: SelectorUsage
+        if let cached = cache[rule.selector] {
+            usage = cached
+        } else {
+            let computed = isSelectorUsed(
+                rule.selector,
+                usedClasses: options.usedClassNames ?? [],
+                usedIDs: options.usedIDs ?? []
+            )
+            cache[rule.selector] = computed
+            usage = computed
+        }
+
+        switch usage {
         case .unknown, .used:
             return .keep
-
         case .unused:
             switch options.unreferenced {
-            case .keep:
-                return .keep
-            case .drop:
-                return .drop
-            case .commented:
-                return .commented
+            case .keep:      return .keep
+            case .drop:      return .drop
+            case .commented: return .commented
             }
         }
     }
@@ -739,6 +512,39 @@ extension Array where Element == CSSStyleSheet {
 }
 
 extension CSSStyleSheet {
+    /// Render this stylesheet, pruned against multiple HTML fragments.
+    /// Useful if you already have several node collections (pages, components, etc.).
+    public func rendered(
+        forNodeCollections collections: [HTMLFragment],
+        indentStep: Int = 4,
+        ensureTrailingNewline: Bool = true,
+        unreferenced: CSSUnreferenced = .drop
+    ) -> String {
+        var usedClasses = Set<String>()
+        var usedIDs = Set<String>()
+
+        // for nodes in collections {
+        //     let doc = nodes.htmlDocument
+        //     usedClasses.formUnion(doc.collectedClassNames())
+        //     usedIDs.formUnion(doc.collectedIDs())
+        // }
+        for nodes in collections {
+            let symbols = HTMLSymbolCollector.collect(from: nodes)
+            usedClasses.formUnion(symbols.classes)
+            usedIDs.formUnion(symbols.ids)
+        }
+
+        let options = CSSRenderOptions(
+            indentStep: indentStep,
+            ensureTrailingNewline: ensureTrailingNewline,
+            usedClassNames: usedClasses,
+            usedIDs: usedIDs,
+            unreferenced: unreferenced
+        )
+
+        return render(options: options)
+    }
+
     /// Render this stylesheet, pruned against a single HTML fragment.
     public func rendered(
         forNodes nodes: HTMLFragment,
@@ -752,34 +558,6 @@ extension CSSStyleSheet {
             ensureTrailingNewline: ensureTrailingNewline,
             unreferenced: unreferenced
         )
-        return render(options: options)
-    }
-
-    /// Render this stylesheet, pruned against multiple HTML fragments.
-    /// Useful if you already have several node collections (pages, components, etc.).
-    public func rendered(
-        forNodeCollections collections: [HTMLFragment],
-        indentStep: Int = 4,
-        ensureTrailingNewline: Bool = true,
-        unreferenced: CSSUnreferenced = .drop
-    ) -> String {
-        var usedClasses = Set<String>()
-        var usedIDs = Set<String>()
-
-        for nodes in collections {
-            let doc = nodes.htmlDocument
-            usedClasses.formUnion(doc.collectedClassNames())
-            usedIDs.formUnion(doc.collectedIDs())
-        }
-
-        let options = CSSRenderOptions(
-            indentStep: indentStep,
-            ensureTrailingNewline: ensureTrailingNewline,
-            usedClassNames: usedClasses,
-            usedIDs: usedIDs,
-            unreferenced: unreferenced
-        )
-
         return render(options: options)
     }
 
@@ -851,25 +629,6 @@ extension CSSStyleSheet {
     /// are merged into a single rule, preserving selector order and
     /// declaration order. Media blocks are merged similarly.
     public func mergingDuplicateSelectors() -> CSSStyleSheet {
-        func mergeRules(_ rules: [CSSRule]) -> [CSSRule] {
-            var out: [CSSRule] = []
-            var indexBySelector: [String: Int] = [:]
-
-            out.reserveCapacity(rules.count)
-
-            for rule in rules {
-                if let idx = indexBySelector[rule.selector] {
-                    // Append declarations to the first occurrence
-                    out[idx].declarations.append(contentsOf: rule.declarations)
-                } else {
-                    indexBySelector[rule.selector] = out.count
-                    out.append(rule)
-                }
-            }
-
-            return out
-        }
-
         let mergedTopLevel = mergeRules(self.rules)
 
         let mergedMedia = self.media.map { mediaBlock in
@@ -884,5 +643,24 @@ extension CSSStyleSheet {
             media: mergedMedia,
             keyframes: self.keyframes
         )
+    }
+
+    @inline(__always)
+    private func mergeRules(_ rules: [CSSRule]) -> [CSSRule] {
+        var out: [CSSRule] = []
+        out.reserveCapacity(rules.count)
+
+        var indexBySelector: [String: Int] = [:]
+        indexBySelector.reserveCapacity(rules.count)
+
+        for rule in rules {
+            if let idx = indexBySelector[rule.selector] {
+                out[idx].declarations.append(contentsOf: rule.declarations)
+            } else {
+                indexBySelector[rule.selector] = out.count
+                out.append(rule)
+            }
+        }
+        return out
     }
 }

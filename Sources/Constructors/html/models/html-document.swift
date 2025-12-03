@@ -117,11 +117,17 @@ extension HTMLDocument {
 }
 
 extension HTMLDocument {
-    public func collectedClassNames() -> Set<String> {
-        HTMLSymbolCollector.collect(from: children).classes
+    public func collectedSymbols() -> HTMLSymbols {
+        HTMLSymbolCollector.collect(from: children)
     }
 
-    public func collectedIDs() -> Set<String> {
-        HTMLSymbolCollector.collect(from: children).ids
-    }
+    // !bad_pfm: rerun the symbol collection for contained data object separately for both ids and classes !
+
+    // public func collectedClassNames() -> Set<String> {
+    //     HTMLSymbolCollector.collect(from: children).classes
+    // }
+
+    // public func collectedIDs() -> Set<String> {
+    //     HTMLSymbolCollector.collect(from: children).ids
+    // }
 }
