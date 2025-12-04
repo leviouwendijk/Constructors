@@ -31,3 +31,21 @@ public extension HTMLNode {
         return HTML.comment(sanitizeForHtmlComment(rendered))
     }
 }
+
+public func + (lhs: any HTMLNode, rhs: any HTMLNode) -> [any HTMLNode] {
+    [lhs, rhs]
+}
+
+public func + (lhs: any HTMLNode, rhs: [any HTMLNode]) -> [any HTMLNode] {
+    [lhs] + rhs
+}
+
+public func + (lhs: [any HTMLNode], rhs: any HTMLNode) -> [any HTMLNode] {
+    lhs + [rhs]
+}
+
+public func + (lhs: [any HTMLNode], rhs: [any HTMLNode]) -> [any HTMLNode] {
+    var out = lhs
+    out.append(contentsOf: rhs)
+    return out
+}

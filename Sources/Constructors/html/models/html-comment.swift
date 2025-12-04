@@ -1,7 +1,22 @@
 import Foundation
 
 public struct HTMLComment: HTMLNode {
+    public let prefix: String?
     public let text: String
+    
+    public init(
+        prefix: String? = nil,
+        text: String,
+    ) {
+        guard let prefix else {
+            self.prefix = nil
+            self.text = text
+            return
+        } 
+
+        self.prefix = prefix
+        self.text = prefix + text
+    }
 
     public func render(options: HTMLRenderOptions, indent: Int) -> String {
         // let space = " "

@@ -155,7 +155,19 @@ public enum HTML {
         condition ? content() : []
     }
 
-    public static func comment(_ s: String) -> any HTMLNode { HTMLComment(text: s) }
+    public static func comment(_ s: String) -> any HTMLNode { 
+        HTMLComment(text: s) 
+    }
+
+    public static func prefixedComment(
+        prefix: String = "@",
+        _ s: String
+    ) -> any HTMLNode {
+        HTMLComment(
+            prefix: prefix,
+            text: s
+        ) 
+    }
 
     public static func elSC(_ tag: String, _ attrs: HTMLAttribute = HTMLAttribute()) -> any HTMLNode {
         HTMLElement(tag, attrs: attrs, children: [], selfClosing: true)
