@@ -26,6 +26,59 @@ public struct HTMLGate: HTMLNode {
         guard ok else { return "" }
         return children.map { $0.render(options: options, indent: indent) }.joined()
     }
+
+}
+
+@inlinable
+public func demarcation_comment(
+    id: String?,
+    prefix: String,
+    allow: Set<BuildEnvironment> = []
+) -> any HTMLNode {
+    var pre = prefix
+
+    if let id {
+        let str = ": \(id)"
+        pre.append(str)
+    }
+
+    if !allow.isEmpty {
+        pre.append("\(allow.map { $0.rawValue } )")
+    }
+
+    return HTML.prefixedComment(pre)
+}
+
+@inlinable
+public func demarcation_comment_end(
+    id: String?,
+    prefix: String = "end",
+) -> any HTMLNode {
+    return demarcation_comment(id: id, prefix: prefix)
+}
+
+@inlinable
+public func demarcate_html_node(
+    id: String?,
+    body: [any HTMLNode],
+    prefix: String,
+    suffix: String? = nil,
+    allow: Set<BuildEnvironment> = []
+) -> [any HTMLNode] {
+    let demarc_start: any HTMLNode = demarcation_comment(
+        id: id, 
+        prefix: prefix,
+        allow: allow
+    )
+    let demarc_end: any HTMLNode
+
+    if let suffix {
+        demarc_end = demarcation_comment_end(id: id, prefix: suffix)
+    } else {
+        demarc_end = demarcation_comment_end(id: id)
+    }
+
+    return demarc_start + body + demarc_end
 }
 
 @inlinable
@@ -34,10 +87,14 @@ public func experimental(
     allow: Set<BuildEnvironment> = [.local, .test],
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    let prependable_el = HTML.prefixedComment("experimental")
-    let combined_body = prependable_el + body()
+    let demarcated_body = demarcate_html_node(
+        id: id,
+        body: body(),
+        prefix: "experimental",
+        allow: allow
+    )
     // return HTMLGate(id: id, allow: allow, children: body())
-    return HTMLGate(id: id, allow: allow, children: combined_body)
+    return HTMLGate(id: id, allow: allow, children: demarcated_body)
 }
 
 @inlinable
@@ -46,7 +103,7 @@ public func scoped(
     allow: Set<BuildEnvironment> = [.local, .test],
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    HTMLGate(id: id, allow: allow, children: body())
+    return HTMLGate(id: id, allow: allow, children: body())
 }
 
 @inlinable

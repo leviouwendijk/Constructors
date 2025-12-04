@@ -1,7 +1,7 @@
 import Foundation
 
 /// Build environments we care about for feature gating.
-public enum BuildEnvironment: Sendable {
+public enum BuildEnvironment: String, Sendable, RawRepresentable {
     case local
     case test
     case `public`
