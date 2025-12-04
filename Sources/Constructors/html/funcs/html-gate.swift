@@ -103,7 +103,15 @@ public func scoped(
     allow: Set<BuildEnvironment> = [.local, .test],
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    return HTMLGate(id: id, allow: allow, children: body())
+    let demarcated_body = demarcate_html_node(
+        id: id,
+        body: body(),
+        prefix: "scoped",
+        allow: allow
+    )
+
+    // return HTMLGate(id: id, allow: allow, children: body())
+    return HTMLGate(id: id, allow: allow, children: demarcated_body)
 }
 
 @inlinable
@@ -111,7 +119,15 @@ public func onlyPublic(
     id: String? = nil,
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    experimental(id: id, allow: [.public], body)
+    let demarcated_body = demarcate_html_node(
+        id: id,
+        body: body(),
+        prefix: "onlyPublic",
+        allow: [.public]
+    )
+
+    // return experimental(id: id, allow: [.public], body)
+    return HTMLGate(id: id, allow: [.public], children: demarcated_body)
 }
 
 @inlinable
@@ -119,7 +135,14 @@ public func onlyTest(
     id: String? = nil,
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    experimental(id: id, allow: [.test], body)
+    let demarcated_body = demarcate_html_node(
+        id: id,
+        body: body(),
+        prefix: "onlyTest",
+        allow: [.test]
+    )
+    // experimental(id: id, allow: [.test], body)
+    return HTMLGate(id: id, allow: [.test], children: demarcated_body)
 }
 
 @inlinable
@@ -127,5 +150,15 @@ public func notPublic(
     id: String? = nil,
     @HTMLBuilder _ body: () -> [any HTMLNode]
 ) -> any HTMLNode {
-    experimental(id: id, allow: [.local, .test], body)
+    var cases: Set<BuildEnvironment> = Set(BuildEnvironment.allCases)
+    cases.remove(.public)
+
+    let demarcated_body = demarcate_html_node(
+        id: id,
+        body: body(),
+        prefix: "notPublic",
+        allow: cases
+    )
+    // return experimental(id: id, allow: [.local, .test], body)
+    return HTMLGate(id: id, allow: cases, children: demarcated_body)
 }
