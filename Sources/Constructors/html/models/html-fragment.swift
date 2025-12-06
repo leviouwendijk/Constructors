@@ -3,7 +3,16 @@ import Foundation
 public typealias HTMLFragment = [any HTMLNode]
 
 extension Array where Element == any HTMLNode {
+    @available(*, message: "Being deprecated in favor of a better API, use <nodes>.doc or .document instead")
     public var htmlDocument: HTMLDocument {
+        HTMLDocument(children: self)
+    }
+
+    public var doc: HTMLDocument {
+        HTMLDocument(children: self)
+    }
+
+    public var document: HTMLDocument {
         HTMLDocument(children: self)
     }
 
