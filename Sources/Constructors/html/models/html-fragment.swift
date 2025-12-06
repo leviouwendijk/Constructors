@@ -16,7 +16,12 @@ extension Array where Element == any HTMLNode {
         HTMLDocument(children: self)
     }
 
+    @available(*, message: "use more explicit and conscious render_doc() method instead, use snippet() for snippets.")
     public func render(options: HTMLRenderOptions = .Defaults.pretty()) -> String {
+        htmlDocument.render(options: options)
+    }
+
+    public func render_doc(options: HTMLRenderOptions = .Defaults.pretty()) -> String {
         htmlDocument.render(options: options)
     }
 
