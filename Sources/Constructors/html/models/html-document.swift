@@ -1,13 +1,41 @@
 import Foundation
 import plate
 
+// plan: make children be split in:
+// - `head: [any HTMLNode]`
+// - `body: [any HTMLNode]`
+// for improved ergonomics
+
+extension HTMLDocument {
+    public init(
+        head: [any HTMLNode],
+        body: [any HTMLNode]
+    ) { 
+        self.head = head
+        self.body = body
+
+        // backwards compatiblity
+        self.children = head + body
+    }
+}
+
 public struct HTMLDocument: Sendable {
+    // backwards compatiblity:
     public var children: [any HTMLNode]
 
+    // new api:
+    public var head: [any HTMLNode]
+    public var body: [any HTMLNode]
+
+    // backwards compatiblity:
     public init(
         children: [any HTMLNode]
     ) { 
         self.children = children 
+
+        // forward compatiblity:
+        self.head = []
+        self.body = []
     }
 
     public func render(options: HTMLRenderOptions = .init()) -> String {
