@@ -296,6 +296,24 @@ public func form(
 }
 
 @inlinable
+public func table(
+    _ attrs: HTMLAttribute = [:],
+    @HTMLBuilder _ content: () -> [any HTMLNode]
+) -> any HTMLNode { HTML.table(attrs, content) }
+
+@inlinable
+public func tr(
+    _ attrs: HTMLAttribute = [:],
+    @HTMLBuilder _ content: () -> [any HTMLNode]
+) -> any HTMLNode { HTML.tr(attrs, content) }
+
+@inlinable
+public func td(
+    _ attrs: HTMLAttribute = [:],
+    @HTMLBuilder _ content: () -> [any HTMLNode]
+) -> any HTMLNode { HTML.td(attrs, content) }
+
+@inlinable
 public func input(
     _ attrs: HTMLAttribute = [:]
 ) -> any HTMLNode {
