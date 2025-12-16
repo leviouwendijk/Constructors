@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         // .package(url: "https://github.com/swiftlang/swift-testing.git", from: "6.2.0"),
         .package(url: "https://github.com/leviouwendijk/plate.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Structures.git", branch: "master"),
+        // .package(url: "https://github.com/leviouwendijk/Structures.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
     ],
     targets: [
@@ -25,7 +25,7 @@ let package = Package(
             name: "Constructors",
             dependencies: [
                 .product(name: "plate", package: "plate"),
-                .product(name: "Structures", package: "Structures"),
+                // .product(name: "Structures", package: "Structures"),
                 .product(name: "Primitives", package: "Primitives"),
             ],
         ),

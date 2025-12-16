@@ -1,5 +1,6 @@
 import Foundation
-import Structures
+// import Structures
+import plate
 
 // public typealias PSQLFieldTypeRegistry = FieldTypeRegistry<PSQLType>
 
