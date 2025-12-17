@@ -1,5 +1,5 @@
 import Foundation
-import plate
+import Primitives
 
 /// How this ICS timestamp should be interpreted.
 public enum ICSDateKind: Sendable {
@@ -8,7 +8,8 @@ public enum ICSDateKind: Sendable {
 
     /// Local wall-clock time with explicit TZID parameter.
     /// Example: `DTSTART;TZID=Europe/Amsterdam:20251113T190000`
-    case local(CustomTimeZone)
+    // case local(CustomTimeZone)
+    case local(TimeZoneIdentifier)
 }
 
 enum ICSDateFormatter {
@@ -19,12 +20,14 @@ enum ICSDateFormatter {
 
         switch kind {
         case .utc:
-            fmt.timeZone = try CustomTimeZone.utc.set()
+            // fmt.timeZone = try CustomTimeZone.utc.set()
+            fmt.timeZone = try TimeZoneIdentifier.utc.timezone()
             let value = fmt.string(from: date) + "Z"
             return (value, [:])
 
         case .local(let zone):
-            fmt.timeZone = try zone.set()
+            // fmt.timeZone = try zone.set()
+            fmt.timeZone = try zone.timezone()
             let value = fmt.string(from: date)
             return (value, ["TZID": zone.rawValue])
         }

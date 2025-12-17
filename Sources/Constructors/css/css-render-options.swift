@@ -1,5 +1,4 @@
 import Foundation
-import plate
 
 public enum CSSUnreferenced: Sendable {
     /// Leave all rules unchanged, no pruning.

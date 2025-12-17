@@ -1,5 +1,5 @@
 {
-  "originHash" : "cc88d59239530c493ace362960b74f71e9a2af923c219f5e9ee47eba4da603b9",
+  "originHash" : "45ed66027a9213df40c344b1d6adcb6b28a65399505e39208049598dec0222d9",
   "pins" : [
     {
       "identity" : "methods",
@@ -7,7 +7,16 @@
       "location" : "https://github.com/leviouwendijk/Methods.git",
       "state" : {
         "branch" : "master",
-        "revision" : "bddfab93235482cdd8b2deed7b38859531adece1"
+        "revision" : "3668117392a5e07ba36ba461adb90f1805461c3e"
+      }
+    },
+    {
+      "identity" : "milieu",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Milieu.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "242e890af20eb5f77087cf116ae9374f1f809b2a"
       }
     },
     {
@@ -16,7 +25,7 @@
       "location" : "https://github.com/leviouwendijk/plate.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f531a9b03635a8154537fc9b4ab9320793e6b610"
+        "revision" : "922a9af130ece34c788eea5bedad04ac99e27f75"
       }
     },
     {
@@ -26,6 +35,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "95d098547aa8c78b78613753163a1fa8bbbb6a1e"
+      }
+    },
+    {
+      "identity" : "variables",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Variables.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c533569cd399d8d4762f5f4f8241e2234735c6d0"
       }
     }
   ],

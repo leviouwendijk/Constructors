@@ -1,5 +1,4 @@
 import Foundation
-import plate
 
 public struct CSSStyleSheet: Sendable, Equatable {
     public var rules: [CSSRule]
