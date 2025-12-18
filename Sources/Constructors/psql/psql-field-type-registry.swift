@@ -3,7 +3,7 @@ import Registry
 
 // public enum PSQLFieldTypes {
 public enum PSQLFieldTypeRegistry {
-    public static let shared = FieldTypeRegistry<PSQLType>()
+    public static let shared = StandardRegistry<PSQLType>()
 
     public static func register(
         table name: String,

@@ -1,4 +1,5 @@
 import Foundation
+import Indentation
 
 public struct CSSStyleSheet: Sendable, Equatable {
     public var rules: [CSSRule]

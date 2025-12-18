@@ -15,19 +15,21 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/leviouwendijk/Registry.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Registry.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Indentation.git", branch: "master"),
     ],
     targets: [
         .target(
             name: "Constructors",
             dependencies: [
-                .product(name: "Registry", package: "Registry"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),
                 .product(name: "Milieu", package: "Milieu"),
+                .product(name: "Registry", package: "Registry"),
+                .product(name: "Indentation", package: "Indentation"),
             ],
         ),
         .testTarget(
