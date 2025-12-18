@@ -6,22 +6,57 @@ public enum HTMLBuilder: Sendable {
         parts.flatMap { $0 }
     }
     public static func buildArray(_ parts: [[any HTMLNode]]) -> [any HTMLNode] { parts.flatMap { $0 } }
+
     public static func buildEither(first: [any HTMLNode]) -> [any HTMLNode] { first }
     public static func buildEither(second: [any HTMLNode]) -> [any HTMLNode] { second }
+
     public static func buildOptional(_ part: [any HTMLNode]?) -> [any HTMLNode] { part ?? [] }
+
     public static func buildExpression(_ node: any HTMLNode) -> [any HTMLNode] { [node] }
     public static func buildExpression(_ nodes: [any HTMLNode]) -> [any HTMLNode] { nodes }
     public static func buildExpression(_ text: String) -> [any HTMLNode] { [HTMLText(text)] }
+    public static func buildExpression(_ expression: ()) -> HTMLAttribute {
+        HTMLAttribute()
+    }
+
     public static func buildLimitedAvailability(_ part: [any HTMLNode]) -> [any HTMLNode] { part }
 }
 
 @resultBuilder
 public enum HTMLAttrBuilder {
     public static func buildBlock(_ parts: HTMLAttribute...) -> HTMLAttribute {
-        var out = HTMLAttribute(); parts.forEach { out.merge($0) }; return out
+        var out = HTMLAttribute()
+        parts.forEach { out.merge($0) }
+        return out
     }
+
     public static func buildExpression(_ part: HTMLAttribute) -> HTMLAttribute { part }
+
+    public static func buildOptional(_ part: HTMLAttribute?) -> HTMLAttribute {
+        part ?? HTMLAttribute()
+    }
+
+    public static func buildEither(first: HTMLAttribute) -> HTMLAttribute { first }
+    public static func buildEither(second: HTMLAttribute) -> HTMLAttribute { second }
+
+    public static func buildArray(_ parts: [HTMLAttribute]) -> HTMLAttribute {
+        var out = HTMLAttribute()
+        parts.forEach { out.merge($0) }
+        return out
+    }
+
+    public static func buildExpression(_ expression: ()) -> HTMLAttribute {
+        HTMLAttribute()
+    }
 }
+
+// @resultBuilder
+// public enum HTMLAttrBuilder {
+//     public static func buildBlock(_ parts: HTMLAttribute...) -> HTMLAttribute {
+//         var out = HTMLAttribute(); parts.forEach { out.merge($0) }; return out
+//     }
+//     public static func buildExpression(_ part: HTMLAttribute) -> HTMLAttribute { part }
+// }
 
 public extension HTML {
     static func attrs(@HTMLAttrBuilder _ c: () -> HTMLAttribute) -> HTMLAttribute { c() }
