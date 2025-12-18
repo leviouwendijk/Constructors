@@ -1,9 +1,5 @@
 import Foundation
-// import Structures
-import plate // ONLY dependency on plate here
-// requires deprecations in the Captcher / Surfaces / Vaporized use in Dataman
-
-// public typealias PSQLFieldTypeRegistry = FieldTypeRegistry<PSQLType>
+import Registry
 
 // public enum PSQLFieldTypes {
 public enum PSQLFieldTypeRegistry {
