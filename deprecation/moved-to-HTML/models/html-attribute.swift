@@ -102,23 +102,23 @@ public struct HTMLAttribute: ExpressibleByDictionaryLiteral, Sendable {
     public static func `class`(_ s: String) -> HTMLAttribute { ["class": s] }
 }
 
-extension HTMLAttribute {
-    public static func style(_ css: String) -> HTMLAttribute {
-        ["style": css]
-    }
+// extension HTMLAttribute {
+//     public static func style(_ css: String) -> HTMLAttribute {
+//         ["style": css]
+//     }
 
-    public static func style(_ declarations: [CSSDeclaration]) -> HTMLAttribute {
-        ["style": declarations.renderInline()]
-    }
+//     public static func style(_ declarations: [CSSDeclaration]) -> HTMLAttribute {
+//         ["style": declarations.renderInline()]
+//     }
 
-    public static func style(_ declarations: CSSDeclaration...) -> HTMLAttribute {
-        .style(declarations)
-    }
+//     public static func style(_ declarations: CSSDeclaration...) -> HTMLAttribute {
+//         .style(declarations)
+//     }
 
-    public static func style(@CSSDeclBuilder _ c: () -> [CSSDeclaration]) -> HTMLAttribute {
-        .style(c())
-    }
-}
+//     public static func style(@CSSDeclBuilder _ c: () -> [CSSDeclaration]) -> HTMLAttribute {
+//         .style(c())
+//     }
+// }
 
 extension HTMLAttribute {
     /// Return the last value for a given attribute key, if any.

@@ -1,6 +1,24 @@
 {
-  "originHash" : "2e9e06074077d4c3f197868807ef2ed2343b92ccd11a065b42e80e5830379a5e",
+  "originHash" : "0d55e7ca7b3496faffa5ebd06eeb26140d4e03a46ce5eaebf4b1a164e8d1a22b",
   "pins" : [
+    {
+      "identity" : "css",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/CSS.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "728d40142a7640ee4c3d0072194d39045e9afa9e"
+      }
+    },
+    {
+      "identity" : "html",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/HTML.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "b59403060e833afad5be1fe9b19f8fd543d40744"
+      }
+    },
     {
       "identity" : "indentation",
       "kind" : "remoteSourceControl",
@@ -11,12 +29,21 @@
       }
     },
     {
+      "identity" : "js",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/JS.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "96eeea629aa6ad252ec11da15da7df2a34a871e5"
+      }
+    },
+    {
       "identity" : "methods",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/leviouwendijk/Methods.git",
       "state" : {
         "branch" : "master",
-        "revision" : "3668117392a5e07ba36ba461adb90f1805461c3e"
+        "revision" : "c8f7182aa3ddffa106e7d35aa5dd12f0873f63d4"
       }
     },
     {
@@ -26,24 +53,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "242e890af20eb5f77087cf116ae9374f1f809b2a"
-      }
-    },
-    {
-      "identity" : "primitives",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/Primitives.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "5a595a4da45183ce9b7d41ba34fb8486017312ef"
-      }
-    },
-    {
-      "identity" : "registry",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/Registry.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "49966bb43475aae8231356853a2f1303d95346eb"
       }
     },
     {

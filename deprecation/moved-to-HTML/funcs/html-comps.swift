@@ -88,18 +88,6 @@ public enum HTML {
         )
     }
 
-    // public static func img(
-    //     from src_key: EnvironmentExtractableKey,
-    //     alt: String = "",
-    //     _ attrs: HTMLAttribute = HTMLAttribute()
-    // ) throws -> (any HTMLNode)? {
-    //     return try? img(
-    //         src: EnvironmentExtractor.base64_html_src(src_key),
-    //         alt: alt,
-    //         attrs
-    //     )
-    // }
-
     public static func br() -> any HTMLNode { el("br") }
     public static func br(_ n: Int) -> HTMLFragment { Array(repeating: HTML.br(), count: n) }
 
@@ -305,16 +293,16 @@ public extension HTML {
         return el("script", a) { [HTML.raw(js)] }
     }
 
-    static func scriptCall(_ fn: String, args: [JSValue], type: String? = "module") -> any HTMLNode {
-        HTML.scriptInline(JS.call(fn, args), type: type)
-    }
+    // static func scriptCall(_ fn: String, args: [JSValue], type: String? = "module") -> any HTMLNode {
+    //     HTML.scriptInline(JS.call(fn, args), type: type)
+    // }
 
-    /// Emit `<script type="application/json" id="...">…</script>` for props
-    static func jsonProps(id: String, _ value: JSValue) -> any HTMLNode {
-        HTML.el("script", ["type":"application/json","id": id]) {
-            HTML.raw(value.render()) // contents are JSON, not escaped text
-        }
-    }
+    // /// Emit `<script type="application/json" id="...">…</script>` for props
+    // static func jsonProps(id: String, _ value: JSValue) -> any HTMLNode {
+    //     HTML.el("script", ["type":"application/json","id": id]) {
+    //         HTML.raw(value.render()) // contents are JSON, not escaped text
+    //     }
+    // }
 
     static func link(_ spec: HTMLLinkSpec, _ extra: HTMLAttribute = [:]) -> any HTMLNode {
         var a = spec.attributes()
@@ -329,72 +317,72 @@ public extension HTML {
     }
 }
 
-public extension HTML {
-    // Base: single sheet, with optional options (default = plain render)
-    static func style(
-        _ sheet: CSSStyleSheet,
-        options: CSSRenderOptions = CSSRenderOptions()
-    ) -> any HTMLNode {
-        HTML.el("style") {
-            HTML.raw(sheet.render(options: options))
-        }
-    }
+// public extension HTML {
+//     // Base: single sheet, with optional options (default = plain render)
+//     static func style(
+//         _ sheet: CSSStyleSheet,
+//         options: CSSRenderOptions = CSSRenderOptions()
+//     ) -> any HTMLNode {
+//         HTML.el("style") {
+//             HTML.raw(sheet.render(options: options))
+//         }
+//     }
 
-    // Array of sheets
-    static func style(
-        _ sheets: [CSSStyleSheet],
-        options: CSSRenderOptions = CSSRenderOptions()
-    ) -> any HTMLNode {
-        style(CSSStyleSheet.merged(sheets), options: options)
-    }
+//     // Array of sheets
+//     static func style(
+//         _ sheets: [CSSStyleSheet],
+//         options: CSSRenderOptions = CSSRenderOptions()
+//     ) -> any HTMLNode {
+//         style(CSSStyleSheet.merged(sheets), options: options)
+//     }
 
-    // Varargs sheets
-    static func style(
-        _ sheets: CSSStyleSheet...,
-        options: CSSRenderOptions = CSSRenderOptions()
-    ) -> any HTMLNode {
-        style(CSSStyleSheet.merged(sheets), options: options)
-    }
+//     // Varargs sheets
+//     static func style(
+//         _ sheets: CSSStyleSheet...,
+//         options: CSSRenderOptions = CSSRenderOptions()
+//     ) -> any HTMLNode {
+//         style(CSSStyleSheet.merged(sheets), options: options)
+//     }
 
-    // Rules + media → sheet
-    static func style(
-        rules: [CSSRule],
-        media: [CSSMedia] = [],
-        keyframes: [CSSKeyframes] = [],
-        options: CSSRenderOptions = CSSRenderOptions()
-    ) -> any HTMLNode {
-        let sheet = CSSStyleSheet(
-            rules: rules,
-            media: media,
-            keyframes: keyframes
-        )
-        return style(sheet, options: options)
-    }
+//     // Rules + media → sheet
+//     static func style(
+//         rules: [CSSRule],
+//         media: [CSSMedia] = [],
+//         keyframes: [CSSKeyframes] = [],
+//         options: CSSRenderOptions = CSSRenderOptions()
+//     ) -> any HTMLNode {
+//         let sheet = CSSStyleSheet(
+//             rules: rules,
+//             media: media,
+//             keyframes: keyframes
+//         )
+//         return style(sheet, options: options)
+//     }
 
-    static func style(
-        @CSSBuilder _ css: () -> [CSSBlock],
-        options: CSSRenderOptions = CSSRenderOptions()
-    ) -> any HTMLNode {
-        var rules: [CSSRule] = []
-        var media: [CSSMedia] = []
-        var keyframes: [CSSKeyframes] = []
+//     static func style(
+//         @CSSBuilder _ css: () -> [CSSBlock],
+//         options: CSSRenderOptions = CSSRenderOptions()
+//     ) -> any HTMLNode {
+//         var rules: [CSSRule] = []
+//         var media: [CSSMedia] = []
+//         var keyframes: [CSSKeyframes] = []
 
-        for block in css() {
-            switch block {
-            case .rule(let r):
-                rules.append(r)
-            case .media(let m):
-                media.append(m)
-            case .keyframes(let k):
-                keyframes.append(k)
-            }
-        }
+//         for block in css() {
+//             switch block {
+//             case .rule(let r):
+//                 rules.append(r)
+//             case .media(let m):
+//                 media.append(m)
+//             case .keyframes(let k):
+//                 keyframes.append(k)
+//             }
+//         }
 
-        return style(
-            rules: rules,
-            media: media,
-            keyframes: keyframes,
-            options: options
-        )
-    }
-}
+//         return style(
+//             rules: rules,
+//             media: media,
+//             keyframes: keyframes,
+//             options: options
+//         )
+//     }
+// }
