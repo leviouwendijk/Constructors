@@ -18,11 +18,15 @@ let package = Package(
         // .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Registry.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Indentation.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/JS.git", branch: "master"),
+
+        .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Version.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/ProtocolComponents.git", branch: "master"),
     ],
     targets: [
         .target(
@@ -31,11 +35,15 @@ let package = Package(
                 // .product(name: "Primitives", package: "Primitives"),
                 // .product(name: "Methods", package: "Methods"),
                 // .product(name: "Milieu", package: "Milieu"),
-                // .product(name: "Registry", package: "Registry"),
-                // .product(name: "Indentation", package: "Indentation"),
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "JS", package: "JS"),
+
+                .product(name: "Milieu", package: "Milieu"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Version", package: "Version"),
+                .product(name: "Path", package: "Path"),
+                .product(name: "ProtocolComponents", package: "ProtocolComponents"),
             ],
         ),
         .testTarget(

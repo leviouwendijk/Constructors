@@ -1,5 +1,5 @@
 {
-  "originHash" : "0d55e7ca7b3496faffa5ebd06eeb26140d4e03a46ce5eaebf4b1a164e8d1a22b",
+  "originHash" : "0fe3ba8e15d5e7ec40497ba3ef6a1721d7206df2e318100fd21c7c0212e8add3",
   "pins" : [
     {
       "identity" : "css",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/leviouwendijk/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "b59403060e833afad5be1fe9b19f8fd543d40744"
+        "revision" : "6dde433ce557d8db296241ec52ba5721735eef5e"
       }
     },
     {
@@ -56,12 +56,57 @@
       }
     },
     {
+      "identity" : "path",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Path.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "b18278a4832ef11e4d6c8051e1ff1c03363c03a5"
+      }
+    },
+    {
+      "identity" : "primitives",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Primitives.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "f7c2d22952ba235c3078b590ccf695ac783e87fe"
+      }
+    },
+    {
+      "identity" : "protocolcomponents",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/ProtocolComponents.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "1d300607d190d21fdf29eb19868828ef8a1791ea"
+      }
+    },
+    {
       "identity" : "variables",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/leviouwendijk/Variables.git",
       "state" : {
         "branch" : "master",
         "revision" : "c533569cd399d8d4762f5f4f8241e2234735c6d0"
+      }
+    },
+    {
+      "identity" : "version",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Version.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "a7eeda6e3b84eca36f61366e5d420787c9aba69f"
+      }
+    },
+    {
+      "identity" : "writers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Writers.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "6084ab52b34ab2433000ad865cfa13bd6fe3b804"
       }
     }
   ],
