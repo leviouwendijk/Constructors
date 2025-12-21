@@ -8,8 +8,8 @@ public extension SiteObject {
     // static func snippets() -> [String: SnippetTargets] { [:] }
 
     // fast accessible API from self
-    static func navigation() -> NavigationInterface { 
-        return NavigationInterface.build(
+    static func navigation() -> NavigationStructure { 
+        return NavigationStructure.build(
             // from: pages()
             from: arrayPages()
         ) { target in

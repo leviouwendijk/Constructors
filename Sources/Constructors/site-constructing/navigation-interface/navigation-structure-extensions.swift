@@ -3,7 +3,7 @@ import Primitives
 import HTML
 import Path
 
-extension NavigationInterface {
+extension NavigationStructure {
     internal static func autoSegments(
         for path: ProjectPath,
         options: NavigationRenderOptions
@@ -91,7 +91,7 @@ extension NavigationInterface {
     }
 }
 
-public extension NavigationInterface {
+public extension NavigationStructure {
     /// Build tree from all page targets.
     ///
     /// - pages: your `SitePages.pages()`
@@ -100,7 +100,7 @@ public extension NavigationInterface {
         from pages: [PageTarget],
         include: (PageTarget) -> Bool,
         sort_order: NavigationSortOrder = .insertion
-    ) -> NavigationInterface {
+    ) -> NavigationStructure {
         var entries: [NavigationEntry] = []
 
         for target in pages {
@@ -124,7 +124,7 @@ public extension NavigationInterface {
         }
 
         let roots = buildTree(from: entries, sort_order: sort_order)
-        return NavigationInterface(roots: roots)
+        return NavigationStructure(roots: roots)
     }
 
     private static func buildTree(
@@ -189,13 +189,13 @@ public extension NavigationInterface {
     }
 }
 
-extension NavigationInterface {
+public extension NavigationStructure {
     static func build(
         from pages: [String : PageTarget],
         env: BuildEnvironment,
         sort_order: NavigationSortOrder = .insertion
-    ) -> NavigationInterface {
-        NavigationInterface.build(from: pages, sort_order: sort_order) { target in
+    ) -> NavigationStructure {
+        NavigationStructure.build(from: pages, sort_order: sort_order) { target in
             let visible = target.visibility.isEmpty || target.visibility.contains(env)
             guard visible else { return false }
 
@@ -212,7 +212,7 @@ extension NavigationInterface {
         from pages: [String : PageTarget],
         sort_order: NavigationSortOrder = .alphabetical,
         include: (PageTarget) -> Bool
-    ) -> NavigationInterface {
+    ) -> NavigationStructure {
         var entries: [NavigationEntry] = []
 
         for (_, target) in pages {
@@ -236,6 +236,6 @@ extension NavigationInterface {
         }
 
         let roots = buildTree(from: entries, sort_order: sort_order)
-        return NavigationInterface(roots: roots)
+        return NavigationStructure(roots: roots)
     }
 }

@@ -33,7 +33,7 @@ public protocol SiteObject: Sendable {
     // static func snippets() -> [String: SnippetTargets]
 
     // static func navigation() -> NavigationTree
-    static func navigation() -> NavigationInterface
+    static func navigation() -> NavigationStructure
 
     static var _pagesType: Any.Type { get }
     static var _stylesheetsType: Any.Type { get }

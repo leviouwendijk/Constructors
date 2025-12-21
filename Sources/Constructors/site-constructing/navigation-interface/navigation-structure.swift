@@ -1,4 +1,4 @@
-public struct NavigationInterface: Sendable {
+public struct NavigationStructure: Sendable {
     public var roots: [NavigationNode]
 
     public init(roots: [NavigationNode] = []) {
