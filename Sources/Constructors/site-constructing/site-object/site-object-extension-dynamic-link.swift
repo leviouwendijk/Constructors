@@ -5,7 +5,7 @@ extension SiteObject {
     //      .dynamiclink.base()
     //      .dynamiclink.sub()
     //      .dynamiclink.build(...args)
-    static var dynlink: SiteDynamicLink<Self> {
+    public static var dynlink: SiteDynamicLink<Self> {
         SiteDynamicLink<Self>()
     }
 }
