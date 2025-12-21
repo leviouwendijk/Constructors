@@ -17,7 +17,7 @@ public struct NavigationRenderOptions: Sendable, Equatable {
     
     public init(
         capitalization: Capitalization = .per_word,
-        space_chars: [String] = ["-", "_"]
+        space_chars: [String] = ["-", "_"],
     ) {
         self.capitalization = capitalization
         self.space_chars = space_chars
