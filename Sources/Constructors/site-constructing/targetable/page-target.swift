@@ -26,11 +26,13 @@ public struct PageTarget: Targetable, MetadataTargetable {
         self.visibility = visibility
         self.navigation = navigation
 
-        if let metadata {
-            self.metadata = metadata
-        } else {
-            self.metadata = visibility.contains(.public) ? .default : .blocked
-        }
+        // if let metadata {
+        //     self.metadata = metadata
+        // } else {
+        //     self.metadata = visibility.contains(.public) ? .default : .blocked
+        // }
+
+        self.metadata = metadata.exists_or_inits(visibility: visibility)
     }
 
     public func document() -> HTMLDocument {

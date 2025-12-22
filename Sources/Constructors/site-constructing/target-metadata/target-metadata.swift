@@ -1,3 +1,5 @@
+import Primitives
+
 public struct TargetMetadata: Sendable, Equatable {
     public var includeInSitemap: Bool
     public var robots: RobotsDirective
@@ -9,6 +11,7 @@ public struct TargetMetadata: Sendable, Equatable {
         self.includeInSitemap = includeInSitemap
         self.robots = robots
     }
+
 
     public static let `default` = TargetMetadata()
 
@@ -26,4 +29,34 @@ public struct TargetMetadata: Sendable, Equatable {
     //     includeInSitemap: false,
     //     robots: .disallow
     // )
+}
+
+extension TargetMetadata {
+    public static func from(
+        visibility: Set<BuildEnvironment>
+    ) -> TargetMetadata {
+        return visibility.contains(.public) ? .default : .blocked
+    }
+
+    public static func return_provided_or_initialize(
+        metadata: TargetMetadata?,
+        visibility: Set<BuildEnvironment>
+    ) -> TargetMetadata {
+        if let metadata {
+            return metadata
+        } else {
+            return from(visibility: visibility)
+        }
+    }
+}
+
+extension Optional where Wrapped == TargetMetadata {
+    public func exists_or_inits(
+        visibility: Set<BuildEnvironment>
+    ) -> TargetMetadata {
+        return TargetMetadata.return_provided_or_initialize(
+            metadata: self,
+            visibility: visibility
+        )
+    }
 }
