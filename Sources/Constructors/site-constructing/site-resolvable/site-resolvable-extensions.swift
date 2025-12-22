@@ -18,42 +18,6 @@ public extension SiteResolvable {
 }
 
 public extension SiteResolvable {
-    func default_target_subdirectory(
-        dist: BuildEnvironment
-    ) -> StandardPath {
-        if dist == .local {
-            fputs("Warning: invoking default_target_subdirectory() using .local results in an unused target path that does not exist.", stderr)
-            fputs("This path should not be reached when using .local as your input.", stderr)
-        }
-        
-        var strs: [String] = [
-            // dist.rawValue, // test or public ( local irrelevant )
-            dist.target_subdir(), // tests or public ( local irrelevant )
-        ]
-
-        var target = ""
-        if dist == .test {
-            target.append("test.")
-        }
-
-        target.append(web_root_component) 
-
-        // if a non-nil TLD, append TLD
-        // kept nillable in case you don't want to add it in some paths (non-web targets)
-        if let tld = tld_component {
-            target.append(tld.component)
-        }
-
-        strs.append(target) // either test.<hondenmeesters.nl> or without test
-
-        // results in, say, /public/docs.hondenmeesters.nl
-        // this we can then use from a standard root like `www-hondenmeesters`
-        // to achieve dynamic computation of: /www-hondenmeesters/public/docs.hondenmeestesr.nl
-        return StandardPath(strs) 
-    }
-}
-
-public extension SiteResolvable {
     func compose_address(
         appending path: GenericPath? = nil
     ) -> String {

@@ -3,7 +3,6 @@ import ProtocolComponents
 
 public protocol SiteResolvable: Codable, Sendable, CaseIterable, RawRepresentable where RawValue == String {
     func dist() throws -> DistributionPaths
-    // func copyables_from_public() -> [Copyables]
     func copyables_from_public() -> [CopyableResource]
     func site_object() throws -> any SiteObject.Type
 
@@ -15,4 +14,12 @@ public protocol SiteResolvable: Codable, Sendable, CaseIterable, RawRepresentabl
     func address(for identifier: (any TargetIdentifying)?) -> String
 
     func root_address() -> String
+
+    // based on per-site directory:
+    // case dependendent location, can be overwritten by user implementation
+    // defaults to a 'www-<self.rawValue>' name
+    func default_working_subdirectory() -> String
+
+    // stronger working directory defaults:
+    func default_dist_directory(root: DistributionPathsRoot) -> DistributionPaths
 }
