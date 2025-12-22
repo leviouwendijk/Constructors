@@ -21,5 +21,5 @@ public protocol SiteResolvable: Codable, Sendable, CaseIterable, RawRepresentabl
     func default_working_subdirectory() -> String
 
     // stronger working directory defaults:
-    func default_dist_directory(root: DistributionPathsRoot) -> DistributionPaths
+    func default_dist_directory(root: DistributionPathsRoot) throws -> DistributionPaths
 }
