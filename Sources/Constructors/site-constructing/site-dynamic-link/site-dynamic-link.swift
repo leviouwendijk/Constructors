@@ -4,6 +4,10 @@ import Path
 public struct SiteDynamicLink<S: SiteObject> {
     public init() {}
 
+    public func css_default() -> [any HTMLNode] {
+        return build(appending: "default")
+    }
+
     public func css_base() -> [any HTMLNode] {
         return build(appending: "base")
     }
