@@ -5,6 +5,7 @@ extension TargetIdentifying {
         .replacingOccurrences(of: "_", with: "-")
     }
 
+    // relative, Page-scoped API
     public static func refer(to id: Self, asRootPath: Bool = true) -> String {
         id.target().output.rendered(asRootPath: asRootPath)
     }

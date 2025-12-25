@@ -5,7 +5,7 @@ import Primitives
 public struct PageTarget: Targetable, MetadataTargetable {
     public let html: @Sendable () -> HTMLDocument
 
-    public let output: GenericPath
+    public let output: StandardPath
     public let visibility: Set<BuildEnvironment>
     public let navigation: NavigationSetting
 
@@ -13,7 +13,7 @@ public struct PageTarget: Targetable, MetadataTargetable {
 
     public init(
         html: @Sendable @escaping () -> HTMLDocument,
-        output: GenericPath,
+        output: StandardPath,
         visibility: Set<BuildEnvironment> = [.local, .test, .public],
         navigation: NavigationSetting = .none,
         metadata: TargetMetadata? = nil
