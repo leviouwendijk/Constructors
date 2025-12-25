@@ -2,6 +2,8 @@ import Path
 import ProtocolComponents
 
 public protocol SiteResolvable: Codable, Sendable, CaseIterable, RawRepresentable where RawValue == String {
+    var site_id: String { get }
+
     func dist() throws -> DistributionPaths
     func copyables_from_public() -> [CopyableResource]
     func site_object() throws -> any SiteObject.Type

@@ -4,6 +4,10 @@ import ProtocolComponents
 import Primitives
 
 public extension SiteResolvable {
+    var site_id: String { rawValue }
+}
+
+public extension SiteResolvable {
     var protocol_component: HTTPProtocolComponent? {
         return .https
     }
