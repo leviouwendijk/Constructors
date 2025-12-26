@@ -28,6 +28,20 @@ public extension SiteObject {
     // }
 }
 
+// generic StandardPath appending
+public extension SiteObject {
+    static func refer(
+        path: StandardPath,
+        absolute: Bool = false,
+        asRootPath: Bool = true
+    ) -> String {
+        if absolute {
+            return Self.site.compose_address(appending: path)
+        }
+        return path.rendered(asRootPath: asRootPath)
+    }
+}
+
 // typed overloads
 public extension SiteObject {
     static func refer(
