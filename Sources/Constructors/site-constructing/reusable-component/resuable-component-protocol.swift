@@ -1,12 +1,12 @@
 import CSS
 import HTML
 
-public protocol WebComponent: Sendable {
+public protocol ReusableComponent: Sendable {
     func html() -> HTMLFragment
     func styles() -> [CSSStyleSheet]
 }
 
-public extension Array where Element == any WebComponent {
+public extension Array where Element == any ReusableComponent {
     func gathered_styles() -> [CSSStyleSheet] {
         var out: [CSSStyleSheet] = []
         for c in self {
