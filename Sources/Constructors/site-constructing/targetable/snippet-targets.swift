@@ -3,6 +3,7 @@ import Primitives
 import Path
 import HTML
 import CSS
+import JS
 
 public struct SnippetTargets: Targetable, MetadataTargetable {
     public enum Mode: Sendable {
@@ -12,22 +13,22 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
     }
 
     public let html: HTMLFragment
+    public let javascript: [JSScript]
     public let stylesheets: [CSSStyleSheet]
     public let htmlOutput: GenericPath
-    public let mode: Mode // render css this way
+    public let mode: Mode
     public let visibility: Set<BuildEnvironment>
 
     public var suffix: String = "snippets"
 
     public var output: GenericPath {
         var comps: [String] = []
-        comps.append(suffix) // append 'snippets' dir
+        comps.append(suffix)
 
         if let s = sorting_category {
-            comps.append(s.rawValue) // optional subcategory
+            comps.append(s.rawValue)
         }
 
-        // return htmlOutput.merged(appending: GenericPath(comps))
         return GenericPath(comps).merged(appending: htmlOutput)
     }
 
@@ -35,11 +36,13 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         case asset
         case document
     }
-    public let sorting_category: SortingCategory? 
+
+    public let sorting_category: SortingCategory?
     public let metadata: TargetMetadata
 
     public init(
         html: HTMLFragment,
+        javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
         htmlOutput: GenericPath,
         mode: Mode,
@@ -48,18 +51,18 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         metadata: TargetMetadata? = nil
     ) {
         self.html = html
+        self.javascript = javascript
         self.stylesheets = stylesheets
         self.htmlOutput = htmlOutput
         self.mode = mode
         self.visibility = visibility
         self.sorting_category = sorting_category
-        // self.metadata = metadata
         self.metadata = metadata ?? .blocked
     }
 
-    /// Renders CSS inline
     public static func doc_inline_css(
         html: HTMLFragment,
+        javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
         htmlOutput: GenericPath,
         visibility: Set<BuildEnvironment> = [.local],
@@ -67,6 +70,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
     ) -> SnippetTargets {
         SnippetTargets(
             html: html,
+            javascript: javascript,
             stylesheets: stylesheets,
             htmlOutput: htmlOutput,
             mode: .inline,
@@ -75,9 +79,9 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         )
     }
 
-    /// Renders CSS as separate file
     public static func doc_external_css(
         html: HTMLFragment,
+        javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
         htmlOutput: GenericPath,
         cssOutput: GenericPath,
@@ -86,6 +90,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
     ) -> SnippetTargets {
         SnippetTargets(
             html: html,
+            javascript: javascript,
             stylesheets: stylesheets,
             htmlOutput: htmlOutput,
             mode: .external(cssPath: cssOutput),
@@ -94,17 +99,16 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         )
     }
 
-    /// DOES NOT accept CSS
-    /// Is for public side snippets
-    /// requires manual inclusion for conscious publication
     public static func html_fragment(
         html: HTMLFragment,
+        javascript: [JSScript] = [],
         output: GenericPath,
         visibility: Set<BuildEnvironment> = [.local, .test],
         sorting_category: SortingCategory? = .asset
     ) -> SnippetTargets {
         SnippetTargets(
             html: html,
+            javascript: javascript,
             stylesheets: [],
             htmlOutput: output,
             mode: .fragment,
@@ -113,33 +117,25 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         )
     }
 
-    // MARK: - Helpers
-
     @inlinable
     public func isVisible(in environment: BuildEnvironment) -> Bool {
         visibility.contains(environment)
     }
 
-    // @inlinable
-    // public var htmlFragment: HTMLFragment {
-    //     html
-    // }
-
     @inlinable
     public var htmlDocument: HTMLDocument {
-        html.htmlDocument
+        let placed = place_scripts(javascript)
+        return HTML.document(
+            head: placed.head,
+            body: html + placed.body
+        )
     }
 
-    // struct URL: Sendable {
-    //     public let base: URL
-    //     public var suffix: String
-    // }
-
     public func url(
-        base_url: URL,
+        base_url: URL
     ) -> URL {
         var url = base_url
-        .appendingPathComponent(suffix)
+            .appendingPathComponent(suffix)
 
         if let cat = sorting_category {
             url = url.appendingPathComponent(cat.rawValue)
@@ -151,19 +147,23 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
 
 internal func renderInlineHTML(
     fragment: HTMLFragment,
+    scripts: [JSScript] = [],
     sheets: [CSSStyleSheet],
     env: BuildEnvironment,
     onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
 ) -> String {
-    // If there are styles, merge + prune them against the snippet fragment.
-    // If there are none, we skip the <style> block entirely.
+    let placedScripts = place_scripts(scripts)
+
     let inlineCSS: String?
     if sheets.isEmpty {
         inlineCSS = nil
     } else {
         inlineCSS = CSSStyleSheet.renderedMerged(
             sheets,
-            forNodeCollections: [fragment],
+            forNodeCollections: [
+                fragment + placedScripts.body,
+                placedScripts.head
+            ].filter { !$0.isEmpty },
             indentStep: 4,
             ensureTrailingNewline: true,
             unreferenced: .commented
@@ -176,7 +176,7 @@ internal func renderInlineHTML(
         stylesheets: [],
         inlineStyle: inlineCSS
     ) {
-        fragment
+        placedScripts.head + fragment + placedScripts.body
     }
 
     return doc.render(
@@ -185,3 +185,85 @@ internal func renderInlineHTML(
         onGate: onGate
     )
 }
+
+// public extension SnippetTargets {
+//     init(
+//         artifact: RenderArtifact,
+//         htmlOutput: GenericPath,
+//         mode: Mode,
+//         visibility: Set<BuildEnvironment> = [.local],
+//         sorting_category: SortingCategory? = nil,
+//         metadata: TargetMetadata? = nil
+//     ) {
+//         self.init(
+//             html: artifact.html,
+//             javascript: artifact.scripts,
+//             stylesheets: artifact.stylesheets,
+//             htmlOutput: htmlOutput,
+//             mode: mode,
+//             visibility: visibility,
+//             sorting_category: sorting_category,
+//             metadata: metadata
+//         )
+//     }
+
+//     static func doc_inline_css(
+//         artifact: RenderArtifact,
+//         htmlOutput: GenericPath,
+//         visibility: Set<BuildEnvironment> = [.local],
+//         sorting_category: SortingCategory? = .document
+//     ) -> SnippetTargets {
+//         SnippetTargets(
+//             artifact: artifact,
+//             htmlOutput: htmlOutput,
+//             mode: .inline,
+//             visibility: visibility,
+//             sorting_category: sorting_category
+//         )
+//     }
+
+//     static func doc_external_css(
+//         artifact: RenderArtifact,
+//         htmlOutput: GenericPath,
+//         cssOutput: GenericPath,
+//         visibility: Set<BuildEnvironment> = [.local],
+//         sorting_category: SortingCategory? = .document
+//     ) -> SnippetTargets {
+//         SnippetTargets(
+//             artifact: artifact,
+//             htmlOutput: htmlOutput,
+//             mode: .external(cssPath: cssOutput),
+//             visibility: visibility,
+//             sorting_category: sorting_category
+//         )
+//     }
+
+//     static func html_fragment(
+//         artifact: RenderArtifact,
+//         output: GenericPath,
+//         visibility: Set<BuildEnvironment> = [.local, .test],
+//         sorting_category: SortingCategory? = .asset
+//     ) -> SnippetTargets {
+//         SnippetTargets(
+//             html: artifact.html,
+//             javascript: artifact.scripts,
+//             stylesheets: [],
+//             htmlOutput: output,
+//             mode: .fragment,
+//             visibility: visibility,
+//             sorting_category: sorting_category
+//         )
+//     }
+
+//     var artifact: RenderArtifact {
+//         RenderArtifact(
+//             html: html,
+//             scripts: javascript,
+//             stylesheets: stylesheets
+//         )
+//     }
+
+//     var css_bundle: CSSBundle {
+//         CSSBundle(stylesheets)
+//     }
+// }

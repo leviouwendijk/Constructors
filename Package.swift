@@ -18,6 +18,8 @@ let package = Package(
         // .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/DSL.git", branch: "master"),
+
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/JS.git", branch: "master"),
@@ -35,6 +37,8 @@ let package = Package(
                 // .product(name: "Primitives", package: "Primitives"),
                 // .product(name: "Methods", package: "Methods"),
                 // .product(name: "Milieu", package: "Milieu"),
+                .product(name: "DSL", package: "DSL"),
+
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "JS", package: "JS"),
@@ -43,6 +47,7 @@ let package = Package(
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Version", package: "Version"),
                 .product(name: "Path", package: "Path"),
+                .product(name: "PathWeb", package: "Path"),
                 .product(name: "ProtocolComponents", package: "ProtocolComponents"),
             ],
         ),

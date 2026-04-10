@@ -47,7 +47,8 @@ extension BuildEnvironment {
         case .public:
             // Safe write with backup + atomic replace
             let opts = SafeWriteOptions(
-                overrideExisting: true,            // allow overwrite in public dist
+                // overrideExisting: true,            // allow overwrite in public dist
+                existingFilePolicy: .overwrite,
                 makeBackupOnOverride: true,        // create a backup before overwriting
                 whitespaceOnlyIsBlank: true,       // treat whitespace-only files as blank
                 backupSuffix: "_previous_version.bak",

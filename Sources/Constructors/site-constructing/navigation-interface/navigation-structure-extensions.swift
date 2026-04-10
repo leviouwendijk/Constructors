@@ -239,3 +239,77 @@ public extension NavigationStructure {
         return NavigationStructure(roots: roots)
     }
 }
+
+// ----------
+
+// building from new refactor api SitePageDefinition
+public extension NavigationStructure {
+    static func build(
+        from pages: [String : SiteDocumentDefinition],
+        env: BuildEnvironment,
+        sort_order: NavigationSortOrder = .insertion
+    ) -> NavigationStructure {
+        NavigationStructure.build(
+            from: pages,
+            sort_order: sort_order
+        ) { page in
+            let visible = page.visibility.isEmpty || page.visibility.contains(env)
+            guard visible else { return false }
+
+            switch page.navigation {
+            case .none:
+                return false
+            case .auto, .custom:
+                return true
+            }
+        }
+    }
+
+    static func build(
+        from pages: [String : SiteDocumentDefinition],
+        sort_order: NavigationSortOrder = .alphabetical,
+        include: (SiteDocumentDefinition) -> Bool
+    ) -> NavigationStructure {
+        var entries: [NavigationEntry] = []
+
+        for (_, page) in pages {
+            guard include(page) else { continue }
+
+            let href = page.output.render(as: .root)
+
+            switch page.navigation {
+            case .none:
+                continue
+
+            case .custom(let segments):
+                guard !segments.isEmpty else { continue }
+                entries.append(
+                    NavigationEntry(
+                        segments: segments,
+                        path: href
+                    )
+                )
+
+            case .auto(let options):
+                let segs = autoSegments(
+                    for: page.output,
+                    options: options
+                )
+                guard !segs.isEmpty else { continue }
+                entries.append(
+                    NavigationEntry(
+                        segments: segs,
+                        path: href
+                    )
+                )
+            }
+        }
+
+        let roots = buildTree(
+            from: entries,
+            sort_order: sort_order
+        )
+
+        return NavigationStructure(roots: roots)
+    }
+}

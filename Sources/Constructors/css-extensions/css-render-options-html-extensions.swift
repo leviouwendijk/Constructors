@@ -1,6 +1,23 @@
 import CSS
 import HTML
 
+private func collectedSymbols(
+    from document: HTMLDocument
+) -> HTMLSymbols {
+    return HTMLSymbolCollector.collect(
+        from: [
+            HTML.html(document.html_attributes) {
+                HTML.head {
+                    document.head
+                }
+                HTML.body {
+                    document.body
+                }
+            }
+        ]
+    )
+}
+
 extension CSSRenderOptions {
     public static func forNodes(
         _ nodes: HTMLFragment,
@@ -27,7 +44,8 @@ extension CSSRenderOptions {
         unreferenced: CSSUnreferenced = .keep,
         mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
-            forNodes([node], 
+        forNodes(
+            [node],
             indentStep: indentStep,
             ensureTrailingNewline: ensureTrailingNewline,
             unreferenced: unreferenced,
@@ -44,15 +62,13 @@ extension CSSRenderOptions {
         unreferenced: CSSUnreferenced = .keep,
         mergeDuplicateSelectors: Bool = true
     ) -> CSSRenderOptions {
-        let symbols = document.collectedSymbols()
-        let classes = symbols.classes
-        let ids = symbols.ids
+        let symbols = collectedSymbols(from: document)
 
         return CSSRenderOptions(
             indentStep: indentStep,
             ensureTrailingNewline: ensureTrailingNewline,
-            usedClassNames: classes,
-            usedIDs: ids,
+            usedClassNames: symbols.classes,
+            usedIDs: symbols.ids,
             unreferenced: unreferenced,
             mergeDuplicateSelectors: mergeDuplicateSelectors
         )
@@ -69,7 +85,7 @@ extension CSSRenderOptions {
         var usedIDs = Set<String>()
 
         for doc in documents {
-            let symbols = doc.collectedSymbols()
+            let symbols = collectedSymbols(from: doc)
             usedClasses.formUnion(symbols.classes)
             usedIDs.formUnion(symbols.ids)
         }

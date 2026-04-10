@@ -29,7 +29,8 @@ public func copyIfDifferent(src: URL, dst: URL, backups: Bool) throws -> Bool {
 
     let data = try Data(contentsOf: src, options: .uncached)
     let opts = SafeWriteOptions(
-        overrideExisting: true,
+        // overrideExisting: true,
+        existingFilePolicy: .overwrite,
         makeBackupOnOverride: backups,
         whitespaceOnlyIsBlank: false,
         backupSuffix: "_previous_version.bak",

@@ -1,82 +1,176 @@
 import Path
 
 public extension SiteObject {
-    // generic
     static func refer<T: TargetIdentifying>(
         to target: T,
         absolute: Bool = false,
-        asRootPath: Bool = true
+        relativity: PathRelativity = .root
     ) -> String {
         let reference_path = target.target().output
 
         if absolute {
-            return Self.site.compose_address(appending: reference_path)
+            return Self.site.compose_address(
+                appending: reference_path
+            )
         }
-        return reference_path.rendered(asRootPath: asRootPath)
-    }
 
-    // // existential
-    // static func refer(
-    //     to target: (any TargetIdentifying),
-    //     absolute: Bool = false,
-    //     asRootPath: Bool = true
-    // ) -> String {
-    //     if absolute {
-    //         return Self.site.compose_address(appending: target.target().output)
-    //     }
-    //     return target.target().output.rendered(asRootPath: asRootPath)
-    // }
+        return reference_path.render(as: relativity)
+    }
 }
 
-// generic StandardPath appending
 public extension SiteObject {
     static func refer(
         path: StandardPath,
         absolute: Bool = false,
-        asRootPath: Bool = true
+        relativity: PathRelativity = .root
     ) -> String {
         if absolute {
-            return Self.site.compose_address(appending: path)
+            return Self.site.compose_address(
+                appending: path
+            )
         }
-        return path.rendered(asRootPath: asRootPath)
+
+        return path.render(as: relativity)
     }
 }
 
-// typed overloads
 public extension SiteObject {
     static func refer(
         page: Page,
         absolute: Bool = false,
-        asRootPath: Bool = true
+        relativity: PathRelativity = .root
     ) -> String {
         self.refer(
             to: page,
             absolute: absolute,
-            asRootPath: asRootPath
+            relativity: relativity
         )
     }
 
     static func refer(
         stylesheet: Stylesheet,
         absolute: Bool = false,
-        asRootPath: Bool = true
+        relativity: PathRelativity = .root
     ) -> String {
         self.refer(
             to: stylesheet,
             absolute: absolute,
-            asRootPath: asRootPath
+            relativity: relativity
         )
     }
 
     static func refer(
         snippet: Snippet,
         absolute: Bool = false,
-        asRootPath: Bool = true
+        relativity: PathRelativity = .root
     ) -> String {
         self.refer(
             to: snippet,
             absolute: absolute,
-            asRootPath: asRootPath
+            relativity: relativity
         )
     }
 }
+
+// refactor SitePageDefinition
+public extension SiteObject {
+    static func refer(
+        document: SiteDocumentDefinition,
+        absolute: Bool = false,
+        relativity: PathRelativity = .root
+    ) -> String {
+        let reference_path = document.output
+
+        if absolute {
+            return Self.site.compose_address(
+                appending: reference_path
+            )
+        }
+
+        return reference_path.render(as: relativity)
+    }
+}
+
+// previous:
+
+// public extension SiteObject {
+//     // generic
+//     static func refer<T: TargetIdentifying>(
+//         to target: T,
+//         absolute: Bool = false,
+//         asRootPath: Bool = true
+//     ) -> String {
+//         let reference_path = target.target().output
+
+//         if absolute {
+//             return Self.site.compose_address(appending: reference_path)
+//         }
+//         return reference_path.rendered(asRootPath: asRootPath)
+//     }
+
+//     // // existential
+//     // static func refer(
+//     //     to target: (any TargetIdentifying),
+//     //     absolute: Bool = false,
+//     //     asRootPath: Bool = true
+//     // ) -> String {
+//     //     if absolute {
+//     //         return Self.site.compose_address(appending: target.target().output)
+//     //     }
+//     //     return target.target().output.rendered(asRootPath: asRootPath)
+//     // }
+// }
+
+// // generic StandardPath appending
+// public extension SiteObject {
+//     static func refer(
+//         path: StandardPath,
+//         absolute: Bool = false,
+//         asRootPath: Bool = true
+//     ) -> String {
+//         if absolute {
+//             return Self.site.compose_address(appending: path)
+//         }
+//         return path.rendered(asRootPath: asRootPath)
+//     }
+// }
+
+// // typed overloads
+// public extension SiteObject {
+//     static func refer(
+//         page: Page,
+//         absolute: Bool = false,
+//         asRootPath: Bool = true
+//     ) -> String {
+//         self.refer(
+//             to: page,
+//             absolute: absolute,
+//             asRootPath: asRootPath
+//         )
+//     }
+
+//     static func refer(
+//         stylesheet: Stylesheet,
+//         absolute: Bool = false,
+//         asRootPath: Bool = true
+//     ) -> String {
+//         self.refer(
+//             to: stylesheet,
+//             absolute: absolute,
+//             asRootPath: asRootPath
+//         )
+//     }
+
+//     static func refer(
+//         snippet: Snippet,
+//         absolute: Bool = false,
+//         asRootPath: Bool = true
+//     ) -> String {
+//         self.refer(
+//             to: snippet,
+//             absolute: absolute,
+//             asRootPath: asRootPath
+//         )
+//     }
+// }
+

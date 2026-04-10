@@ -4,4 +4,3 @@ public enum CopyableResource: String, RawRepresentable, Sendable {
     case webmanifest = "site.webmanifest"
     case sitemap = "sitemap.xml"
 }
-

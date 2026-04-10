@@ -1,5 +1,6 @@
 import HTML
 import CSS
+import DSL
 
 public extension HTML {
     // Base: single sheet, with optional options (default = plain render)
@@ -44,29 +45,44 @@ public extension HTML {
     }
 
     static func style(
-        @CSSBuilder _ css: () -> [CSSBlock],
+        @CSSBuilder _ css: () -> [CSSContributionUnit],
         options: CSSRenderOptions = CSSRenderOptions()
     ) -> any HTMLNode {
-        var rules: [CSSRule] = []
-        var media: [CSSMedia] = []
-        var keyframes: [CSSKeyframes] = []
-
-        for block in css() {
-            switch block {
-            case .rule(let r):
-                rules.append(r)
-            case .media(let m):
-                media.append(m)
-            case .keyframes(let k):
-                keyframes.append(k)
-            }
-        }
+        let sheet = CSSContributionCollector.collect(
+            .all,
+            from: css()
+        )
 
         return style(
-            rules: rules,
-            media: media,
-            keyframes: keyframes,
+            sheet,
             options: options
         )
     }
+
+    // static func style(
+    //     @CSSBuilder _ css: () -> [CSSBlock],
+    //     options: CSSRenderOptions = CSSRenderOptions()
+    // ) -> any HTMLNode {
+    //     var rules: [CSSRule] = []
+    //     var media: [CSSMedia] = []
+    //     var keyframes: [CSSKeyframes] = []
+
+    //     for block in css() {
+    //         switch block {
+    //         case .rule(let r):
+    //             rules.append(r)
+    //         case .media(let m):
+    //             media.append(m)
+    //         case .keyframes(let k):
+    //             keyframes.append(k)
+    //         }
+    //     }
+
+    //     return style(
+    //         rules: rules,
+    //         media: media,
+    //         keyframes: keyframes,
+    //         options: options
+    //     )
+    // }
 }

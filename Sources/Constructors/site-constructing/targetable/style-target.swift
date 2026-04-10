@@ -2,21 +2,10 @@ import CSS
 import Path
 
 public struct StylesheetTarget: Targetable {
-    /// Friendly identifier, e.g. "dynamic", "critical", etc.
     public let name: String
-
-    /// The stylesheet to render.
     public let sheet: CSSStyleSheet
-
-    /// Where to write it relative to the site root
-    /// e.g. ["assets", "css", "dynamic-minified.css"]
     public let output: GenericPath
-
-    /// Whether to drop unused selectors based on referenced classes/ids
-    /// across all rendered documents.
     public let pruneUnusedSelectors: Bool
-
-    /// Optional override for indent/minification; default is "minified-ish".
     public let indentStep: Int
 
     public init(
@@ -33,3 +22,39 @@ public struct StylesheetTarget: Targetable {
         self.indentStep = indentStep
     }
 }
+
+// public extension StylesheetTarget {
+//     init(
+//         name: String,
+//         artifact: RenderArtifact,
+//         output: GenericPath,
+//         pruneUnusedSelectors: Bool = true,
+//         indentStep: Int = 4
+//     ) {
+//         self.init(
+//             name: name,
+//             sheet: CSSBundle(artifact.stylesheets).mergedSheet,
+//             output: output,
+//             pruneUnusedSelectors: pruneUnusedSelectors,
+//             indentStep: indentStep
+//         )
+//     }
+
+//     init(
+//         name: String,
+//         artifacts: [RenderArtifact],
+//         output: GenericPath,
+//         pruneUnusedSelectors: Bool = true,
+//         indentStep: Int = 4
+//     ) {
+//         self.init(
+//             name: name,
+//             sheet: CSSBundle(
+//                 artifacts.flatMap(\.stylesheets)
+//             ).mergedSheet,
+//             output: output,
+//             pruneUnusedSelectors: pruneUnusedSelectors,
+//             indentStep: indentStep
+//         )
+//     }
+// }
