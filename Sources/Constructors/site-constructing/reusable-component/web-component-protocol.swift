@@ -2,6 +2,7 @@ import CSS
 import HTML
 
 // backwards compatibility
+@available(*, message: "stop using WebComponent because redundant 1:1 to ReusableComponent")
 public typealias WebComponent = ReusableComponent
 
 
