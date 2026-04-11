@@ -146,6 +146,30 @@ public extension SiteObject {
         )
     }
 
+    static func asset_reference(
+        path: StandardPath,
+        on destinationSite: any SiteResolvable,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: path,
+            destinationSite: destinationSite,
+            style: style
+        )
+    }
+
+    static func asset_reference<Destination: SiteObject>(
+        path: StandardPath,
+        on destination: Destination.Type,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        asset_reference(
+            path: path,
+            on: destination.site,
+            style: style
+        )
+    }
+
     static func asset_reference<T: TargetIdentifying>(
         to target: T,
         on destinationSite: any SiteResolvable,

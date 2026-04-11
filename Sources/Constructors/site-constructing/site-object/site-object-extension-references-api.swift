@@ -12,6 +12,30 @@ public extension SiteObject {
         )
     }
 
+    static func refer(
+        path: StandardPath,
+        on destinationSite: any SiteResolvable,
+        style: SiteReferenceStyle = .automatic
+    ) -> String {
+        resolve_reference(
+            path: path,
+            destinationSite: destinationSite,
+            style: style
+        )
+    }
+
+    static func refer<Destination: SiteObject>(
+        path: StandardPath,
+        on destination: Destination.Type,
+        style: SiteReferenceStyle = .automatic
+    ) -> String {
+        refer(
+            path: path,
+            on: destination.site,
+            style: style
+        )
+    }
+
     static func refer<T: TargetIdentifying>(
         to target: T,
         on destinationSite: any SiteResolvable,
