@@ -2,8 +2,7 @@ import Path
 import PathWeb
 import ProtocolComponents
 
-
-public struct HTMLAssetReference: Sendable, Equatable,ExpressibleByStringLiteral {
+public struct HTMLAssetReference: Sendable, Equatable, ExpressibleByStringLiteral {
     public enum Value: Sendable, Equatable {
         case web(WebReference)
         case raw(String)
@@ -133,6 +132,115 @@ public struct HTMLAssetReferenceOptions: Sendable, Equatable {
     public static let relative = Self(
         relativity: .relative
     )
+}
+
+public extension SiteObject {
+    static func asset_reference(
+        path: StandardPath,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: path,
+            destinationSite: Self.site,
+            style: style
+        )
+    }
+
+    static func asset_reference<T: TargetIdentifying>(
+        to target: T,
+        on destinationSite: any SiteResolvable,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: target.target().output,
+            destinationSite: destinationSite,
+            style: style
+        )
+    }
+
+    static func asset_reference<Destination: SiteObject, T: TargetIdentifying>(
+        to target: T,
+        on destination: Destination.Type,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        asset_reference(
+            to: target,
+            on: destination.site,
+            style: style
+        )
+    }
+
+    static func asset_reference(
+        page: Page,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: page.target().output,
+            destinationSite: Self.site,
+            style: style
+        )
+    }
+
+    static func asset_reference(
+        stylesheet: Stylesheet,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: stylesheet.target().output,
+            destinationSite: Self.site,
+            style: style
+        )
+    }
+
+    static func asset_reference(
+        snippet: Snippet,
+        style: SiteReferenceStyle = .automatic
+    ) -> HTMLAssetReference {
+        resolve_asset_reference(
+            path: snippet.target().output,
+            destinationSite: Self.site,
+            style: style
+        )
+    }
+}
+
+private extension SiteObject {
+    static func resolve_asset_reference(
+        path: StandardPath,
+        destinationSite: any SiteResolvable,
+        style: SiteReferenceStyle
+    ) -> HTMLAssetReference {
+        switch style {
+        case .absolute:
+            return .raw(
+                destinationSite.compose_address(
+                    appending: path
+                )
+            )
+
+        case .local(let relativity):
+            return HTMLAssetReference(
+                path,
+                options: .init(
+                    relativity: relativity
+                )
+            )
+
+        case .automatic:
+            if Self.site.site_id == destinationSite.site_id {
+                return HTMLAssetReference(
+                    path,
+                    options: .root
+                )
+            }
+
+            return .raw(
+                destinationSite.compose_address(
+                    appending: path
+                )
+            )
+        }
+    }
 }
 
 // import Path
