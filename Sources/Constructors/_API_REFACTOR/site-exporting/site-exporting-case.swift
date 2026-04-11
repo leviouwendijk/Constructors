@@ -10,8 +10,7 @@ public protocol SiteExportingCase:
 where RawValue == String, ID == String {
     var id: String { get }
 
-    /// Final emitted output path for this declaration.
-    /// For snippets, this should be the fully resolved emitted path.
+    var path: StandardPath { get }
     var output: StandardPath { get }
 
     var visibility: Set<BuildEnvironment> { get }
@@ -38,8 +37,17 @@ public protocol SiteStylesheetCase: SiteExportingCase {
 )
 public enum SiteSnippetMode: Sendable, Equatable {
     case inline
-    case external(cssPath: GenericPath)
+    case external(cssPath: StandardPath)
     case fragment
+}
+
+public enum SiteSnippetSortingCategory: String, Sendable, Equatable, CaseIterable {
+    case asset
+    case document
+
+    public var segment: PathSegment {
+        PathSegment(rawValue)
+    }
 }
 
 public protocol SiteSnippetCase: SiteExportingCase {
@@ -51,5 +59,38 @@ public protocol SiteSnippetCase: SiteExportingCase {
         """
     )
     var mode: SiteSnippetMode { get }
-    var suffix: String { get }
+}
+
+public struct SiteSnippetRouting: Sendable, Equatable {
+    public let namespace: StandardPath
+    public let category: SiteSnippetSortingCategory?
+    public let affix: PathSegmentAffix?
+
+    public init(
+        namespace: StandardPath = .init(["snippets"]),
+        category: SiteSnippetSortingCategory? = nil,
+        affix: PathSegmentAffix? = nil
+    ) {
+        self.namespace = namespace
+        self.category = category
+        self.affix = affix
+    }
+
+    public var prefix: StandardPath {
+        var path = namespace
+
+        if let category {
+            path.appendingSegments([category.segment])
+        }
+
+        return path
+    }
+
+    public func resolve(
+        _ leafOutput: StandardPath
+    ) -> StandardPath {
+        prefix
+            .merged(appending: leafOutput)
+            .affixedLastSegment(affix)
+    }
 }

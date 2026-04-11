@@ -6,14 +6,14 @@ import Primitives
 
 private func _snippet_output_prefix(
     for target: SnippetTargets
-) -> GenericPath {
-    var prefix = GenericPath(
+) -> StandardPath {
+    var prefix = StandardPath(
         ["snippets"]
     )
 
     if let category = target.sorting_category {
         prefix = prefix.merged(
-            appending: GenericPath(
+            appending: StandardPath(
                 [category.rawValue]
             )
         )

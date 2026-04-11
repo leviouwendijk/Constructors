@@ -23,7 +23,7 @@ public extension SiteResolvable {
 
 public extension SiteResolvable {
     func compose_address(
-        appending path: GenericPath? = nil
+        appending path: StandardPath? = nil
     ) -> String {
         var res: [String] = []
         if let p = protocol_component {
@@ -56,7 +56,7 @@ public extension SiteResolvable {
     func address(
         for identifier: (any TargetIdentifying)? = nil
     ) -> String {
-        let path: GenericPath? = identifier?.target().output
+        let path: StandardPath? = identifier?.target().output
         return self.compose_address(appending: path)
     }
 

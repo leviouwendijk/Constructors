@@ -8,20 +8,20 @@ import JS
 public struct SnippetTargets: Targetable, MetadataTargetable {
     public enum Mode: Sendable {
         case inline
-        case external(cssPath: GenericPath)
+        case external(cssPath: StandardPath)
         case fragment
     }
 
     public let html: HTMLFragment
     public let javascript: [JSScript]
     public let stylesheets: [CSSStyleSheet]
-    public let htmlOutput: GenericPath
+    public let htmlOutput: StandardPath
     public let mode: Mode
     public let visibility: Set<BuildEnvironment>
 
     public var suffix: String = "snippets"
 
-    public var output: GenericPath {
+    public var output: StandardPath {
         var comps: [String] = []
         comps.append(suffix)
 
@@ -29,7 +29,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
             comps.append(s.rawValue)
         }
 
-        return GenericPath(comps).merged(appending: htmlOutput)
+        return StandardPath(comps).merged(appending: htmlOutput)
     }
 
     public enum SortingCategory: String, Sendable {
@@ -44,7 +44,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         html: HTMLFragment,
         javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
-        htmlOutput: GenericPath,
+        htmlOutput: StandardPath,
         mode: Mode,
         visibility: Set<BuildEnvironment> = [.local],
         sorting_category: SortingCategory? = nil,
@@ -64,7 +64,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         html: HTMLFragment,
         javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
-        htmlOutput: GenericPath,
+        htmlOutput: StandardPath,
         visibility: Set<BuildEnvironment> = [.local],
         sorting_category: SortingCategory? = .document
     ) -> SnippetTargets {
@@ -83,8 +83,8 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
         html: HTMLFragment,
         javascript: [JSScript] = [],
         stylesheets: [CSSStyleSheet],
-        htmlOutput: GenericPath,
-        cssOutput: GenericPath,
+        htmlOutput: StandardPath,
+        cssOutput: StandardPath,
         visibility: Set<BuildEnvironment> = [.local],
         sorting_category: SortingCategory? = .document
     ) -> SnippetTargets {
@@ -102,7 +102,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
     public static func html_fragment(
         html: HTMLFragment,
         javascript: [JSScript] = [],
-        output: GenericPath,
+        output: StandardPath,
         visibility: Set<BuildEnvironment> = [.local, .test],
         sorting_category: SortingCategory? = .asset
     ) -> SnippetTargets {
@@ -189,7 +189,7 @@ internal func renderInlineHTML(
 // public extension SnippetTargets {
 //     init(
 //         artifact: RenderArtifact,
-//         htmlOutput: GenericPath,
+//         htmlOutput: StandardPath,
 //         mode: Mode,
 //         visibility: Set<BuildEnvironment> = [.local],
 //         sorting_category: SortingCategory? = nil,
@@ -209,7 +209,7 @@ internal func renderInlineHTML(
 
 //     static func doc_inline_css(
 //         artifact: RenderArtifact,
-//         htmlOutput: GenericPath,
+//         htmlOutput: StandardPath,
 //         visibility: Set<BuildEnvironment> = [.local],
 //         sorting_category: SortingCategory? = .document
 //     ) -> SnippetTargets {
@@ -224,8 +224,8 @@ internal func renderInlineHTML(
 
 //     static func doc_external_css(
 //         artifact: RenderArtifact,
-//         htmlOutput: GenericPath,
-//         cssOutput: GenericPath,
+//         htmlOutput: StandardPath,
+//         cssOutput: StandardPath,
 //         visibility: Set<BuildEnvironment> = [.local],
 //         sorting_category: SortingCategory? = .document
 //     ) -> SnippetTargets {
@@ -240,7 +240,7 @@ internal func renderInlineHTML(
 
 //     static func html_fragment(
 //         artifact: RenderArtifact,
-//         output: GenericPath,
+//         output: StandardPath,
 //         visibility: Set<BuildEnvironment> = [.local, .test],
 //         sorting_category: SortingCategory? = .asset
 //     ) -> SnippetTargets {

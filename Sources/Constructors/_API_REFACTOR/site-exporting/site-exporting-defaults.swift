@@ -18,6 +18,10 @@ public extension SiteExportingCase {
     var metadata: TargetMetadata? {
         nil
     }
+
+    var output: StandardPath {
+        path
+    }
 }
 
 public extension SiteDocumentCase {
@@ -41,6 +45,14 @@ public extension SiteStylesheetCase {
 }
 
 public extension SiteSnippetCase {
+    var output: StandardPath {
+        routing.resolve(path)
+    }
+
+    var routing: SiteSnippetRouting {
+        .init()
+    }
+
     var metadata: TargetMetadata? {
         .blocked
     }

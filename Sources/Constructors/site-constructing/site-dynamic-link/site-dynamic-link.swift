@@ -17,7 +17,7 @@ public struct SiteDynamicLink<S: SiteObject> {
     }
 
     public func build(
-        root: GenericPath = .init("assets", "css"),
+        root: StandardPath = .init("assets", "css"),
         appending name: String = "dynamic",
         suffix: String = "-minified",
         extension: String = ".css",

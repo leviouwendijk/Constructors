@@ -12,7 +12,7 @@ public protocol SiteResolvable: Codable, Sendable, CaseIterable, RawRepresentabl
     var tld_component: TopLevelDomainComponent? { get }
     var web_root_component: String { get }
 
-    func compose_address(appending path: GenericPath?) -> String
+    func compose_address(appending path: StandardPath?) -> String
     func address(for identifier: (any TargetIdentifying)?) -> String
 
     func root_address() -> String

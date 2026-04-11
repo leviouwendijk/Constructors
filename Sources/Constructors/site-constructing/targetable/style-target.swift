@@ -4,14 +4,14 @@ import Path
 public struct StylesheetTarget: Targetable {
     public let name: String
     public let sheet: CSSStyleSheet
-    public let output: GenericPath
+    public let output: StandardPath
     public let pruneUnusedSelectors: Bool
     public let indentStep: Int
 
     public init(
         name: String,
         sheet: CSSStyleSheet,
-        output: GenericPath,
+        output: StandardPath,
         pruneUnusedSelectors: Bool = true,
         indentStep: Int = 4
     ) {
@@ -27,7 +27,7 @@ public struct StylesheetTarget: Targetable {
 //     init(
 //         name: String,
 //         artifact: RenderArtifact,
-//         output: GenericPath,
+//         output: StandardPath,
 //         pruneUnusedSelectors: Bool = true,
 //         indentStep: Int = 4
 //     ) {
@@ -43,7 +43,7 @@ public struct StylesheetTarget: Targetable {
 //     init(
 //         name: String,
 //         artifacts: [RenderArtifact],
-//         output: GenericPath,
+//         output: StandardPath,
 //         pruneUnusedSelectors: Bool = true,
 //         indentStep: Int = 4
 //     ) {

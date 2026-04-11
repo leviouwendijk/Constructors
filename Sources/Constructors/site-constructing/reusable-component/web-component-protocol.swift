@@ -2,10 +2,13 @@ import CSS
 import HTML
 
 // backwards compatibility
-public protocol WebComponent: ReusableComponent {
-    // func html() -> HTMLFragment
-    // func styles() -> [CSSStyleSheet]
-}
+public typealias WebComponent = ReusableComponent
+
+
+// public protocol WebComponent: ReusableComponent {
+//     // func html() -> HTMLFragment
+//     // func styles() -> [CSSStyleSheet]
+// }
 
 // public extension Array where Element == any WebComponent {
 //     func gathered_styles() -> [CSSStyleSheet] {
