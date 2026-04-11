@@ -14,23 +14,6 @@ extension RenderBundle: RenderContributing {
     }
 }
 
-extension ReusableComponent {
-    public func render_contribution() -> RenderContribution {
-        RenderContribution(
-            head: head(),
-            body: body(),
-            stylesheets: styles(),
-            scripts: javascript()
-        )
-    }
-
-    public func bundle() -> RenderBundle {
-        RenderBundle(
-            render_contribution()
-        )
-    }
-}
-
 extension HTMLDocument: RenderContributing {
     public func render_contribution() -> RenderContribution {
         RenderContribution(
@@ -64,38 +47,6 @@ extension JSScript: RenderContributing {
     public func render_contribution() -> RenderContribution {
         RenderContribution(
             scripts: [self]
-        )
-    }
-}
-
-public extension Array where Element: ReusableComponent {
-    func contribution() -> RenderContribution {
-        reduce(.empty) { partial, element in
-            partial.merging(
-                element.render_contribution()
-            )
-        }
-    }
-
-    func bundle() -> RenderBundle {
-        RenderBundle(
-            contribution()
-        )
-    }
-}
-
-public extension Array where Element == any ReusableComponent {
-    func contribution() -> RenderContribution {
-        reduce(.empty) { partial, element in
-            partial.merging(
-                element.render_contribution()
-            )
-        }
-    }
-
-    func bundle() -> RenderBundle {
-        RenderBundle(
-            contribution()
         )
     }
 }

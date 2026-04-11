@@ -3,81 +3,137 @@ import HTML
 import JS
 
 public protocol ReusableComponent: RenderContributing, Sendable {
-    func head() -> HTMLFragment
-    func body() -> HTMLFragment
+    typealias Nodes = ReusableComponentNodes
 
-    func styles() -> [CSSStyleSheet]
-    func javascript() -> [JSScript]
+    var nodes: Nodes { get }
 }
 
-extension ReusableComponent {
-    public func head() -> HTMLFragment { [] }
-    public func body() -> HTMLFragment { [] }
-    public func styles() -> [CSSStyleSheet] { [] }
-    public func javascript() -> [JSScript] { [] }
+public extension ReusableComponent {
+    func render_contribution() -> RenderContribution {
+        nodes.render_contribution()
+    }
+
+    func bundle() -> RenderBundle {
+        RenderBundle(
+            render_contribution()
+        )
+    }
 }
 
 public extension Array where Element: ReusableComponent {
-    func gathered_head() -> HTMLFragment {
-        flatMap { $0.head() }
+    func contribution() -> RenderContribution {
+        reduce(.empty) { partial, element in
+            partial.merging(
+                element.render_contribution()
+            )
+        }
     }
 
-    func gathered_body() -> HTMLFragment {
-        flatMap { $0.body() }
-    }
-
-    func gathered_styles() -> [CSSStyleSheet] {
-        flatMap { $0.styles() }
-    }
-
-    func gathered_javascript() -> [JSScript] {
-        flatMap { $0.javascript() }
-    }
-
-    // func artifact() -> RenderArtifact {
-    //     RenderArtifact(
-    //         head: gathered_head(),
-    //         html: gathered_body(),
-    //         scripts: gathered_javascript(),
-    //         stylesheets: gathered_styles()
-    //     )
-    // }
-
-    func css_bundle() -> CSSBundle {
-        CSSBundle(gathered_styles())
+    func bundle() -> RenderBundle {
+        RenderBundle(
+            contribution()
+        )
     }
 }
 
 public extension Array where Element == any ReusableComponent {
-    func gathered_head() -> HTMLFragment {
-        flatMap { $0.head() }
+    func contribution() -> RenderContribution {
+        reduce(.empty) { partial, element in
+            partial.merging(
+                element.render_contribution()
+            )
+        }
     }
 
-    func gathered_body() -> HTMLFragment {
-        flatMap { $0.body() }
-    }
-
-    func gathered_styles() -> [CSSStyleSheet] {
-        flatMap { $0.styles() }
-    }
-
-    func gathered_javascript() -> [JSScript] {
-        flatMap { $0.javascript() }
-    }
-
-    // func artifact() -> RenderArtifact {
-    //     RenderArtifact(
-    //         head: gathered_head(),
-    //         html: gathered_body(),
-    //         scripts: gathered_javascript(),
-    //         stylesheets: gathered_styles()
-    //     )
-    // }
-
-    func css_bundle() -> CSSBundle {
-        CSSBundle(gathered_styles())
+    func bundle() -> RenderBundle {
+        RenderBundle(
+            contribution()
+        )
     }
 }
+
+// 2nd
+
+// public protocol ReusableComponent: RenderContributing, Sendable {
+//     func head() -> HTMLFragment
+//     func body() -> HTMLFragment
+
+//     func styles() -> [CSSStyleSheet]
+//     func javascript() -> [JSScript]
+// }
+
+// extension ReusableComponent {
+//     public func head() -> HTMLFragment { [] }
+//     public func body() -> HTMLFragment { [] }
+//     public func styles() -> [CSSStyleSheet] { [] }
+//     public func javascript() -> [JSScript] { [] }
+// }
+
+// public extension Array where Element: ReusableComponent {
+//     func gathered_head() -> HTMLFragment {
+//         flatMap { $0.head() }
+//     }
+
+//     func gathered_body() -> HTMLFragment {
+//         flatMap { $0.body() }
+//     }
+
+//     func gathered_styles() -> [CSSStyleSheet] {
+//         flatMap { $0.styles() }
+//     }
+
+//     func gathered_javascript() -> [JSScript] {
+//         flatMap { $0.javascript() }
+//     }
+
+//     // func artifact() -> RenderArtifact {
+//     //     RenderArtifact(
+//     //         head: gathered_head(),
+//     //         html: gathered_body(),
+//     //         scripts: gathered_javascript(),
+//     //         stylesheets: gathered_styles()
+//     //     )
+//     // }
+
+//     func css_bundle() -> CSSBundle {
+//         CSSBundle(gathered_styles())
+//     }
+// }
+
+// public extension Array where Element == any ReusableComponent {
+//     func gathered_head() -> HTMLFragment {
+//         flatMap { $0.head() }
+//     }
+
+//     func gathered_body() -> HTMLFragment {
+//         flatMap { $0.body() }
+//     }
+
+//     func gathered_styles() -> [CSSStyleSheet] {
+//         flatMap { $0.styles() }
+//     }
+
+//     func gathered_javascript() -> [JSScript] {
+//         flatMap { $0.javascript() }
+//     }
+
+//     // func artifact() -> RenderArtifact {
+//     //     RenderArtifact(
+//     //         head: gathered_head(),
+//     //         html: gathered_body(),
+//     //         scripts: gathered_javascript(),
+//     //         stylesheets: gathered_styles()
+//     //     )
+//     // }
+
+//     func css_bundle() -> CSSBundle {
+//         CSSBundle(gathered_styles())
+//     }
+// }
+
+// ----
+
+// 1st
 
 // import CSS
 // import HTML
