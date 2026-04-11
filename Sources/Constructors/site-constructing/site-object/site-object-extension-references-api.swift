@@ -91,6 +91,86 @@ public extension SiteObject {
     }
 }
 
+public extension SiteObject {
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer<T: TargetIdentifying>(
+        to target: T,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            to: target,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer(
+        path: StandardPath,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            path: path,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer(
+        page: Page,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            page: page,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer(
+        stylesheet: Stylesheet,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            stylesheet: stylesheet,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer(
+        snippet: Snippet,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            snippet: snippet,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+
+    @available(*, deprecated, message: "use relativity: .root or .relative")
+    static func refer(
+        document: SiteDocumentDefinition,
+        absolute: Bool = false,
+        asRootPath: Bool
+    ) -> String {
+        refer(
+            document: document,
+            absolute: absolute,
+            relativity: asRootPath ? .root : .relative
+        )
+    }
+}
+
 // previous:
 
 // public extension SiteObject {
