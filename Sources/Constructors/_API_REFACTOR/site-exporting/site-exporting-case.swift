@@ -1,6 +1,13 @@
 import Path
 import Primitives
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based export bridge. Prefer SiteDeclaring.declarations() with DocumentDeclaration, StyleDeclaration, and SnippetDeclaration.
+    """
+)
 public protocol SiteExportingCase:
     CaseIterable,
     Hashable,
@@ -19,10 +26,24 @@ where RawValue == String, ID == String {
     func bundle() -> RenderBundle
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based document bridge. Prefer SiteDeclaring.declarations() with DocumentDeclaration.
+    """
+)
 public protocol SiteDocumentCase: SiteExportingCase {
     var navigation: NavigationSetting { get }
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based style bridge. Prefer SiteDeclaring.declarations() with StyleDeclaration.
+    """
+)
 public protocol SiteStylesheetCase: SiteExportingCase {
     var pruneUnusedSelectors: Bool { get }
     var indentStep: Int { get }
@@ -32,7 +53,7 @@ public protocol SiteStylesheetCase: SiteExportingCase {
     *,
     deprecated,
     message: """
-    SiteSnippetMode is a temporary bridge. Prefer expressing snippet output directly through bundle export APIs, e.g. bundle().export.document.html.evaluate(...) or bundle().export.fragment.html.evaluate(...).
+    SiteSnippetMode is a temporary bridge. Prefer expressing snippet output directly through SnippetDeclaration + bundle export APIs.
     """
 )
 public enum SiteSnippetMode: Sendable, Equatable {
@@ -50,12 +71,19 @@ public enum SiteSnippetSortingCategory: String, Sendable, Equatable, CaseIterabl
     }
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based snippet bridge. Prefer SiteDeclaring.declarations() with SnippetDeclaration.
+    """
+)
 public protocol SiteSnippetCase: SiteExportingCase {
     @available(
         *,
         deprecated,
         message: """
-        Prefer expressing snippet output directly through bundle export APIs rather than a secondary mode enum.
+        Prefer expressing snippet output directly through SnippetDeclaration rather than a secondary mode enum.
         """
     )
     var mode: SiteSnippetMode { get }

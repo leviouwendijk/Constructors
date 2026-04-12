@@ -234,36 +234,12 @@ private extension SiteObject {
         destinationSite: any SiteResolvable,
         style: SiteReferenceStyle
     ) -> HTMLAssetReference {
-        switch style {
-        case .absolute:
-            return .raw(
-                destinationSite.compose_address(
-                    appending: path
-                )
-            )
-
-        case .local(let relativity):
-            return HTMLAssetReference(
-                path,
-                options: .init(
-                    relativity: relativity
-                )
-            )
-
-        case .automatic:
-            if Self.site.site_id == destinationSite.site_id {
-                return HTMLAssetReference(
-                    path,
-                    options: .root
-                )
-            }
-
-            return .raw(
-                destinationSite.compose_address(
-                    appending: path
-                )
-            )
-        }
+        resolve_site_asset_reference(
+            sourceSite: Self.site,
+            destinationSite: destinationSite,
+            path: path,
+            style: style
+        )
     }
 }
 

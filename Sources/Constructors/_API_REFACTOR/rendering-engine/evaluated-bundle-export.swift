@@ -45,7 +45,7 @@ public struct MetadataRoute: Sendable, Equatable {
 }
 
 public struct EvaluatedBundleExport: Sendable {
-    public let id: String?
+    public let id: ExportKey?
     public let kind: BundleExportKind
     public let bundle: RenderBundle
     public let content: String
@@ -56,7 +56,7 @@ public struct EvaluatedBundleExport: Sendable {
     public let metadata_route: MetadataRoute?
 
     public init(
-        id: String? = nil,
+        id: ExportKey? = nil,
         kind: BundleExportKind,
         bundle: RenderBundle,
         content: String,
@@ -101,7 +101,7 @@ public struct EvaluatedBundleExport: Sendable {
     }
 
     public func identified(
-        _ id: String
+        _ id: ExportKey
     ) -> EvaluatedBundleExport {
         EvaluatedBundleExport(
             id: id,
@@ -257,7 +257,7 @@ public struct EvaluatedExportSet: Sendable {
     }
 
     public subscript(
-        id: String
+        id: ExportKey
     ) -> EvaluatedBundleExport? {
         exports.first { $0.id == id }
     }

@@ -1,6 +1,5 @@
 import HTML
 import CSS
-import JS
 import Path
 import Primitives
 
@@ -34,9 +33,17 @@ public extension SiteObject {
                 continue
             }
 
-            out[key] = target.document_definition(
-                id: key
-            )
+            out[key] = SiteDocumentDefinition(
+                id: key,
+                route: BundleExportRoute(
+                    output: target.output,
+                    visibility: target.visibility,
+                    metadata: target.metadata
+                ),
+                navigation: target.navigation
+            ) { _ in
+                target.bundle()
+            }
         }
 
         return out
@@ -54,15 +61,7 @@ public extension SiteObject {
             }
 
             exports.append(
-                BundleExportDefinition(
-                    id: key,
-                    visibility: document.visibility,
-                    metadata: document.metadata
-                ) { context in
-                    try document.evaluate(
-                        context: context
-                    )
-                }
+                document.export
             )
         }
 
@@ -81,10 +80,17 @@ public extension SiteObject {
                 continue
             }
 
+            let route = BundleExportRoute(
+                output: target.output
+            )
+
             exports.append(
                 BundleExportDefinition(
-                    id: key
-                ) { context in
+                    id: export_key(
+                        stylesheetKey: key
+                    ),
+                    route: route
+                ) { context, _ in
                     let visibleDocuments: [HTMLDocument] = pages
                         .keys
                         .sorted()
@@ -122,14 +128,7 @@ public extension SiteObject {
                     return EvaluatedBundleExport(
                         kind: .stylesheet,
                         bundle: target.bundle(),
-                        content: css,
-                        additional_files: [],
-                        route: BundleExportRoute(
-                            output: target.output
-                        ),
-                        metadata: nil,
-                        visibility: [.local, .test, .public],
-                        metadata_route: nil
+                        content: css
                     )
                 }
             )
@@ -149,24 +148,19 @@ public extension SiteObject {
                 continue
             }
 
+            let route = BundleExportRoute(
+                output: target.output,
+                visibility: target.visibility,
+                metadata: target.metadata
+            )
+
             exports.append(
                 BundleExportDefinition(
-                    id: key,
-                    visibility: target.visibility,
-                    metadata: target.metadata
-                ) { context in
-                    let route = BundleExportRoute(
-                        output: target.output,
-                        visibility: target.visibility,
-                        metadata: target.metadata
-                    )
-
-                    let metadataRoute = MetadataRoute(
-                        output: target.output,
-                        visibility: target.visibility,
-                        metadata: target.metadata
-                    )
-
+                    id: export_key(
+                        snippetKey: key
+                    ),
+                    route: route
+                ) { context, _ in
                     switch target.mode {
                     case .inline:
                         let html = renderInlineHTML(
@@ -179,17 +173,10 @@ public extension SiteObject {
                         return EvaluatedBundleExport(
                             kind: .html(.document),
                             bundle: target.bundle(),
-                            content: html,
-                            additional_files: [],
-                            route: route,
-                            metadata: target.metadata,
-                            visibility: target.visibility,
-                            metadata_route: metadataRoute
+                            content: html
                         )
 
-                    case .external(
-                        let cssPath
-                    ):
+                    case .external(let cssPath):
                         let doc = target.htmlDocument
 
                         let html = doc.render(
@@ -225,23 +212,14 @@ public extension SiteObject {
                                     output: cssOutput,
                                     content: cssText
                                 )
-                            ],
-                            route: route,
-                            metadata: target.metadata,
-                            visibility: target.visibility,
-                            metadata_route: metadataRoute
+                            ]
                         )
 
                     case .fragment:
                         return EvaluatedBundleExport(
                             kind: .html(.fragment),
                             bundle: target.bundle(),
-                            content: target.html.snippet(),
-                            additional_files: [],
-                            route: route,
-                            metadata: target.metadata,
-                            visibility: target.visibility,
-                            metadata_route: metadataRoute
+                            content: target.html.snippet()
                         )
                     }
                 }
@@ -252,7 +230,11 @@ public extension SiteObject {
     }
 
     static func export_definitions() throws -> [BundleExportDefinition] {
-        try document_exports()
+        if let declaring = Self.self as? any SiteDeclaring.Type {
+            return try declaring.declaration_exports()
+        }
+
+        return try document_exports()
             + stylesheet_exports()
             + snippet_exports()
     }

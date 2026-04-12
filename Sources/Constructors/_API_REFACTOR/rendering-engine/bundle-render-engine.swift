@@ -12,12 +12,19 @@ public struct BundleRenderEngine {
     public func evaluate(
         _ definitions: [BundleExportDefinition]
     ) throws -> EvaluatedExportSet {
+        let references = DeclaredSiteReferenceResolver(
+            sourceGraph: route_graph(definitions)
+        )
+
         let evaluated = try definitions.compactMap { definition -> EvaluatedBundleExport? in
             guard definition.visibility.contains(context.env) else {
                 return nil
             }
 
-            return try definition.evaluate(context: context)
+            return try definition.evaluate(
+                context: context,
+                references: references
+            )
         }
 
         return EvaluatedExportSet(evaluated)

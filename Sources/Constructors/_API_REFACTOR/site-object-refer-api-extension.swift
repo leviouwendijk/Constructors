@@ -3,6 +3,14 @@ import PathWeb
 import ProtocolComponents
 
 public extension BundleHTMLDocumentStyle {
+    @available(
+        *,
+        deprecated,
+        message: """
+        Prefer BundleHTMLDocumentStyle.linked([Site.stylesheet_key(...)], style: ...)
+        so the destination site identity is carried by the typed stylesheet key.
+        """
+    )
     static func linked<Site: SiteObject>(
         site: Site.Type,
         stylesheets: [Site.Stylesheet],
@@ -18,6 +26,14 @@ public extension BundleHTMLDocumentStyle {
         )
     }
 
+    @available(
+        *,
+        deprecated,
+        message: """
+        Prefer BundleHTMLDocumentStyle.linked(from: Source.self, [Destination.stylesheet_key(...)], style: ...)
+        so the destination site identity is carried by the typed stylesheet key.
+        """
+    )
     static func linked<Source: SiteObject, Destination: SiteObject>(
         from source: Source.Type,
         site destination: Destination.Type,

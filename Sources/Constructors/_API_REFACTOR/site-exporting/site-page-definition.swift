@@ -4,72 +4,95 @@ import Primitives
 
 public struct SiteDocumentDefinition: Sendable {
     public let id: String
-    public let output: StandardPath
-    public let visibility: Set<BuildEnvironment>
-    public let metadata: TargetMetadata?
     public let navigation: NavigationSetting
     public let export: BundleExportDefinition
 
     public init(
         id: String,
-        output: StandardPath,
-        visibility: Set<BuildEnvironment> = [.local, .test, .public],
-        metadata: TargetMetadata? = nil,
         navigation: NavigationSetting = .none,
         export: BundleExportDefinition
     ) {
         self.id = id
-        self.output = output
-        self.visibility = visibility
-        self.metadata = metadata
         self.navigation = navigation
         self.export = export
+    }
+
+    public init(
+        id: String,
+        route: BundleExportRoute,
+        navigation: NavigationSetting = .none,
+        build: @escaping @Sendable (any SiteReferenceResolving) throws -> RenderBundle
+    ) {
+        self.id = id
+        self.navigation = navigation
+        self.export = BundleExportDefinition(
+            id: .document(id),
+            route: route
+        ) { context, references in
+            try build(
+                references
+            ).export.document.html.evaluate(
+                environment: context.env
+            )
+        }
+    }
+
+    public var route: BundleExportRoute {
+        guard let route = export.route else {
+            preconditionFailure(
+                "SiteDocumentDefinition requires an export route."
+            )
+        }
+
+        return route
+    }
+
+    public var output: StandardPath {
+        route.output
+    }
+
+    public var visibility: Set<BuildEnvironment> {
+        export.visibility
+    }
+
+    public var metadata: TargetMetadata? {
+        export.metadata
     }
 }
 
 public extension SiteDocumentDefinition {
     func evaluate(
-        context: BuildContext
+        context: BuildContext,
+        references: any SiteReferenceResolving
     ) throws -> EvaluatedBundleExport {
         try export.evaluate(
-            context: context
+            context: context,
+            references: references
         )
-        .withRoute(
-            BundleExportRoute(
-                output: output,
-                visibility: visibility,
-                metadata: metadata
-            )
-        )
-        .withVisibility(visibility)
-        .withMetadata(metadata)
     }
 }
 
 public extension PageTarget {
+    @available(
+        *,
+        deprecated,
+        message: """
+        Prefer declaring documents in SiteDeclaring.declarations() using DocumentDeclaration(id:route:navigation:build:).
+        """
+    )
     func document_definition(
         id: String
     ) -> SiteDocumentDefinition {
-        let bundle = self.bundle()
-
-        let export = BundleExportDefinition(
+        SiteDocumentDefinition(
             id: id,
-            visibility: visibility,
-            metadata: metadata
-        ) { context in
-            bundle.export.document.html.evaluate(
-                route: nil,
-                environment: context.env
-            )
+            route: BundleExportRoute(
+                output: output,
+                visibility: visibility,
+                metadata: metadata
+            ),
+            navigation: navigation
+        ) { _ in
+            self.bundle()
         }
-
-        return SiteDocumentDefinition(
-            id: id,
-            output: output,
-            visibility: visibility,
-            metadata: metadata,
-            navigation: navigation,
-            export: export
-        )
     }
 }

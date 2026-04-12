@@ -1,6 +1,13 @@
 import Path
 import Primitives
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based export bridge defaults. Prefer SiteDeclaring.declarations() with DocumentDeclaration, StyleDeclaration, and SnippetDeclaration.
+    """
+)
 public extension SiteExportingCase {
     var id: String {
         rawValue
@@ -24,6 +31,13 @@ public extension SiteExportingCase {
     }
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based document bridge defaults. Prefer SiteDeclaring.declarations() with DocumentDeclaration.
+    """
+)
 public extension SiteDocumentCase {
     var navigation: NavigationSetting {
         .none
@@ -34,6 +48,13 @@ public extension SiteDocumentCase {
     }
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based style bridge defaults. Prefer SiteDeclaring.declarations() with StyleDeclaration.
+    """
+)
 public extension SiteStylesheetCase {
     var pruneUnusedSelectors: Bool {
         true
@@ -44,6 +65,13 @@ public extension SiteStylesheetCase {
     }
 }
 
+@available(
+    *,
+    deprecated,
+    message: """
+    Legacy case-based snippet bridge defaults. Prefer SiteDeclaring.declarations() with SnippetDeclaration.
+    """
+)
 public extension SiteSnippetCase {
     var output: StandardPath {
         routing.resolve(path)

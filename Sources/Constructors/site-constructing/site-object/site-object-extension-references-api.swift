@@ -125,24 +125,12 @@ private extension SiteObject {
         destinationSite: any SiteResolvable,
         style: SiteReferenceStyle
     ) -> String {
-        switch style {
-        case .absolute:
-            return destinationSite.compose_address(
-                appending: path
-            )
-
-        case .local(let relativity):
-            return path.render(as: relativity)
-
-        case .automatic:
-            if Self.site.site_id == destinationSite.site_id {
-                return path.render(as: .root)
-            }
-
-            return destinationSite.compose_address(
-                appending: path
-            )
-        }
+        resolve_site_reference(
+            sourceSite: Self.site,
+            destinationSite: destinationSite,
+            path: path,
+            style: style
+        )
     }
 }
 
