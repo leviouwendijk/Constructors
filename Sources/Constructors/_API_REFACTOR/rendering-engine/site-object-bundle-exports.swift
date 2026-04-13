@@ -40,10 +40,11 @@ public extension SiteObject {
                     visibility: target.visibility,
                     metadata: target.metadata
                 ),
-                navigation: target.navigation
-            ) { _ in
-                target.bundle()
-            }
+                navigation: target.navigation,
+                build: {
+                    target.bundle()
+                }
+            )
         }
 
         return out
