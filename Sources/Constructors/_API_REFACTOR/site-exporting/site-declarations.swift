@@ -58,17 +58,44 @@ public struct DocumentDeclaration<Identifier: DeclarationIdentifier>: Sendable {
         id: Identifier,
         route: BundleExportRoute,
         navigation: NavigationSetting = .none,
-        build: @escaping @Sendable (any SiteReferenceResolving) throws -> RenderBundle
+        evaluate: @escaping @Sendable (BuildContext, any SiteReferenceResolving) throws -> EvaluatedBundleExport
     ) {
         self.id = id
         self.navigation = navigation
         self.export = BundleExportDefinition(
             id: .document(id.rawValue),
-            route: route
+            route: route,
+            evaluate: evaluate
+        )
+    }
+
+    public init(
+        id: Identifier,
+        route: BundleExportRoute,
+        navigation: NavigationSetting = .none,
+        options: @escaping @Sendable (
+            BuildContext,
+            any SiteReferenceResolving
+        ) throws -> DocumentEvaluationOptions = { _, _ in .default },
+        build: @escaping @Sendable (
+            any SiteReferenceResolving
+        ) throws -> RenderBundle
+    ) {
+        self.init(
+            id: id,
+            route: route,
+            navigation: navigation
         ) { context, references in
-            try build(
+            let documentOptions = try options(
+                context,
                 references
-            ).export.document.html.evaluate(
+            )
+
+            return documentOptions.evaluate(
+                try build(
+                    references
+                ),
+                route: route,
                 environment: context.env
             )
         }
