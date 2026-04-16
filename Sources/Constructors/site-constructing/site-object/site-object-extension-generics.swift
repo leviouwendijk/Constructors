@@ -14,16 +14,23 @@ public extension SiteObject {
             ) ?? NavigationStructure()
         }
 
-        guard let documents = try? document_definitions() else {
-            return NavigationStructure()
-        }
-
         return NavigationStructure.build(
-            from: documents,
-            env: env,
+            from: arrayPages(),
+            include: { target in
+                let visible = target.visibility.isEmpty || target.visibility.contains(env)
+                guard visible else { return false }
+
+                switch target.navigation {
+                case .none:
+                    return false
+                case .auto, .custom:
+                    return true
+                }
+            },
             sort_order: sort_order
         )
     }
+
     // static func navigation(
     //     env: BuildEnvironment,
     //     sort_order: NavigationSortOrder = .insertion
