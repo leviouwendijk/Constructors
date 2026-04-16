@@ -92,6 +92,11 @@ extension NavigationStructure {
 }
 
 public extension NavigationStructure {
+
+
+
+
+    // --------------------------------------------
     /// Build tree from all page targets.
     ///
     /// - pages: your `SitePages.pages()`
@@ -296,6 +301,80 @@ public extension NavigationStructure {
                     options: options
                 )
                 guard !segs.isEmpty else { continue }
+                entries.append(
+                    NavigationEntry(
+                        segments: segs,
+                        path: href
+                    )
+                )
+            }
+        }
+
+        let roots = buildTree(
+            from: entries,
+            sort_order: sort_order
+        )
+
+        return NavigationStructure(roots: roots)
+    }
+}
+
+public extension NavigationStructure {
+    static func build<Identifier: DeclarationIdentifier>(
+        from documents: [DocumentDeclaration<Identifier>],
+        env: BuildEnvironment,
+        sort_order: NavigationSortOrder = .insertion
+    ) -> NavigationStructure {
+        NavigationStructure.build(
+            from: documents,
+            sort_order: sort_order
+        ) { document in
+            let visible = document.visibility.isEmpty || document.visibility.contains(env)
+            guard visible else { return false }
+
+            switch document.navigation {
+            case .none:
+                return false
+            case .auto, .custom:
+                return true
+            }
+        }
+    }
+
+    static func build<Identifier: DeclarationIdentifier>(
+        from documents: [DocumentDeclaration<Identifier>],
+        sort_order: NavigationSortOrder = .insertion,
+        include: (DocumentDeclaration<Identifier>) -> Bool
+    ) -> NavigationStructure {
+        var entries: [NavigationEntry] = []
+
+        for document in documents {
+            guard include(document) else { continue }
+
+            let href = document.output.render(as: .root)
+
+            switch document.navigation {
+            case .none:
+                continue
+
+            case .custom(let segments):
+                guard !segments.isEmpty else { continue }
+
+                entries.append(
+                    NavigationEntry(
+                        segments: segments,
+                        path: href
+                    )
+                )
+
+            case .auto(let options):
+                let segs = autoSegments(
+                    for: document.output,
+                    options: options
+                )
+
+                guard !segs.isEmpty else { continue }
+
                 entries.append(
                     NavigationEntry(
                         segments: segs,

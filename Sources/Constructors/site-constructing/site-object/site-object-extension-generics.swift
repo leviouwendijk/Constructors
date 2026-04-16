@@ -5,6 +5,15 @@ public extension SiteObject {
         env: BuildEnvironment,
         sort_order: NavigationSortOrder = .insertion
     ) -> NavigationStructure {
+        if let declaring = Self.self as? any SiteDeclaring.Type {
+            return (
+                try? declaring.declaration_navigation(
+                    env: env,
+                    sort_order: sort_order
+                )
+            ) ?? NavigationStructure()
+        }
+
         guard let documents = try? document_definitions() else {
             return NavigationStructure()
         }
@@ -15,6 +24,20 @@ public extension SiteObject {
             sort_order: sort_order
         )
     }
+    // static func navigation(
+    //     env: BuildEnvironment,
+    //     sort_order: NavigationSortOrder = .insertion
+    // ) -> NavigationStructure {
+    //     guard let documents = try? document_definitions() else {
+    //         return NavigationStructure()
+    //     }
+
+    //     return NavigationStructure.build(
+    //         from: documents,
+    //         env: env,
+    //         sort_order: sort_order
+    //     )
+    // }
 
     static func navigation() -> NavigationStructure {
         navigation(

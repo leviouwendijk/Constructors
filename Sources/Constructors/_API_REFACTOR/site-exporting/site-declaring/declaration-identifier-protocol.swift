@@ -1,1 +1,1 @@
-public protocol DeclarationIdentifier: RawRepresentable, Hashable, Sendable where RawValue == String {}
+public protocol DeclarationIdentifier: RawRepresentable, CaseIterable, Hashable, Sendable where RawValue == String {}
