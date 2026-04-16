@@ -16,7 +16,7 @@
       "location" : "https://github.com/leviouwendijk/CSS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "1dda5a4331dcbfb9245515c0ff7162345be13018"
+        "revision" : "68f20037a981a7f2ce1268cfb7e59fc9464d716f"
       }
     },
     {
@@ -34,7 +34,7 @@
       "location" : "https://github.com/leviouwendijk/DSL.git",
       "state" : {
         "branch" : "master",
-        "revision" : "e65e0fd25e1174ee5e5ace233aa89d20dc1e1583"
+        "revision" : "703dbdf2da2a9fe814a1843f35dfb7104229f4eb"
       }
     },
     {
@@ -43,7 +43,7 @@
       "location" : "https://github.com/leviouwendijk/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "d555f6d4144f340be7727e00e0845547bf0bf069"
+        "revision" : "27657e5ec38bd0921e64d795c8e7a33b2c1195fc"
       }
     },
     {
