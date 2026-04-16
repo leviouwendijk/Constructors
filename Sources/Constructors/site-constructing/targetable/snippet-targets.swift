@@ -126,6 +126,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
     public var htmlDocument: HTMLDocument {
         let placed = place_scripts(javascript)
         return HTML.document(
+            attributes: .empty,
             head: placed.head,
             body: html + placed.body
         )
