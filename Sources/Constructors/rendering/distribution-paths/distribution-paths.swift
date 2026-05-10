@@ -1,5 +1,6 @@
 import Foundation
 import Milieu
+import Partition
 
 public struct DistributionPaths: Sendable {
     public var test: String
@@ -44,9 +45,23 @@ public enum DistributionPathsRoot: Sendable {
     case manually_provided
     case resolve_from_env
 
+    // public static func default_websites_root() throws -> String {
+    //     let replacer = EnvironmentReplacer(replacements: [.home])
+    //     let websites_root = try EnvironmentExtractor.value(.symbol("WEBSITES_ROOT"), replacer: replacer)
+    //     return websites_root
+    // }
+
     public static func default_websites_root() throws -> String {
-        let replacer = EnvironmentReplacer(replacements: [.home])
-        let websites_root = try EnvironmentExtractor.value(.symbol("WEBSITES_ROOT"), replacer: replacer)
-        return websites_root
+        try PartitionEnvironment
+            .resolver(
+                fallback: DevelopmentPartitionLayout.main
+            )
+            .resolve(
+                .websites
+            )
+            .render(
+                as: .root,
+                filetype: false
+            )
     }
 }
