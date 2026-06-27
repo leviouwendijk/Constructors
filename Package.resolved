@@ -16,7 +16,7 @@
       "location" : "https://github.com/leviouwendijk/CSS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "68f20037a981a7f2ce1268cfb7e59fc9464d716f"
+        "revision" : "af30a940fe952a2a25d4d706487f762d2d72bd20"
       }
     },
     {
@@ -52,7 +52,7 @@
       "location" : "https://github.com/leviouwendijk/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "af5a7a61150ed6f2b5577882119a64ea567eed29"
+        "revision" : "814a59c4301c709c48ac9bc43bc7134e491a38a3"
       }
     },
     {
@@ -133,7 +133,7 @@
       "location" : "https://github.com/leviouwendijk/Primitives.git",
       "state" : {
         "branch" : "master",
-        "revision" : "1682a0cf9c3e921cf08b0fb22beea88013763a32"
+        "revision" : "eb58bcd1ea305d13ff0c0f6fcd03d869a8612802"
       }
     },
     {
@@ -152,6 +152,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "9aec5eaf7cd193202bed6c09a86f180ec1e55b6b"
+      }
+    },
+    {
+      "identity" : "references",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/References.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "7436cfa47fd9b17f981324470d30d2e5e30856be"
       }
     },
     {
@@ -178,7 +187,7 @@
       "location" : "https://github.com/leviouwendijk/TestFlows.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f98bf580f3bc44f0b8aff20d75cc88ba8fed9452"
+        "revision" : "79b1af3ebd1fe834f2bd0b68642e55f25a261428"
       }
     },
     {
