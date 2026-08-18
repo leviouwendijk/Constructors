@@ -39,7 +39,7 @@ extension RenderEngine {
 
             let sink = GateTallySink()
 
-            let doc = target.html()
+            let doc = try target.html()
             let html = doc.render(
                 default: .pretty,
                 environment: context.env,

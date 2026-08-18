@@ -5,7 +5,7 @@ import Path
 import Primitives
 
 public struct PageTarget: Targetable, MetadataTargetable {
-    public let html: @Sendable () -> HTMLDocument
+    public let html: @Sendable () throws -> HTMLDocument
 
     public let output: StandardPath
     public let visibility: Set<BuildEnvironment>
@@ -13,6 +13,28 @@ public struct PageTarget: Targetable, MetadataTargetable {
 
     public let metadata: TargetMetadata
 
+    public init(
+        html: @Sendable @escaping () throws -> HTMLDocument,
+        output: StandardPath,
+        visibility: Set<BuildEnvironment> = [.local, .test, .public],
+        navigation: NavigationSetting = .none,
+        metadata: TargetMetadata? = nil
+    ) {
+        self.html = html
+        self.output = output
+        self.visibility = visibility
+        self.navigation = navigation
+        self.metadata =
+            metadata.exists_or_inits(visibility: visibility)
+    }
+
+    @available(
+        *,
+        deprecated,
+        message: """
+        Use the throwing PageTarget initializer so page-construction failures can propagate through the render pipeline. For an otherwise nonthrowing builder, explicitly type the closure as () throws -> HTMLDocument when migrating.
+        """
+    )
     public init(
         html: @Sendable @escaping () -> HTMLDocument,
         output: StandardPath,
@@ -28,8 +50,8 @@ public struct PageTarget: Targetable, MetadataTargetable {
             metadata.exists_or_inits(visibility: visibility)
     }
 
-    public func document() -> HTMLDocument {
-        html()
+    public func document() throws -> HTMLDocument {
+        try html()
     }
 }
 

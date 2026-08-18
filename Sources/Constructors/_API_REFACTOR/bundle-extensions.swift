@@ -3,9 +3,9 @@ import CSS
 import JS
 
 public extension PageTarget {
-    func bundle() -> RenderBundle {
+    func bundle() throws -> RenderBundle {
         RenderBundle(
-            html().render_contribution()
+            try html().render_contribution()
         )
     }
 }

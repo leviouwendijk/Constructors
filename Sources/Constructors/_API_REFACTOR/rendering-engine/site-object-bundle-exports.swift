@@ -42,7 +42,7 @@ public extension SiteObject {
                 ),
                 navigation: target.navigation,
                 build: {
-                    target.bundle()
+                    try target.bundle()
                 }
             )
         }
@@ -92,7 +92,7 @@ public extension SiteObject {
                     ),
                     route: route
                 ) { context, _ in
-                    let visibleDocuments: [HTMLDocument] = pages
+                    let visibleDocuments: [HTMLDocument] = try pages
                         .keys
                         .sorted()
                         .compactMap { pageKey in
@@ -103,7 +103,7 @@ public extension SiteObject {
                                 return nil
                             }
 
-                            return page.html()
+                            return try page.html()
                         }
 
                     let options: CSSRenderOptions

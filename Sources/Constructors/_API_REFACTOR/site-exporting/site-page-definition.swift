@@ -184,7 +184,7 @@ public extension PageTarget {
             ),
             navigation: navigation,
             build: {
-                self.bundle()
+                try self.bundle()
             }
         )
     }
