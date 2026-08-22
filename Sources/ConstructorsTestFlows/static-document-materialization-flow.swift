@@ -11,13 +11,12 @@ extension ConstructorsFlowSuite {
         TestFlow(
             "static-document-materialization",
             title:
-                "Static document materialization establishes physical HTML artifacts only after rendering",
+                "Static document materialization establishes physical HTML document plans only after rendering",
             tags: [
                 "constructors",
                 "html",
                 "materialization",
                 "path",
-                "serialization",
                 "static",
             ]
         ) {
@@ -112,87 +111,48 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
-                "HTML serialization occurs at the static document materialization boundary"
+                "HTML document and per-document dependencies remain structural through static output planning"
             ) {
-                let projection =
-                    try materializationGraph()
-                        .project(
-                            in:
-                                .public
+                let rendered =
+                    try materializationRenderedSite()
+
+                let materialized =
+                    StaticDocumentMaterializer()
+                        .materialize(
+                            rendered
                         )
 
-                let context =
-                    RenderContext(
-                        projection:
-                            projection
-                    )
-
-                let rendered =
-                    try context
-                        .render(
-                            page:
-                                "home"
-                        ) {
-                            _,
-                            _
-                            in
-
-                            PageRenderOutput(
-                                document:
-                                    materializationDocument()
+                guard
+                    let renderedHome =
+                        rendered
+                            .documents
+                            .first(
+                                where: {
+                                    $0
+                                        .identifier
+                                        .rawValue
+                                        == "home"
+                                }
+                            ),
+                    let materializedHome =
+                        materialized
+                            .documents
+                            .first(
+                                where: {
+                                    $0
+                                        .identifier
+                                        .rawValue
+                                        == "home"
+                                }
                             )
-                        }
-
-                let prettyPolicy =
-                    StaticDocumentMaterializationPolicy(
-                        html:
-                            HTMLRenderOptions
-                                .Defaults
-                                .pretty()
-                    )
-
-                let minifiedPolicy =
-                    StaticDocumentMaterializationPolicy(
-                        html:
-                            HTMLRenderOptions
-                                .Defaults
-                                .minified()
-                    )
-
-                let pretty =
-                    StaticDocumentMaterializer(
-                        policy:
-                            prettyPolicy
-                    )
-                    .materialize(
-                        rendered
-                    )
-
-                let minified =
-                    StaticDocumentMaterializer(
-                        policy:
-                            minifiedPolicy
-                    )
-                    .materialize(
-                        rendered
-                    )
+                else {
+                    throw
+                        StaticMaterializationFlowFailure
+                            .missingHome
+                }
 
                 try Expect.equal(
-                    pretty.serializedHTML,
-                    rendered
-                        .document
-                        .render(
-                            options:
-                                HTMLRenderOptions
-                                    .Defaults
-                                    .pretty()
-                        ),
-                    "static-materialization.pretty-terminal-serialization"
-                )
-
-                try Expect.equal(
-                    minified.serializedHTML,
-                    rendered
+                    materializedHome
                         .document
                         .render(
                             options:
@@ -200,13 +160,35 @@ extension ConstructorsFlowSuite {
                                     .Defaults
                                     .minified()
                         ),
-                    "static-materialization.minified-terminal-serialization"
+                    renderedHome
+                        .document
+                        .render(
+                            options:
+                                HTMLRenderOptions
+                                    .Defaults
+                                    .minified()
+                        ),
+                    "static-materialization.document-remains-structural"
                 )
 
                 try Expect.equal(
-                    pretty.output,
-                    minified.output,
-                    "static-materialization.serialization-does-not-change-output-identity"
+                    materializedHome
+                        .dependencies,
+                    renderedHome
+                        .dependencies,
+                    "static-materialization.per-document-dependencies-retained"
+                )
+
+                try Expect.equal(
+                    materializedHome
+                        .output,
+                    StaticDocumentMaterializationPolicy()
+                        .documentOutput(
+                            for:
+                                renderedHome
+                                    .route
+                        ),
+                    "static-materialization.output-identity-independent-of-serialization"
                 )
             }
 

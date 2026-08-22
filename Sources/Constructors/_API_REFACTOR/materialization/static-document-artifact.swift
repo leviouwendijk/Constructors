@@ -1,12 +1,13 @@
+import HTML
 import Path
 import Primitives
 
-/// One rendered document after static output identity and HTML serialization
-/// have been chosen, but before any filesystem write occurs.
+/// One rendered document after static output identity has been chosen, but
+/// before dependency integration, terminal serialization, or filesystem write.
 ///
-/// Semantic provenance is intentionally retained beside the physical output so
-/// diagnostics and later materializers do not need to reverse-engineer page
-/// identity from a filename.
+/// Semantic provenance and per-document dependency state remain beside the
+/// physical output so later materialization stages do not need to reconstruct
+/// either from site-wide state or from a filename.
 public struct StaticDocumentArtifact<
     Identifier:
         StringIdentifier
@@ -22,8 +23,17 @@ public struct StaticDocumentArtifact<
     public let output:
         StandardPath
 
-    public let serializedHTML:
-        String
+    /// Still-structural document representation.
+    public let document:
+        HTMLDocument
+
+    /// Dependencies belonging to this document specifically.
+    ///
+    /// Site-wide packaging may deduplicate contributions, but document-local
+    /// membership and ordering remain authoritative when those packaged
+    /// dependencies are integrated into the document.
+    public let dependencies:
+        RenderDependencies
 
     public init(
         identifier:
@@ -32,8 +42,10 @@ public struct StaticDocumentArtifact<
             SiteRoute,
         output:
             StandardPath,
-        serializedHTML:
-            String
+        document:
+            HTMLDocument,
+        dependencies:
+            RenderDependencies
     ) {
         self.identifier =
             identifier
@@ -44,17 +56,18 @@ public struct StaticDocumentArtifact<
         self.output =
             output
 
-        self.serializedHTML =
-            serializedHTML
+        self.document =
+            document
+
+        self.dependencies =
+            dependencies
     }
 }
 
-/// Document-only static materialization of one rendered site.
+/// Document-output planning for one rendered site.
 ///
-/// CSS and JavaScript remain rich resolved dependencies. Their packaging
-/// strategy is deliberately deferred: this pass does not assume that all
-/// scripts can be concatenated, externalized, inlined, or represented by one
-/// generated file.
+/// Site-wide resolved dependency identity remains available for packaging,
+/// while every document also retains its own resolved dependency membership.
 public struct StaticSiteDocumentMaterialization<
     Page:
         PageGraphNode

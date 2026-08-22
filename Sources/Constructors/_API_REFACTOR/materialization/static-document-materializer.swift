@@ -1,17 +1,16 @@
-/// Static document materialization.
+/// Static document output planning.
 ///
-/// This type deliberately stops before filesystem mutation and before CSS/JS
-/// packaging. It converts already-rendered semantic documents into static
-/// document artifacts:
+/// This stage deliberately stops before dependency integration, terminal
+/// serialization, and filesystem mutation.
+///
+/// It performs only the first static lowering:
 ///
 ///     logical SiteRoute
 ///         -> physical StandardPath
 ///
-///     HTMLDocument
-///         -> terminal HTML String
-///
-/// Resolved CSS/JS dependency identity remains available for the next
-/// materialization stage.
+/// `HTMLDocument` and per-document `RenderDependencies` remain structural so
+/// later materialization stages can integrate packaged stylesheet/script
+/// dependencies without rewriting serialized HTML.
 public struct StaticDocumentMaterializer:
     Sendable
 {
@@ -47,13 +46,12 @@ public struct StaticDocumentMaterializer:
                         for:
                             document.route
                     ),
-            serializedHTML:
+            document:
                 document
-                    .document
-                    .render(
-                        options:
-                            policy.html
-                    )
+                    .document,
+            dependencies:
+                document
+                    .dependencies
         )
     }
 
