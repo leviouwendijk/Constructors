@@ -24,18 +24,6 @@ public enum StaticFileWriterError:
         String
     )
 
-    /// Compatibility case retained from the initial filesystem backend.
-    ///
-    /// Writers now owns intermediate-directory creation, so the current
-    /// backend no longer emits this case directly. Its API fate belongs to the
-    /// post-0G Guidelines/API review rather than this backend cutover.
-    case createDirectoryFailed(
-        destination:
-            String,
-        reason:
-            String
-    )
-
     case writeFailed(
         destination:
             String,

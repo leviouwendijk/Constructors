@@ -344,14 +344,6 @@ extension ConstructorsFlowSuite {
                     "render-result.document-script-identity"
                 )
 
-                try Expect.equal(
-                    renderedResourceRoute(
-                        rendered
-                    )
-                    .href,
-                    "/",
-                    "render-result.rendered-resource-conformance"
-                )
             }
 
             Step(
@@ -707,17 +699,6 @@ private func renderFixtureDocument() -> HTMLDocument {
         body:
             []
     )
-}
-
-private func renderedResourceRoute<
-    Resource:
-        RenderedResource
->(
-    _ resource:
-        Resource
-) -> SiteRoute {
-    resource
-        .route
 }
 
 private enum RenderResultFlowFailure:

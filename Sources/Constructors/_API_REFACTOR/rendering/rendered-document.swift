@@ -11,13 +11,10 @@ public struct RenderedDocument<
     Page:
         PageGraphNode
 >:
-    RenderedResource
+    Sendable
 {
     public typealias Identifier =
         Page.PageIdentifier
-
-    public typealias Representation =
-        HTMLDocument
 
     public let projectedPage:
         PageProjection<Page>
@@ -58,12 +55,6 @@ public struct RenderedDocument<
     {
         projectedPage
             .siteRoute
-    }
-
-    public var representation:
-        HTMLDocument
-    {
-        document
     }
 
     public var styles:
