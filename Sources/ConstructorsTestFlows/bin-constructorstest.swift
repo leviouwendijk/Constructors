@@ -33,6 +33,7 @@ enum ConstructorsFlowSuite:
         staticDependencyPackaging,
         staticDocumentDependencyIntegration,
         staticTerminalSerialization,
+        staticFileWriter,
     ]
 
     static let logicalRouteResolution =
