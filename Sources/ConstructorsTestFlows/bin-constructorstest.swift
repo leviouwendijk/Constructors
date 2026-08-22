@@ -30,6 +30,7 @@ enum ConstructorsFlowSuite:
         renderResultModel,
         renderOrchestration,
         staticDocumentMaterialization,
+        staticDependencyPackaging,
     ]
 
     static let logicalRouteResolution =
