@@ -27,15 +27,12 @@ extension ConstructorsFlowSuite {
                 let graph =
                     renderFixtureGraph()
 
-                let projection =
+                let resolvedGraph =
                     try graph
-                        .project(
-                            in:
-                                .public
-                        )
+                        .resolve()
 
-                let projected =
-                    try projection
+                let resolvedReference =
+                    try resolvedGraph
                         .resolve(
                             .to(
                                 "contact"
@@ -43,6 +40,25 @@ extension ConstructorsFlowSuite {
                             from:
                                 "home"
                         )
+
+                let projection =
+                    resolvedGraph
+                        .project(
+                            in:
+                                .public
+                        )
+
+                let projected =
+                    try projection
+                        .project(
+                            resolvedReference
+                        )
+
+                try Expect.equal(
+                    projected.resolved,
+                    resolvedReference,
+                    "render-context.exact-resolved-reference-provenance"
+                )
 
                 try Expect.equal(
                     projected
@@ -97,15 +113,19 @@ extension ConstructorsFlowSuite {
             Step(
                 "explicit local relative style lowers logical route without root slash"
             ) {
-                let projection =
+                let resolvedGraph =
                     try renderFixtureGraph()
+                        .resolve()
+
+                let projection =
+                    resolvedGraph
                         .project(
                             in:
                                 .public
                         )
 
-                let projected =
-                    try projection
+                let resolvedReference =
+                    try resolvedGraph
                         .resolve(
                             .to(
                                 "contact",
@@ -116,6 +136,12 @@ extension ConstructorsFlowSuite {
                             ),
                             from:
                                 "home"
+                        )
+
+                let projected =
+                    try projection
+                        .project(
+                            resolvedReference
                         )
 
                 let rendered =
@@ -137,15 +163,19 @@ extension ConstructorsFlowSuite {
             Step(
                 "absolute style requires explicit site-level rendering base URL"
             ) {
-                let projection =
+                let resolvedGraph =
                     try renderFixtureGraph()
+                        .resolve()
+
+                let projection =
+                    resolvedGraph
                         .project(
                             in:
                                 .public
                         )
 
-                let projected =
-                    try projection
+                let resolvedReference =
+                    try resolvedGraph
                         .resolve(
                             .to(
                                 "contact",
@@ -154,6 +184,12 @@ extension ConstructorsFlowSuite {
                             ),
                             from:
                                 "home"
+                        )
+
+                let projected =
+                    try projection
+                        .project(
+                            resolvedReference
                         )
 
                 do {
@@ -234,6 +270,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try renderFixtureGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -322,6 +359,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try renderFixtureGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -424,6 +462,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try renderFixtureGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -447,6 +486,7 @@ extension ConstructorsFlowSuite {
 
                 let driftedProjection =
                     try driftedGraph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -529,6 +569,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try renderFixtureGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public

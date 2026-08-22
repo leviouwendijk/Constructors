@@ -1,22 +1,20 @@
 import Primitives
 
-public extension PageGraph {
-    /// Project the fully resolved page graph into one build environment.
+public extension ResolvedPageGraph {
+    /// Project this coherent semantic graph into one build environment.
     ///
-    /// A page exists in the projection only when:
+    /// A resolved page exists in the projection only when:
     ///
     /// - the page itself is visible in the environment; and
-    /// - every ancestor is visible in the environment.
+    /// - every resolved ancestor is visible in the environment.
     ///
-    /// The second condition preserves hierarchical existence. A child cannot
-    /// escape an excluded parent merely because its own visibility includes
-    /// the environment.
+    /// Projection does not perform graph resolution or reconstruct routes.
     func project(
         in environment:
             BuildEnvironment
-    ) throws -> SiteProjection<Page> {
+    ) -> SiteProjection<Page> {
         let pages =
-            try resolved()
+            pages
                 .filter { page in
                     page
                         .visibility

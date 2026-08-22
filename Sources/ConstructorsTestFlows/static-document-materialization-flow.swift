@@ -338,6 +338,7 @@ extension ConstructorsFlowSuite {
                             ),
                         ]
                     )
+                    .resolve()
                     .project(
                         in:
                             .public
@@ -424,6 +425,7 @@ private func materializationRenderedSite()
 {
     let projection =
         try materializationGraph()
+            .resolve()
             .project(
                 in:
                     .public

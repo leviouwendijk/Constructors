@@ -26,6 +26,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try orchestrationGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -111,6 +112,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try orchestrationGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -168,6 +170,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try orchestrationGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -247,6 +250,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try orchestrationGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -331,6 +335,7 @@ extension ConstructorsFlowSuite {
             ) {
                 let projection =
                     try orchestrationGraph()
+                        .resolve()
                         .project(
                             in:
                                 .public

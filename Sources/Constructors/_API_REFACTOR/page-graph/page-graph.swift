@@ -17,8 +17,13 @@ public struct PageGraph<
             roots
     }
 
-    public func resolved()
-        throws -> [ResolvedPage<Page>]
+    /// Resolve the declaration graph into coherent semantic graph state.
+    ///
+    /// Successful resolution returns a `ResolvedPageGraph` so callers cannot
+    /// accidentally discard the collection-level invariant and then ask later
+    /// stages to resolve the declaration graph again.
+    public func resolve()
+        throws -> ResolvedPageGraph<Page>
     {
         var pages:
             [ResolvedPage<Page>] =
@@ -50,38 +55,10 @@ public struct PageGraph<
             )
         }
 
-        return pages
-    }
-
-    public func navigation(
-        in environment:
-            BuildEnvironment
-    ) throws -> NavigationStructure {
-        let roots =
-            try resolved()
-                .filter { page in
-                    page.depth == 0
-                    && page
-                        .visibility
-                        .contains(
-                            environment
-                        )
-                }
-                .compactMap { page in
-                    navigationNode(
-                        for:
-                            page.page,
-                        ancestors:
-                            [],
-                        environment:
-                            environment
-                    )
-                }
-
         return
-            NavigationStructure(
-                roots:
-                    roots
+            ResolvedPageGraph(
+                pages:
+                    pages
             )
     }
 
@@ -180,19 +157,17 @@ public struct PageGraph<
             nextRoute
         )
 
-        let resolvedPage =
-            ResolvedPage(
-                page:
-                    page,
-                route:
-                    route,
-                ancestors:
-                    ancestors
+        pages
+            .append(
+                ResolvedPage(
+                    page:
+                        page,
+                    route:
+                        route,
+                    ancestors:
+                        ancestors
+                )
             )
-
-        pages.append(
-            resolvedPage
-        )
 
         for child
             in page.children
@@ -214,84 +189,5 @@ public struct PageGraph<
                     &routes
             )
         }
-    }
-
-    private func navigationNode(
-        for page:
-            Page,
-        ancestors:
-            [Page],
-        environment:
-            BuildEnvironment
-    ) -> NavigationNode? {
-        guard
-            page
-                .visibility
-                .contains(
-                    environment
-                )
-        else {
-            return nil
-        }
-
-        let siteRoute =
-            (
-                ancestors
-                + [
-                    page,
-                ]
-            )
-            .compactMap(
-                \.slug
-            )
-            .reduce(
-                SiteRoute.root
-            ) { route, slug in
-                route
-                    .appending(
-                        SiteRoute
-                            .Segment(
-                                slug.value
-                            )
-                    )
-            }
-
-        let route =
-            PageRoute(
-                identifier:
-                    page.identifier,
-                siteRoute:
-                    siteRoute
-            )
-
-        let children =
-            page
-                .children
-                .compactMap { child in
-                    navigationNode(
-                        for:
-                            child,
-                        ancestors:
-                            ancestors
-                            + [
-                                page,
-                            ],
-                        environment:
-                            environment
-                    )
-                }
-
-        return
-            NavigationNode(
-                label:
-                    page.title,
-                path:
-                    page.slug == nil
-                    && children.isEmpty
-                        ? nil
-                        : route.href,
-                children:
-                    children
-            )
     }
 }

@@ -16,8 +16,9 @@ public enum SiteProjectionError:
 
 /// The semantic site that exists for one build environment.
 ///
-/// Resolution has already established coherent page and route identity.
-/// Projection only decides which of those resolved semantic objects exist.
+/// Resolution has already established coherent page, route, hierarchy, and
+/// reference identity. Projection decides only which resolved semantic objects
+/// exist in this environment.
 public struct SiteProjection<
     Page:
         PageGraphNode
@@ -57,39 +58,43 @@ public struct SiteProjection<
             }
     }
 
-    /// Resolve a relationship inside this projection.
+    /// Strengthen one already-resolved semantic relationship with projected
+    /// existence.
     ///
-    /// A globally valid page may still be absent here because projection has
-    /// excluded it for this build environment.
-    public func resolve(
-        _ reference:
-            SiteReference<Page.PageIdentifier>,
-        from source:
-            Page.PageIdentifier
+    /// This method deliberately accepts `ResolvedReference`, not
+    /// `SiteReference`: global relationship resolution belongs to the
+    /// Resolution stage and is never repeated here.
+    public func project(
+        _ resolved:
+            ResolvedReference<Page.PageIdentifier>
     ) throws -> ProjectedReference<Page.PageIdentifier> {
         guard
-            let projectedSource =
-                self[
-                    source
-                ]
+            self[
+                resolved
+                    .source
+            ]
+                != nil
         else {
             throw
                 SiteProjectionError
                     .sourceNotProjected(
-                        source.rawValue
+                        resolved
+                            .source
+                            .rawValue
                     )
         }
 
         guard
-            let projectedDestination =
-                self[
-                    reference.destination
-                ]
+            self[
+                resolved
+                    .destination
+            ]
+                != nil
         else {
             throw
                 SiteProjectionError
                     .destinationNotProjected(
-                        reference
+                        resolved
                             .destination
                             .rawValue
                     )
@@ -97,20 +102,8 @@ public struct SiteProjection<
 
         return
             ProjectedReference(
-                source:
-                    projectedSource
-                        .identifier,
-                destination:
-                    projectedDestination
-                        .identifier,
-                sourceRoute:
-                    projectedSource
-                        .siteRoute,
-                destinationRoute:
-                    projectedDestination
-                        .siteRoute,
-                style:
-                    reference.style
+                resolved:
+                    resolved
             )
     }
 }

@@ -1,31 +1,29 @@
-public extension PageGraph {
-    /// Resolve one semantic reference in the context of its source page.
+import Primitives
+
+public extension ResolvedPageGraph {
+    /// Resolve one authoring-time site reference inside this already-resolved
+    /// semantic graph.
     ///
     /// Successful resolution proves:
     ///
-    /// - the source identity exists;
-    /// - the destination identity exists;
-    /// - both logical routes are known;
-    /// - the authoring reference remains available as semantic information.
+    /// - the source identity exists in this resolved graph;
+    /// - the destination identity exists in this resolved graph;
+    /// - both logical routes are already known;
+    /// - the authoring reference style remains semantic information.
     ///
-    /// No href, `StandardPath`, or HTML value is produced here.
+    /// No projection, href, filesystem path, or HTML representation is
+    /// produced here.
     func resolve(
         _ reference:
             SiteReference<Page.PageIdentifier>,
         from source:
             Page.PageIdentifier
     ) throws -> ResolvedReference<Page.PageIdentifier> {
-        let pages =
-            try resolved()
-
         guard
             let resolvedSource =
-                pages.first(
-                    where: {
-                        $0.identifier.rawValue
-                            == source.rawValue
-                    }
-                )
+                self[
+                    source
+                ]
         else {
             throw
                 SiteReferenceResolutionError
@@ -36,14 +34,10 @@ public extension PageGraph {
 
         guard
             let resolvedDestination =
-                pages.first(
-                    where: {
-                        $0.identifier.rawValue
-                            == reference
-                                .destination
-                                .rawValue
-                    }
-                )
+                self[
+                    reference
+                        .destination
+                ]
         else {
             throw
                 SiteReferenceResolutionError
@@ -57,9 +51,11 @@ public extension PageGraph {
         return
             ResolvedReference(
                 source:
-                    resolvedSource.identifier,
+                    resolvedSource
+                        .identifier,
                 destination:
-                    resolvedDestination.identifier,
+                    resolvedDestination
+                        .identifier,
                 sourceRoute:
                     resolvedSource
                         .route

@@ -414,6 +414,7 @@ private func serializationIntegratedFixture()
 {
     let projection =
         try serializationGraph()
+            .resolve()
             .project(
                 in:
                     .public

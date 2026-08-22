@@ -3,9 +3,9 @@ import Primitives
 /// A resolved semantic reference whose source and destination have additionally
 /// been proven to exist in one site projection.
 ///
-/// The contained `ResolvedReference` preserves the stronger invariant already
-/// established by semantic resolution. Projection adds another invariant
-/// without lowering either identity or logical route to rendered text.
+/// Projection retains the exact `ResolvedReference` supplied by the Resolution
+/// stage. It adds projected-existence proof without reconstructing semantic
+/// identity, logical routes, or reference style.
 public struct ProjectedReference<
     Identifier:
         StringIdentifier
@@ -47,29 +47,10 @@ public struct ProjectedReference<
     }
 
     init(
-        source:
-            Identifier,
-        destination:
-            Identifier,
-        sourceRoute:
-            SiteRoute,
-        destinationRoute:
-            SiteRoute,
-        style:
-            SiteReferenceStyle
+        resolved:
+            ResolvedReference<Identifier>
     ) {
         self.resolved =
-            ResolvedReference(
-                source:
-                    source,
-                destination:
-                    destination,
-                sourceRoute:
-                    sourceRoute,
-                destinationRoute:
-                    destinationRoute,
-                style:
-                    style
-            )
+            resolved
     }
 }

@@ -26,6 +26,7 @@ enum ConstructorsFlowSuite:
         duplicateRouteResolution,
         semanticReferenceResolution,
         siteProjection,
+        resolutionProjectionCompaction,
         renderContextReferenceLowering,
         renderResultModel,
         renderOrchestration,
@@ -92,7 +93,8 @@ enum ConstructorsFlowSuite:
 
                 let resolved =
                     try graph
-                        .resolved()
+                        .resolve()
+                            .pages
 
                 try Expect.equal(
                     resolved
@@ -148,7 +150,8 @@ enum ConstructorsFlowSuite:
                 guard
                     let resolved =
                         try graph
-                            .resolved()
+                            .resolve()
+                            .pages
                             .first
                 else {
                     throw
@@ -215,7 +218,8 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try graph
-                            .resolved()
+                            .resolve()
+                            .pages
 
                     throw
                         ConstructorsFlowFailure
@@ -277,7 +281,8 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try graph
-                            .resolved()
+                            .resolve()
+                            .pages
 
                     throw
                         ConstructorsFlowFailure
@@ -392,6 +397,7 @@ enum ConstructorsFlowSuite:
 
                 let resolved =
                     try graph
+                        .resolve()
                         .resolve(
                             reference,
                             from:
@@ -483,6 +489,7 @@ enum ConstructorsFlowSuite:
 
                 let resolved =
                     try graph
+                        .resolve()
                         .resolve(
                             .to(
                                 "behaviour"
@@ -537,6 +544,7 @@ enum ConstructorsFlowSuite:
 
                 let resolved =
                     try graph
+                        .resolve()
                         .resolve(
                             .to(
                                 "contact",
@@ -587,6 +595,7 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try graph
+                            .resolve()
                             .resolve(
                                 .to(
                                     "missing"
@@ -634,6 +643,7 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try graph
+                            .resolve()
                             .resolve(
                                 .to(
                                     "contact"
@@ -731,6 +741,7 @@ enum ConstructorsFlowSuite:
 
                 let local =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .local
@@ -738,6 +749,7 @@ enum ConstructorsFlowSuite:
 
                 let publicProjection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -829,6 +841,7 @@ enum ConstructorsFlowSuite:
 
                 let projection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -901,6 +914,7 @@ enum ConstructorsFlowSuite:
 
                 let projection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -933,7 +947,8 @@ enum ConstructorsFlowSuite:
 
                 let resolved =
                     try graph
-                        .resolved()
+                        .resolve()
+                            .pages
                         .first {
                             $0
                                 .identifier
@@ -996,6 +1011,7 @@ enum ConstructorsFlowSuite:
 
                 let globalReference =
                     try graph
+                        .resolve()
                         .resolve(
                             .to(
                                 "private"
@@ -1014,6 +1030,7 @@ enum ConstructorsFlowSuite:
 
                 let publicProjection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -1022,12 +1039,16 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try publicProjection
-                            .resolve(
-                                .to(
-                                    "private"
-                                ),
-                                from:
-                                    "home"
+                            .project(
+                                try graph
+                                    .resolve()
+                                    .resolve(
+                                        .to(
+                                            "private"
+                                        ),
+                                        from:
+                                            "home"
+                                    )
                             )
 
                     throw
@@ -1048,6 +1069,7 @@ enum ConstructorsFlowSuite:
 
                 let localProjection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .local
@@ -1055,12 +1077,16 @@ enum ConstructorsFlowSuite:
 
                 let localReference =
                     try localProjection
-                        .resolve(
-                            .to(
-                                "private"
-                            ),
-                            from:
-                                "home"
+                        .project(
+                            try graph
+                                .resolve()
+                                .resolve(
+                                    .to(
+                                        "private"
+                                    ),
+                                    from:
+                                        "home"
+                                )
                         )
 
                 try Expect.equal(
@@ -1115,6 +1141,7 @@ enum ConstructorsFlowSuite:
 
                 let projection =
                     try graph
+                        .resolve()
                         .project(
                             in:
                                 .public
@@ -1123,12 +1150,16 @@ enum ConstructorsFlowSuite:
                 do {
                     _ =
                         try projection
-                            .resolve(
-                                .to(
-                                    "target"
-                                ),
-                                from:
-                                    "hidden-source"
+                            .project(
+                                try graph
+                                    .resolve()
+                                    .resolve(
+                                        .to(
+                                            "target"
+                                        ),
+                                        from:
+                                            "hidden-source"
+                                    )
                             )
 
                     throw

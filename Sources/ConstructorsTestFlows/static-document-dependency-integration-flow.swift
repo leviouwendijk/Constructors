@@ -480,6 +480,7 @@ private func integrationFixturePlan()
 {
     let projection =
         try integrationGraph()
+            .resolve()
             .project(
                 in:
                     .public

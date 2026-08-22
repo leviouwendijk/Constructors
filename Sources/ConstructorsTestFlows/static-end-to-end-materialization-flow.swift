@@ -610,6 +610,7 @@ private func endToEndRenderedSite()
 {
     let projection =
         try endToEndGraph()
+            .resolve()
             .project(
                 in:
                     .public
