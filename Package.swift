@@ -75,6 +75,18 @@ let package = Package(
                     package: "Path"
                 ),
                 .product(
+                    name: "CSS",
+                    package: "CSS"
+                ),
+                .product(
+                    name: "HTML",
+                    package: "HTML"
+                ),
+                .product(
+                    name: "JS",
+                    package: "JS"
+                ),
+                .product(
                     name: "TestFlows",
                     package: "TestFlows"
                 ),

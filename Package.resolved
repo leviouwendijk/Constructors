@@ -1,5 +1,5 @@
 {
-  "originHash" : "93cea95e96f661db6b089362d87288fdc7bb19d519be7a71ecf0469be0c988c8",
+  "originHash" : "1d4762a55520321900aa8ab27d20b17b78a330ec6b246f1e86b6d14b98728237",
   "pins" : [
     {
       "identity" : "ansi",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/leviouwendijk/CSS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "af30a940fe952a2a25d4d706487f762d2d72bd20"
+        "revision" : "5bf0a866fa0a8c8fa2a85efd643bf9a11b7dcfc9"
       }
     },
     {
@@ -88,7 +88,7 @@
       "location" : "https://github.com/leviouwendijk/JS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "09b61d8c0f29a225569d280938f86c2e4f2407bc"
+        "revision" : "e8fb7326813098a03b2c4cb0fe00c07900b46a30"
       }
     },
     {

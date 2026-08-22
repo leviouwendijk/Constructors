@@ -1,5 +1,8 @@
+import CSS
 import Constructors
 import Foundation
+import HTML
+import JS
 import Path
 import Primitives
 import TestFlows
@@ -210,6 +213,484 @@ extension ConstructorsFlowSuite {
                 )
             }
         }
+}
+
+extension ConstructorsFlowSuite {
+    static let renderResultModel =
+        TestFlow(
+            "render-result-model",
+            title:
+                "Rendering retains projected documents and resolved dependency identity without materialization",
+            tags: [
+                "constructors",
+                "dependencies",
+                "document",
+                "rendering",
+                "semantic",
+            ]
+        ) {
+            Step(
+                "rendered document retains projected semantic and domain representations"
+            ) {
+                let projection =
+                    try renderFixtureGraph()
+                        .project(
+                            in:
+                                .public
+                        )
+
+                guard
+                    let home =
+                        projection[
+                            "home"
+                        ]
+                else {
+                    throw
+                        RenderResultFlowFailure
+                            .missingFixturePage(
+                                "home"
+                            )
+                }
+
+                let dependencies =
+                    try renderSharedDependencies()
+
+                let rendered =
+                    RenderedDocument(
+                        projectedPage:
+                            home,
+                        document:
+                            renderFixtureDocument(),
+                        dependencies:
+                            dependencies
+                    )
+
+                try Expect.equal(
+                    rendered
+                        .identifier
+                        .rawValue,
+                    "home",
+                    "render-result.document-identifier"
+                )
+
+                try Expect.equal(
+                    rendered
+                        .route
+                        .href,
+                    "/",
+                    "render-result.document-route"
+                )
+
+                try Expect.equal(
+                    rendered
+                        .styles
+                        .identifiers
+                        .map(
+                            \.rawValue
+                        ),
+                    [
+                        "shared-style",
+                    ],
+                    "render-result.document-style-identity"
+                )
+
+                try Expect.equal(
+                    rendered
+                        .scripts
+                        .identifiers
+                        .map(
+                            \.rawValue
+                        ),
+                    [
+                        "shared-script",
+                    ],
+                    "render-result.document-script-identity"
+                )
+
+                try Expect.equal(
+                    renderedResourceRoute(
+                        rendered
+                    )
+                    .href,
+                    "/",
+                    "render-result.rendered-resource-conformance"
+                )
+            }
+
+            Step(
+                "site result derives one stable dependency set across documents"
+            ) {
+                let projection =
+                    try renderFixtureGraph()
+                        .project(
+                            in:
+                                .public
+                        )
+
+                guard
+                    let home =
+                        projection[
+                            "home"
+                        ],
+                    let contact =
+                        projection[
+                            "contact"
+                        ]
+                else {
+                    throw
+                        RenderResultFlowFailure
+                            .missingFixturePage(
+                                "home/contact"
+                            )
+                }
+
+                let dependencies =
+                    try renderSharedDependencies()
+
+                let result =
+                    try SiteRenderResult(
+                        projection:
+                            projection,
+                        documents: [
+                            RenderedDocument(
+                                projectedPage:
+                                    home,
+                                document:
+                                    renderFixtureDocument(),
+                                dependencies:
+                                    dependencies
+                            ),
+                            RenderedDocument(
+                                projectedPage:
+                                    contact,
+                                document:
+                                    renderFixtureDocument(),
+                                dependencies:
+                                    dependencies
+                            ),
+                        ]
+                    )
+
+                try Expect.equal(
+                    result
+                        .documents
+                        .count,
+                    2,
+                    "render-result.document-count"
+                )
+
+                try Expect.equal(
+                    result
+                        .dependencies
+                        .styles
+                        .identifiers
+                        .map(
+                            \.rawValue
+                        ),
+                    [
+                        "shared-style",
+                    ],
+                    "render-result.site-style-deduplication"
+                )
+
+                try Expect.equal(
+                    result
+                        .dependencies
+                        .scripts
+                        .identifiers
+                        .map(
+                            \.rawValue
+                        ),
+                    [
+                        "shared-script",
+                    ],
+                    "render-result.site-script-deduplication"
+                )
+
+                try Expect.equal(
+                    result
+                        .projection[
+                            "contact"
+                        ]?
+                        .siteRoute
+                        .href,
+                    "/contact/",
+                    "render-result.projection-retained"
+                )
+            }
+
+            Step(
+                "site result rejects document route drift from its projection"
+            ) {
+                let projection =
+                    try renderFixtureGraph()
+                        .project(
+                            in:
+                                .public
+                        )
+
+                let driftedGraph =
+                    PageGraph(
+                        roots: [
+                            RenderFixturePage(
+                                identifier:
+                                    "home",
+                                slug:
+                                    renderSegment(
+                                        "drifted"
+                                    ),
+                                title:
+                                    "Home"
+                            ),
+                        ]
+                    )
+
+                let driftedProjection =
+                    try driftedGraph
+                        .project(
+                            in:
+                                .public
+                        )
+
+                guard
+                    let driftedHome =
+                        driftedProjection[
+                            "home"
+                        ]
+                else {
+                    throw
+                        RenderResultFlowFailure
+                            .missingFixturePage(
+                                "drifted-home"
+                            )
+                }
+
+                let rendered =
+                    RenderedDocument(
+                        projectedPage:
+                            driftedHome,
+                        document:
+                            renderFixtureDocument(),
+                        dependencies:
+                            try renderSharedDependencies()
+                    )
+
+                do {
+                    _ =
+                        try SiteRenderResult(
+                            projection:
+                                projection,
+                            documents: [
+                                rendered,
+                            ]
+                        )
+
+                    throw
+                        RenderResultFlowFailure
+                            .expectedRouteMismatch
+                } catch
+                    let error
+                        as SiteRenderResultError
+                {
+                    switch error {
+                    case .documentRouteMismatch(
+                        let identifier,
+                        let projected,
+                        let rendered
+                    ):
+                        try Expect.equal(
+                            identifier,
+                            "home",
+                            "render-result.route-mismatch-identifier"
+                        )
+
+                        try Expect.equal(
+                            projected.href,
+                            "/",
+                            "render-result.route-mismatch-projected"
+                        )
+
+                        try Expect.equal(
+                            rendered.href,
+                            "/drifted/",
+                            "render-result.route-mismatch-rendered"
+                        )
+
+                    case .documentNotProjected:
+                        throw
+                            RenderResultFlowFailure
+                                .unexpectedRenderResultError
+                    }
+                }
+            }
+
+            Step(
+                "site-wide dependency conflicts remain resolution failures"
+            ) {
+                let projection =
+                    try renderFixtureGraph()
+                        .project(
+                            in:
+                                .public
+                        )
+
+                guard
+                    let home =
+                        projection[
+                            "home"
+                        ],
+                    let contact =
+                        projection[
+                            "contact"
+                        ]
+                else {
+                    throw
+                        RenderResultFlowFailure
+                            .missingFixturePage(
+                                "home/contact"
+                            )
+                }
+
+                let firstDependencies =
+                    try renderSharedDependencies(
+                        scriptCode:
+                            "window.shared = 1;"
+                    )
+
+                let conflictingDependencies =
+                    try renderSharedDependencies(
+                        scriptCode:
+                            "window.shared = 2;"
+                    )
+
+                do {
+                    _ =
+                        try SiteRenderResult(
+                            projection:
+                                projection,
+                            documents: [
+                                RenderedDocument(
+                                    projectedPage:
+                                        home,
+                                    document:
+                                        renderFixtureDocument(),
+                                    dependencies:
+                                        firstDependencies
+                                ),
+                                RenderedDocument(
+                                    projectedPage:
+                                        contact,
+                                    document:
+                                        renderFixtureDocument(),
+                                    dependencies:
+                                        conflictingDependencies
+                                ),
+                            ]
+                        )
+
+                    throw
+                        RenderResultFlowFailure
+                            .expectedDependencyConflict
+                } catch
+                    let error
+                        as JSContributionResolutionError
+                {
+                    switch error {
+                    case .conflicting(
+                        let identifier
+                    ):
+                        try Expect.equal(
+                            identifier
+                                .rawValue,
+                            "shared-script",
+                            "render-result.site-dependency-conflict"
+                        )
+                    }
+                }
+            }
+        }
+}
+
+private func renderSharedDependencies(
+    scriptCode:
+        String = "window.shared = true;"
+) throws -> RenderDependencies {
+    let styles =
+        try CSSContributions(
+            [
+                CSSContribution(
+                    identifier:
+                        "shared-style",
+                    content:
+                        CSSContributionSet(
+                            units:
+                                []
+                        )
+                ),
+            ]
+        )
+        .resolve()
+
+    let scripts =
+        try JSContributions(
+            [
+                JSContribution(
+                    identifier:
+                        "shared-script",
+                    script:
+                        .inline(
+                            JSSource(
+                                scriptCode
+                            )
+                        )
+                ),
+            ]
+        )
+        .resolve()
+
+    return
+        RenderDependencies(
+            styles:
+                styles,
+            scripts:
+                scripts
+        )
+}
+
+private func renderFixtureDocument() -> HTMLDocument {
+    HTMLDocument(
+        attributes:
+            .empty,
+        head:
+            [],
+        body:
+            []
+    )
+}
+
+private func renderedResourceRoute<
+    Resource:
+        RenderedResource
+>(
+    _ resource:
+        Resource
+) -> SiteRoute {
+    resource
+        .route
+}
+
+private enum RenderResultFlowFailure:
+    Error
+{
+    case missingFixturePage(
+        String
+    )
+
+    case expectedRouteMismatch
+
+    case expectedDependencyConflict
+
+    case unexpectedRenderResultError
 }
 
 private func renderFixtureGraph() -> PageGraph<RenderFixturePage> {
