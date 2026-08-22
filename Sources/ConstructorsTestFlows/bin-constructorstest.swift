@@ -26,6 +26,7 @@ enum ConstructorsFlowSuite:
         duplicateRouteResolution,
         semanticReferenceResolution,
         siteProjection,
+        renderContextReferenceLowering,
     ]
 
     static let logicalRouteResolution =

@@ -66,7 +66,7 @@ public struct SiteProjection<
             SiteReference<Page.PageIdentifier>,
         from source:
             Page.PageIdentifier
-    ) throws -> ResolvedReference<Page.PageIdentifier> {
+    ) throws -> ProjectedReference<Page.PageIdentifier> {
         guard
             let projectedSource =
                 self[
@@ -96,7 +96,7 @@ public struct SiteProjection<
         }
 
         return
-            ResolvedReference(
+            ProjectedReference(
                 source:
                     projectedSource
                         .identifier,
