@@ -1,5 +1,6 @@
 import Foundation
 import Path
+import Writers
 
 public enum StaticFileWriterError:
     Error,
@@ -23,6 +24,11 @@ public enum StaticFileWriterError:
         String
     )
 
+    /// Compatibility case retained from the initial filesystem backend.
+    ///
+    /// Writers now owns intermediate-directory creation, so the current
+    /// backend no longer emits this case directly. Its API fate belongs to the
+    /// post-0G Guidelines/API review rather than this backend cutover.
     case createDirectoryFailed(
         destination:
             String,
@@ -40,21 +46,24 @@ public enum StaticFileWriterError:
 
 /// Filesystem delivery for already-serialized static text artifacts.
 ///
-/// This is intentionally a lower-level boundary than HTML/CSS/site
-/// materialization:
+/// Constructors owns materialization-specific delivery semantics:
 ///
-///     StaticTextArtifact
-///         StandardPath
-///         String
-///             +
-///     explicit filesystem root
-///             ↓
-///     concrete file URL
-///             ↓
-///     directory creation + atomic write
+/// - the explicit filesystem root;
+/// - `StandardPath` -> concrete URL lowering;
+/// - root containment;
+/// - complete destination planning before mutation;
+/// - duplicate-destination rejection;
+/// - translation of backend failures into this boundary.
 ///
-/// The complete destination set is resolved and validated before the first
-/// filesystem mutation occurs.
+/// Writers owns general-purpose physical file IO:
+///
+/// - intermediate-directory creation;
+/// - textual encoding;
+/// - overwrite execution;
+/// - atomic file replacement.
+///
+/// Writers itself explicitly depends on IO, so generic filesystem mechanics
+/// remain below the Constructors materialization layer.
 public struct StaticFileWriter:
     Sendable
 {
@@ -129,8 +138,17 @@ public struct StaticFileWriter:
 
     /// Deliver an already-serialized artifact set to this writer's root.
     ///
-    /// Every path and collision is validated first. Each individual payload is
-    /// then written atomically at its destination.
+    /// Every destination and collision is validated before the first backend
+    /// write is attempted.
+    ///
+    /// The Writers configuration preserves the generated-artifact behavior
+    /// established by the original implementation:
+    ///
+    /// - existing generated files are overwritten;
+    /// - overwrite backups are disabled;
+    /// - intermediate directories are created;
+    /// - writes are atomic;
+    /// - text is written as UTF-8 by `FileWriter.write(_:encoding:options:)`.
     public func write(
         _ artifacts:
             [StaticTextArtifact]
@@ -149,49 +167,22 @@ public struct StaticFileWriter:
             )
 
         for plan in plans {
-            let parent =
-                plan
-                    .destination
-                    .deletingLastPathComponent()
-
             do {
-                try FileManager
-                    .default
-                    .createDirectory(
-                        at:
-                            parent,
-                        withIntermediateDirectories:
-                            true
-                    )
-            } catch {
-                throw
-                    StaticFileWriterError
-                        .createDirectoryFailed(
-                            destination:
-                                parent
-                                    .path,
-                            reason:
-                                String(
-                                    describing:
-                                        error
-                                )
-                        )
-            }
-
-            do {
-                try Data(
-                    plan
-                        .artifact
-                        .contents
-                        .utf8
-                )
-                .write(
-                    to:
+                _ =
+                    try FileWriter(
                         plan
-                            .destination,
-                    options:
-                        .atomic
-                )
+                            .destination
+                    )
+                    .write(
+                        plan
+                            .artifact
+                            .contents,
+                        encoding:
+                            .utf8,
+                        options:
+                            Self
+                                .writeOptions
+                    )
             } catch {
                 throw
                     StaticFileWriterError
@@ -229,6 +220,22 @@ public struct StaticFileWriter:
                     written
             )
     }
+
+    private static let writeOptions =
+        SafeWriteOptions(
+            existingFilePolicy:
+                .overwrite,
+            makeBackupOnOverride:
+                false,
+            createIntermediateDirectories:
+                true,
+            atomic:
+                true,
+            createBackupDirectory:
+                false,
+            backupPolicy:
+                .disabled
+        )
 
     private func destination(
         for artifact:

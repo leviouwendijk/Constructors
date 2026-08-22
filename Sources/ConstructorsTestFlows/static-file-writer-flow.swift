@@ -505,6 +505,140 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
+                "Writers backend preserves generated-file overwrite semantics without backups"
+            ) {
+                let root =
+                    staticWriterTemporaryRoot(
+                        "writers-overwrite"
+                    )
+
+                defer {
+                    try?
+                        FileManager
+                            .default
+                            .removeItem(
+                                at:
+                                    root
+                            )
+                }
+
+                let output =
+                    StandardPath(
+                        [
+                            "nested",
+                            "overwrite.txt",
+                        ]
+                    )
+
+                let writer =
+                    try StaticFileWriter(
+                        root:
+                            root
+                    )
+
+                _ =
+                    try writer
+                        .write(
+                            [
+                                StaticTextArtifact(
+                                    output:
+                                        output,
+                                    contents:
+                                        "first\n"
+                                ),
+                            ]
+                        )
+
+                _ =
+                    try writer
+                        .write(
+                            [
+                                StaticTextArtifact(
+                                    output:
+                                        output,
+                                    contents:
+                                        "second\n"
+                                ),
+                            ]
+                        )
+
+                let destination =
+                    output
+                        .url(
+                            base:
+                                root
+                        )
+                        .standardizedFileURL
+
+                let contents =
+                    try String(
+                        contentsOf:
+                            destination,
+                        encoding:
+                            .utf8
+                    )
+
+                try Expect.equal(
+                    contents,
+                    "second\n",
+                    "static-writer.writers-backend-overwrite"
+                )
+
+                let nested =
+                    destination
+                        .deletingLastPathComponent()
+
+                let nestedEntries =
+                    try FileManager
+                        .default
+                        .contentsOfDirectory(
+                            at:
+                                nested,
+                            includingPropertiesForKeys:
+                                nil
+                        )
+                        .map(
+                            \.lastPathComponent
+                        )
+                        .sorted()
+
+                try Expect.equal(
+                    nestedEntries,
+                    [
+                        "overwrite.txt",
+                    ],
+                    "static-writer.writers-backend-no-sibling-backup"
+                )
+
+                try Expect.equal(
+                    FileManager
+                        .default
+                        .fileExists(
+                            atPath:
+                                root
+                                    .appendingPathComponent(
+                                        "safe-file-backups"
+                                    )
+                                    .path
+                        ),
+                    false,
+                    "static-writer.writers-backend-no-backup-directory"
+                )
+
+                try Expect.equal(
+                    FileManager
+                        .default
+                        .fileExists(
+                            atPath:
+                                nested
+                                    .path
+                        ),
+                    true,
+                    "static-writer.writers-backend-created-intermediate-directory"
+                )
+            }
+
+            Step(
                 "filesystem writer rejects non-file roots"
             ) {
                 guard
