@@ -27,6 +27,7 @@ enum ConstructorsFlowSuite:
         semanticReferenceResolution,
         siteProjection,
         resolutionProjectionCompaction,
+        siteSemantics,
         renderContextReferenceLowering,
         renderResultModel,
         renderOrchestration,

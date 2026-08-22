@@ -31,17 +31,27 @@ public struct SiteProjection<
     public let pages:
         [PageProjection<Page>]
 
+    /// Semantic relationships that were already resolved and have now also
+    /// been proven to exist in this projection.
+    public let references:
+        [ProjectedReference<Page.PageIdentifier>]
+
     init(
         environment:
             BuildEnvironment,
         pages:
-            [PageProjection<Page>]
+            [PageProjection<Page>],
+        references:
+            [ProjectedReference<Page.PageIdentifier>] = []
     ) {
         self.environment =
             environment
 
         self.pages =
             pages
+
+        self.references =
+            references
     }
 
     public subscript(
@@ -55,6 +65,38 @@ public struct SiteProjection<
                     .rawValue
                     == identifier
                         .rawValue
+            }
+    }
+
+    /// Find one relationship that was declared before Resolution and survived
+    /// Projection.
+    ///
+    /// This lookup does not resolve or project anything. Source identity,
+    /// destination identity, and reference style must match an existing
+    /// `ProjectedReference` exactly.
+    public func reference(
+        _ reference:
+            SiteReference<Page.PageIdentifier>,
+        from source:
+            Page.PageIdentifier
+    ) -> ProjectedReference<Page.PageIdentifier>? {
+        references
+            .first { projected in
+                projected
+                    .source
+                    .rawValue
+                    == source
+                        .rawValue
+                && projected
+                    .destination
+                    .rawValue
+                    == reference
+                        .destination
+                        .rawValue
+                && projected
+                    .style
+                    == reference
+                        .style
             }
     }
 

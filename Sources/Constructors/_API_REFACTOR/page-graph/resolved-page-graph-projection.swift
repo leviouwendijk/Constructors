@@ -9,6 +9,11 @@ public extension ResolvedPageGraph {
     /// - every resolved ancestor is visible in the environment.
     ///
     /// Projection does not perform graph resolution or reconstruct routes.
+    ///
+    /// This lower-level graph operation has no site-level reference
+    /// declarations, so the resulting `SiteProjection` intentionally contains
+    /// an empty projected-reference collection. Use `DeclaredSite` when
+    /// semantic site relationships must participate in the full lifecycle.
     func project(
         in environment:
             BuildEnvironment
@@ -43,7 +48,9 @@ public extension ResolvedPageGraph {
                 environment:
                     environment,
                 pages:
-                    pages
+                    pages,
+                references:
+                    []
             )
     }
 }
