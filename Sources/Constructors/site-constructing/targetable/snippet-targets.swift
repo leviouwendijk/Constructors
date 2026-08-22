@@ -149,9 +149,7 @@ public struct SnippetTargets: Targetable, MetadataTargetable {
 internal func renderInlineHTML(
     fragment: HTMLFragment,
     scripts: [JSScript] = [],
-    sheets: [CSSStyleSheet],
-    env: BuildEnvironment,
-    onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+    sheets: [CSSStyleSheet]
 ) -> String {
     let placedScripts = place_scripts(scripts)
 
@@ -181,9 +179,7 @@ internal func renderInlineHTML(
     }
 
     return doc.render(
-        default: .pretty,
-        environment: env,
-        onGate: onGate
+        default: .pretty
     )
 }
 

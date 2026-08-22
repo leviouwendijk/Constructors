@@ -57,8 +57,7 @@ public struct SiteDocumentDefinition: Sendable {
 
             return documentOptions.evaluate(
                 try build(),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }
@@ -89,8 +88,7 @@ public struct SiteDocumentDefinition: Sendable {
                 try build(
                     references
                 ),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }
@@ -123,8 +121,7 @@ public struct SiteDocumentDefinition: Sendable {
                 try build(
                     references
                 ),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }

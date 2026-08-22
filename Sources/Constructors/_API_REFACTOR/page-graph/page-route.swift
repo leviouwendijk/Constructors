@@ -1,56 +1,40 @@
-import Path
 import Primitives
 
-public struct PageRoute<Identifier: StringIdentifier>: Sendable, Hashable {
-    public let identifier: Identifier
-    public let segments: [PathSegment]
+public struct PageRoute<
+    Identifier:
+        StringIdentifier
+>:
+    Sendable,
+    Hashable
+{
+    public let identifier:
+        Identifier
+
+    /// Authoritative logical route.
+    ///
+    /// Filesystem directories and index-file paths are intentionally absent.
+    public let siteRoute:
+        SiteRoute
 
     public init(
-        identifier: Identifier,
-        segments: [PathSegment]
+        identifier:
+            Identifier,
+        siteRoute:
+            SiteRoute
     ) {
-        self.identifier = identifier
-        self.segments = segments
+        self.identifier =
+            identifier
+
+        self.siteRoute =
+            siteRoute
     }
 
-    public var directory: StandardPath {
-        StandardPath(
-            segments: segments.map { segment in
-                PathSegment(
-                    segment.value,
-                    .directory
-                )
-            }
-        )
-    }
-
-    public var indexOutputWithoutFiletype: StandardPath {
-        directory.merged(
-            appending: StandardPath(
-                [
-                    PathSegment(
-                        "index",
-                        .file
-                    )
-                ]
-            )
-        )
-    }
-
-    public var href: String {
-        let rendered = directory.render(
-            as: .root,
-            filetype: false
-        )
-
-        if rendered.isEmpty || rendered == "/" {
-            return "/"
-        }
-
-        if rendered.hasSuffix("/") {
-            return rendered
-        }
-
-        return "\(rendered)/"
+    /// Transitional URL serialization convenience.
+    ///
+    /// Semantic consumers should retain `siteRoute` wherever possible.
+    public var href:
+        String
+    {
+        siteRoute.href
     }
 }

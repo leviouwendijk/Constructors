@@ -56,8 +56,7 @@ public struct DocumentDeclaration<Identifier: DeclarationIdentifier>: Sendable {
 
             return documentOptions.evaluate(
                 try build(),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }
@@ -88,8 +87,7 @@ public struct DocumentDeclaration<Identifier: DeclarationIdentifier>: Sendable {
                 try build(
                     references
                 ),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }
@@ -122,8 +120,7 @@ public struct DocumentDeclaration<Identifier: DeclarationIdentifier>: Sendable {
                 try build(
                     references
                 ),
-                route: route,
-                environment: context.env
+                route: route
             )
         }
     }

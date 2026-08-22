@@ -74,17 +74,6 @@ private extension HTMLScopeSelector {
                 )
             ]
 
-        case let gate as HTMLGate:
-            return [
-                HTMLGate(
-                    id: gate.id,
-                    allow: gate.allowed,
-                    children: stripScopeWrappers(
-                        from: gate.children
-                    )
-                )
-            ]
-
         default:
             return [node]
         }
@@ -133,12 +122,6 @@ private extension HTMLScopeSelector {
             return extractScoped(
                 matching: scope,
                 from: inline.children
-            )
-
-        case let gate as HTMLGate:
-            return extractScoped(
-                matching: scope,
-                from: gate.children
             )
 
         default:
@@ -214,22 +197,6 @@ private extension HTMLScopeSelector {
             }
 
             return HTMLInlineGroup(children)
-
-        case let gate as HTMLGate:
-            let children = prune(
-                excluding: excluded,
-                from: gate.children
-            )
-
-            guard !children.isEmpty else {
-                return nil
-            }
-
-            return HTMLGate(
-                id: gate.id,
-                allow: gate.allowed,
-                children: children
-            )
 
         default:
             return node

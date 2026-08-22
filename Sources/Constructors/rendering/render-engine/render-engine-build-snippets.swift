@@ -42,15 +42,11 @@ extension RenderEngine {
                 continue
             }
 
-            let sink = GateTallySink()
-
             switch snippet.mode {
             case .inline:
                 let html = renderInlineHTML(
                     fragment: snippet.html,
-                    sheets: snippet.stylesheets,
-                    env: context.env,
-                    onGate: { e in sink.record(e) }
+                    sheets: snippet.stylesheets
                 )
 
                 let outURL: URL = snippet.url(base_url: context.baseURL)
@@ -68,9 +64,7 @@ extension RenderEngine {
             case .external(let cssPath):
                 let doc = snippet.htmlDocument
                 let html = doc.render(
-                    default: .pretty,
-                    environment: context.env,
-                    onGate: { e in sink.record(e) }
+                    default: .pretty
                 )
 
                 let outURL: URL = snippet.url(base_url: context.baseURL)
@@ -119,10 +113,6 @@ extension RenderEngine {
                 stderr("wrote snippet \(context.site.rawValue)/\(id) → \(finalURL.path)\n\n")
             }
 
-            let summary = sink.snapshot().prettySummary(site: context.site, page: id, env: context.env)
-            if !summary.isEmpty {
-                stderr(summary)
-            }
         }
     }
 }

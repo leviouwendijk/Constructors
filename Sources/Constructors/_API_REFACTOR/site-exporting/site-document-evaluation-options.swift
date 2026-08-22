@@ -8,7 +8,6 @@ public struct DocumentEvaluationOptions: Sendable {
     public let style: BundleHTMLDocumentStyle
     public let script: BundleHTMLDocumentScript
     public let referenceOptions: HTMLAssetReferenceOptions
-    public let onGate: @Sendable (GateEvent) -> Void
 
     public init(
         html_attributes: HTMLAttribute = HTMLAttribute(),
@@ -16,8 +15,7 @@ public struct DocumentEvaluationOptions: Sendable {
         title: String? = nil,
         style: BundleHTMLDocumentStyle = .inline(),
         script: BundleHTMLDocumentScript = .inline,
-        referenceOptions: HTMLAssetReferenceOptions = .root,
-        onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+        referenceOptions: HTMLAssetReferenceOptions = .root
     ) {
         self.html_attributes = html_attributes
         self.lang = lang
@@ -25,26 +23,22 @@ public struct DocumentEvaluationOptions: Sendable {
         self.style = style
         self.script = script
         self.referenceOptions = referenceOptions
-        self.onGate = onGate
     }
 
     public static let `default` = Self()
 
     public func evaluate(
         _ bundle: RenderBundle,
-        route: BundleExportRoute,
-        environment: BuildEnvironment
+        route: BundleExportRoute
     ) -> EvaluatedBundleExport {
         bundle.export.document.html.evaluate(
             route: route,
             html_attributes: html_attributes,
             lang: lang,
             title: title,
-            environment: environment,
             style: style,
             script: script,
-            referenceOptions: referenceOptions,
-            onGate: onGate
+            referenceOptions: referenceOptions
         )
     }
 }

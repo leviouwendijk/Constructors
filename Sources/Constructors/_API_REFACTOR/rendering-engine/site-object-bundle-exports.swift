@@ -167,8 +167,7 @@ public extension SiteObject {
                         let html = renderInlineHTML(
                             fragment: target.html,
                             scripts: target.javascript,
-                            sheets: target.stylesheets,
-                            env: context.env
+                            sheets: target.stylesheets
                         )
 
                         return EvaluatedBundleExport(
@@ -181,8 +180,7 @@ public extension SiteObject {
                         let doc = target.htmlDocument
 
                         let html = doc.render(
-                            default: .pretty,
-                            environment: context.env
+                            default: .pretty
                         )
 
                         let cssOptions = CSSRenderOptions.forDocuments(

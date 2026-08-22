@@ -37,13 +37,9 @@ extension RenderEngine {
                 continue
             }
 
-            let sink = GateTallySink()
-
             let doc = try target.html()
             let html = doc.render(
-                default: .pretty,
-                environment: context.env,
-                onGate: { e in sink.record(e) }
+                default: .pretty
             )
 
             let outURL = target.output.url(base: context.baseURL)
@@ -75,17 +71,6 @@ extension RenderEngine {
 
                 """
             )
-
-            if context.showGates {
-                let summary = sink.snapshot().prettySummary(
-                    site: context.site,
-                    page: pageName,
-                    env: context.env
-                )
-                if !summary.isEmpty {
-                    stderr(summary)
-                }
-            }
 
             stderr("\n")
         }

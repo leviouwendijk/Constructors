@@ -129,21 +129,17 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
             html_attributes: HTMLAttribute = HTMLAttribute(),
             lang: String? = nil,
             title: String? = nil,
-            environment: BuildEnvironment,
             style: BundleHTMLDocumentStyle = .inline(),
             script: BundleHTMLDocumentScript = .inline,
-            referenceOptions: HTMLAssetReferenceOptions = .root,
-            onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+            referenceOptions: HTMLAssetReferenceOptions = .root
         ) -> String {
             renderDocument(
                 html_attributes: html_attributes,
                 lang: lang,
                 title: title,
-                environment: environment,
                 style: style,
                 script: script,
-                referenceOptions: referenceOptions,
-                onGate: onGate
+                referenceOptions: referenceOptions
             ).html
         }
 
@@ -152,21 +148,17 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
             html_attributes: HTMLAttribute = HTMLAttribute(),
             lang: String? = nil,
             title: String? = nil,
-            environment: BuildEnvironment,
             style: BundleHTMLDocumentStyle = .inline(),
             script: BundleHTMLDocumentScript = .inline,
-            referenceOptions: HTMLAssetReferenceOptions = .root,
-            onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+            referenceOptions: HTMLAssetReferenceOptions = .root
         ) -> RenderOutput {
             renderDocument(
                 html_attributes: html_attributes,
                 lang: lang,
                 title: title,
-                environment: environment,
                 style: style,
                 script: script,
-                referenceOptions: referenceOptions,
-                onGate: onGate
+                referenceOptions: referenceOptions
             ).output(
                 htmlOutput: output
             )
@@ -177,21 +169,17 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
             html_attributes: HTMLAttribute = HTMLAttribute(),
             lang: String? = nil,
             title: String? = nil,
-            environment: BuildEnvironment,
             style: BundleHTMLDocumentStyle = .inline(),
             script: BundleHTMLDocumentScript = .inline,
-            referenceOptions: HTMLAssetReferenceOptions = .root,
-            onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+            referenceOptions: HTMLAssetReferenceOptions = .root
         ) -> EvaluatedBundleExport {
             let rendered = renderDocument(
                 html_attributes: html_attributes,
                 lang: lang,
                 title: title,
-                environment: environment,
                 style: style,
                 script: script,
-                referenceOptions: referenceOptions,
-                onGate: onGate
+                referenceOptions: referenceOptions
             )
 
             let metadataRoute: MetadataRoute? = {
@@ -227,22 +215,18 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
             html_attributes: HTMLAttribute = HTMLAttribute(),
             lang: String? = nil,
             title: String? = nil,
-            environment: BuildEnvironment,
             style: BundleHTMLDocumentStyle = .inline(),
             script: BundleHTMLDocumentScript = .inline,
-            referenceOptions: HTMLAssetReferenceOptions = .root,
-            onGate: @escaping @Sendable (GateEvent) -> Void = { _ in }
+            referenceOptions: HTMLAssetReferenceOptions = .root
         ) -> RenderOutput {
             file(
                 output: output,
                 html_attributes: html_attributes,
                 lang: lang,
                 title: title,
-                environment: environment,
                 style: style,
                 script: script,
-                referenceOptions: referenceOptions,
-                onGate: onGate
+                referenceOptions: referenceOptions
             )
         }
 
@@ -250,11 +234,9 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
             html_attributes: HTMLAttribute,
             lang: String?,
             title: String?,
-            environment: BuildEnvironment,
             style: BundleHTMLDocumentStyle,
             script: BundleHTMLDocumentScript,
-            referenceOptions: HTMLAssetReferenceOptions,
-            onGate: @escaping @Sendable (GateEvent) -> Void
+            referenceOptions: HTMLAssetReferenceOptions
         ) -> ResolvedBundleHTMLDocumentRender {
             let resolvedScripts = resolveScripts(
                 script,
@@ -304,9 +286,7 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
                     )
 
                     let html = doc.render(
-                        default: .minified,
-                        environment: environment,
-                        onGate: onGate
+                        default: .minified
                     )
 
                     return ResolvedBundleHTMLDocumentRender(
@@ -334,9 +314,7 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
                     )
 
                     let html = doc.render(
-                        default: .minified,
-                        environment: environment,
-                        onGate: onGate
+                        default: .minified
                     )
 
                     let css = bundle.stylesheets.isEmpty
@@ -376,9 +354,7 @@ public extension RenderBundle.ExportAPI.DocumentAPI {
                     )
 
                     let html = doc.render(
-                        default: .minified,
-                        environment: environment,
-                        onGate: onGate
+                        default: .minified
                     )
 
                     return ResolvedBundleHTMLDocumentRender(
