@@ -68,6 +68,23 @@ public struct SiteProjection<
             }
     }
 
+    /// Find the projected page that owns one exact logical route.
+    ///
+    /// The route has already crossed its parsing/resolution boundary. Lookup
+    /// therefore compares structural `SiteRoute` identity and never reparses or
+    /// compares serialized `href` text.
+    public subscript(
+        route route:
+            SiteRoute
+    ) -> PageProjection<Page>? {
+        pages
+            .first { page in
+                page
+                    .siteRoute
+                    == route
+            }
+    }
+
     /// Find one relationship that was declared before Resolution and survived
     /// Projection.
     ///

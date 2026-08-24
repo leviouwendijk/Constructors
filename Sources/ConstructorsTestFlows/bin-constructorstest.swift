@@ -23,6 +23,7 @@ enum ConstructorsFlowSuite:
         [TestFlow] =
     [
         logicalRouteResolution,
+        siteRouteIngress,
         duplicateRouteResolution,
         semanticReferenceResolution,
         siteProjection,

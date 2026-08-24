@@ -49,9 +49,10 @@ public struct SiteRoute:
     public let segments:
         [Segment]
 
-    /// Construction of coherent resolved routes remains inside Constructors
-    /// resolution for now. Explicit declaration policy can gain its own
-    /// public route-building API when SiteDeclaration is introduced.
+    /// Direct construction from resolved segment arrays remains inside
+    /// Constructors graph resolution. External transport adapters should enter
+    /// through `SiteRoute(parsingPath:)` rather than manufacturing resolved
+    /// segment-array state.
     init(
         resolvedSegments:
             [Segment]
