@@ -91,13 +91,13 @@ public extension RenderBundle {
 public extension RenderBundle {
     static func collect(
         _ components: any ReusableComponent...
-    ) -> RenderBundle {
-        components.bundle()
+    ) throws -> RenderBundle {
+        try components.bundle()
     }
 
     static func collect(
         _ components: [any ReusableComponent]
-    ) -> RenderBundle {
-        components.bundle()
+    ) throws -> RenderBundle {
+        try components.bundle()
     }
 }

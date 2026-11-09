@@ -1,5 +1,7 @@
 public extension ReusableComponent {
     var export: RenderBundle.ExportAPI {
-        bundle().export
+        get throws {
+            try bundle().export
+        }
     }
 }

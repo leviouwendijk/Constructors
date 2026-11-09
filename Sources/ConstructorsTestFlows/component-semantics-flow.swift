@@ -420,6 +420,107 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
+                "throwing compatibility lowering resolves composed dependencies once"
+            ) {
+                let original = InteractiveComponent().output()
+                let merged = original.merging(original)
+
+                try Expect.equal(
+                    merged.dependencies.styles.contributions.count,
+                    2,
+                    "component.compatibility.css-unresolved"
+                )
+                try Expect.equal(
+                    merged.dependencies.scripts.contributions.count,
+                    2,
+                    "component.compatibility.js-unresolved"
+                )
+
+                let withHead = ComponentOutput(
+                    content: ComponentContent(
+                        head: [HTML.text("head marker")]
+                    )
+                ).merging(merged)
+
+                let legacy = try withHead.legacyNodes()
+
+                try Expect.equal(
+                    legacy.head.count,
+                    1,
+                    "component.compatibility.head"
+                )
+                try Expect.equal(
+                    legacy.body.count,
+                    2,
+                    "component.compatibility.body"
+                )
+                try Expect.equal(
+                    legacy.stylesheets.count,
+                    1,
+                    "component.compatibility.css-deduplicated"
+                )
+                try Expect.equal(
+                    legacy.scripts.count,
+                    1,
+                    "component.compatibility.js-deduplicated"
+                )
+            }
+
+            Step(
+                "throwing compatibility lowering propagates typed CSS and JS conflicts"
+            ) {
+                let original = InteractiveComponent().output()
+
+                let conflictingStyles = original.merging(
+                    InteractiveComponent(
+                        display: "grid",
+                        script: "window.componentInteractive = true;"
+                    ).output()
+                )
+
+                let cssConflictDetected: Bool
+                do {
+                    _ = try conflictingStyles.legacyNodes()
+                    cssConflictDetected = false
+                } catch {
+                    guard error is CSSContributionResolutionError else {
+                        throw error
+                    }
+                    cssConflictDetected = true
+                }
+
+                try Expect.equal(
+                    cssConflictDetected,
+                    true,
+                    "component.compatibility.css-conflict-propagated"
+                )
+
+                let conflictingScripts = original.merging(
+                    InteractiveComponent(
+                        display: "block",
+                        script: "window.componentInteractive = false;"
+                    ).output()
+                )
+
+                let jsConflictDetected: Bool
+                do {
+                    _ = try conflictingScripts.legacyNodes()
+                    jsConflictDetected = false
+                } catch {
+                    guard error is JSContributionResolutionError else {
+                        throw error
+                    }
+                    jsConflictDetected = true
+                }
+
+                try Expect.equal(
+                    jsConflictDetected,
+                    true,
+                    "component.compatibility.js-conflict-propagated"
+                )
+            }
+
+            Step(
                 "site-aware component retains CSS and JS contributions without resolving them"
             ) {
                 let output =

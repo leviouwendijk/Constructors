@@ -1,24 +1,27 @@
-import HTML
 import Path
 import Primitives
 
-public struct SiteDocumentDefinition: Sendable {
-    public let id: String
+public struct DocumentDeclaration<Identifier: DeclarationIdentifier>: Sendable {
+    public let id: Identifier
     public let navigation: NavigationSetting
-    public let export: BundleExportDefinition
+    public let routedExport: RoutedBundleExportDefinition
 
-    public init(
-        id: String,
-        navigation: NavigationSetting = .none,
-        export: BundleExportDefinition
-    ) {
-        self.id = id
-        self.navigation = navigation
-        self.export = export
+    public var export: BundleExportDefinition {
+        routedExport.export
     }
 
     public init(
-        id: String,
+        id: Identifier,
+        navigation: NavigationSetting = .none,
+        export: RoutedBundleExportDefinition
+    ) {
+        self.id = id
+        self.navigation = navigation
+        self.routedExport = export
+    }
+
+    public init(
+        id: Identifier,
         route: BundleExportRoute,
         navigation: NavigationSetting = .none,
         evaluate: @escaping @Sendable (
@@ -28,15 +31,15 @@ public struct SiteDocumentDefinition: Sendable {
     ) {
         self.id = id
         self.navigation = navigation
-        self.export = BundleExportDefinition(
-            id: .document(id),
+        self.routedExport = RoutedBundleExportDefinition(
+            id: .document(id.rawValue),
             route: route,
             evaluate: evaluate
         )
     }
 
     public init(
-        id: String,
+        id: Identifier,
         route: BundleExportRoute,
         navigation: NavigationSetting = .none,
         options: @escaping @Sendable (
@@ -63,7 +66,7 @@ public struct SiteDocumentDefinition: Sendable {
     }
 
     public init(
-        id: String,
+        id: Identifier,
         route: BundleExportRoute,
         navigation: NavigationSetting = .none,
         options: @escaping @Sendable (
@@ -94,7 +97,7 @@ public struct SiteDocumentDefinition: Sendable {
     }
 
     public init(
-        id: String,
+        id: Identifier,
         route: BundleExportRoute,
         navigation: NavigationSetting = .none,
         options: @escaping @Sendable (
@@ -127,13 +130,7 @@ public struct SiteDocumentDefinition: Sendable {
     }
 
     public var route: BundleExportRoute {
-        guard let route = export.route else {
-            preconditionFailure(
-                "SiteDocumentDefinition requires an export route."
-            )
-        }
-
-        return route
+        routedExport.route
     }
 
     public var output: StandardPath {
@@ -146,43 +143,5 @@ public struct SiteDocumentDefinition: Sendable {
 
     public var metadata: TargetMetadata? {
         export.metadata
-    }
-}
-
-public extension SiteDocumentDefinition {
-    func evaluate(
-        context: BuildContext,
-        references: any SiteReferenceResolving
-    ) throws -> EvaluatedBundleExport {
-        try export.evaluate(
-            context: context,
-            references: references
-        )
-    }
-}
-
-public extension PageTarget {
-    @available(
-        *,
-        deprecated,
-        message: """
-        Prefer declaring documents in SiteDeclaring.declarations() using DocumentDeclaration(id:route:navigation:build:).
-        """
-    )
-    func document_definition(
-        id: String
-    ) -> SiteDocumentDefinition {
-        SiteDocumentDefinition(
-            id: id,
-            route: BundleExportRoute(
-                output: output,
-                visibility: visibility,
-                metadata: metadata
-            ),
-            navigation: navigation,
-            build: {
-                try self.bundle()
-            }
-        )
     }
 }

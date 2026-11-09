@@ -31,6 +31,7 @@ enum ConstructorsFlowSuite:
         siteSemantics,
         componentSemantics,
         componentOutputProviding,
+        routedExportInvariants,
         renderContextReferenceLowering,
         renderResultModel,
         renderOrchestration,

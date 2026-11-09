@@ -2,52 +2,52 @@ import CSS
 import HTML
 import JS
 
-public protocol ReusableComponent: RenderContributing, Sendable {
+public protocol ReusableComponent: Sendable {
     typealias Nodes = ReusableComponentNodes
 
-    var nodes: Nodes { get }
+    var nodes: Nodes { get throws }
 }
 
 public extension ReusableComponent {
-    func render_contribution() -> RenderContribution {
-        nodes.render_contribution()
+    func render_contribution() throws -> RenderContribution {
+        try nodes.render_contribution()
     }
 
-    func bundle() -> RenderBundle {
+    func bundle() throws -> RenderBundle {
         RenderBundle(
-            render_contribution()
+            try render_contribution()
         )
     }
 }
 
 public extension Array where Element: ReusableComponent {
-    func contribution() -> RenderContribution {
-        reduce(.empty) { partial, element in
+    func contribution() throws -> RenderContribution {
+        try reduce(.empty) { partial, element in
             partial.merging(
-                element.render_contribution()
+                try element.render_contribution()
             )
         }
     }
 
-    func bundle() -> RenderBundle {
+    func bundle() throws -> RenderBundle {
         RenderBundle(
-            contribution()
+            try contribution()
         )
     }
 }
 
 public extension Array where Element == any ReusableComponent {
-    func contribution() -> RenderContribution {
-        reduce(.empty) { partial, element in
+    func contribution() throws -> RenderContribution {
+        try reduce(.empty) { partial, element in
             partial.merging(
-                element.render_contribution()
+                try element.render_contribution()
             )
         }
     }
 
-    func bundle() -> RenderBundle {
+    func bundle() throws -> RenderBundle {
         RenderBundle(
-            contribution()
+            try contribution()
         )
     }
 }

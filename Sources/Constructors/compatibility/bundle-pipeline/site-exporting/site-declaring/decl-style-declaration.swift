@@ -3,14 +3,18 @@ import Primitives
 
 public struct StyleDeclaration<Identifier: DeclarationIdentifier>: Sendable {
     public let id: Identifier
-    public let export: BundleExportDefinition
+    public let routedExport: RoutedBundleExportDefinition
+
+    public var export: BundleExportDefinition {
+        routedExport.export
+    }
 
     public init(
         id: Identifier,
-        export: BundleExportDefinition
+        export: RoutedBundleExportDefinition
     ) {
         self.id = id
-        self.export = export
+        self.routedExport = export
     }
 
     public init(
@@ -22,7 +26,7 @@ public struct StyleDeclaration<Identifier: DeclarationIdentifier>: Sendable {
         ) throws -> EvaluatedBundleExport
     ) {
         self.id = id
-        self.export = BundleExportDefinition(
+        self.routedExport = RoutedBundleExportDefinition(
             id: .stylesheet(id.rawValue),
             route: route,
             evaluate: evaluate
@@ -30,13 +34,7 @@ public struct StyleDeclaration<Identifier: DeclarationIdentifier>: Sendable {
     }
 
     public var route: BundleExportRoute {
-        guard let route = export.route else {
-            preconditionFailure(
-                "StyleDeclaration requires an export route."
-            )
-        }
-
-        return route
+        routedExport.route
     }
 
     public var output: StandardPath {
