@@ -1,4 +1,6 @@
 import Constructors
+import HTML
+import Primitives
 import Path
 import TestFlows
 
@@ -58,6 +60,35 @@ extension ConstructorsFlowSuite {
             try Expect.equal(style.export.route, Optional(route), "routed.style.export-route")
             try Expect.equal(siteDocument.route, route, "routed.site-document.route")
             try Expect.equal(siteDocument.export.route, Optional(route), "routed.site-document.export-route")
+        }
+
+        Step("contextual page construction selects content before serialization") {
+            let target = PageTarget(
+                htmlForEnvironment: { environment in
+                    HTML.document {
+                        HTML.html {
+                            HTML.head {}
+                            HTML.body {
+                                HTML.text(
+                                    environment == .public
+                                        ? "public-content"
+                                        : "nonpublic-content"
+                                )
+                            }
+                        }
+                    }
+                },
+                output: StandardPath(["environment.html"])
+            )
+
+            let publicHTML = try target.document(in: .public).render(default: .pretty)
+            let localHTML = try target.document(in: .local).render(default: .pretty)
+            let testHTML = try target.document(in: .test).render(default: .pretty)
+
+            try Expect.equal(publicHTML.contains("public-content"), true, "page-target.public-content")
+            try Expect.equal(publicHTML.contains("nonpublic-content"), false, "page-target.no-private-content")
+            try Expect.equal(localHTML.contains("nonpublic-content"), true, "page-target.local-content")
+            try Expect.equal(testHTML.contains("nonpublic-content"), true, "page-target.test-content")
         }
     }
 }

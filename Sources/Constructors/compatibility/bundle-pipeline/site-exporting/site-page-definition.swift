@@ -130,6 +130,24 @@ public struct SiteDocumentDefinition: Sendable {
         }
     }
 
+    public init(
+        id: String,
+        route: BundleExportRoute,
+        navigation: NavigationSetting = .none,
+        options: @escaping @Sendable (BuildContext) throws -> DocumentEvaluationOptions = { _ in
+            .default
+        },
+        buildForEnvironment: @escaping @Sendable (BuildEnvironment) throws -> RenderBundle
+    ) {
+        self.init(id: id, route: route, navigation: navigation) { context, _ in
+            let documentOptions = try options(context)
+            return documentOptions.evaluate(
+                try buildForEnvironment(context.env),
+                route: route
+            )
+        }
+    }
+
     public var route: BundleExportRoute {
         routedExport.route
     }
@@ -178,8 +196,8 @@ public extension PageTarget {
                 metadata: metadata
             ),
             navigation: navigation,
-            build: {
-                try self.bundle()
+            buildForEnvironment: { environment in
+                try self.bundle(in: environment)
             }
         )
     }

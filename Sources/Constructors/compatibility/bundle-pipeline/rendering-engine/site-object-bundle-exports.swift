@@ -41,8 +41,8 @@ public extension SiteObject {
                     metadata: target.metadata
                 ),
                 navigation: target.navigation,
-                build: {
-                    try target.bundle()
+                buildForEnvironment: { environment in
+                    try target.bundle(in: environment)
                 }
             )
         }
@@ -103,7 +103,7 @@ public extension SiteObject {
                                 return nil
                             }
 
-                            return try page.html()
+                            return try page.document(in: context.env)
                         }
 
                     let options: CSSRenderOptions

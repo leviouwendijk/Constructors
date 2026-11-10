@@ -6,6 +6,7 @@ import Primitives
 
 public struct PageTarget: Targetable, MetadataTargetable {
     public let html: @Sendable () throws -> HTMLDocument
+    private let _htmlForEnvironment: (@Sendable (BuildEnvironment) throws -> HTMLDocument)?
 
     public let output: StandardPath
     public let visibility: Set<BuildEnvironment>
@@ -21,6 +22,7 @@ public struct PageTarget: Targetable, MetadataTargetable {
         metadata: TargetMetadata? = nil
     ) {
         self.html = html
+        self._htmlForEnvironment = nil
         self.output = output
         self.visibility = visibility
         self.navigation = navigation
@@ -43,6 +45,7 @@ public struct PageTarget: Targetable, MetadataTargetable {
         metadata: TargetMetadata? = nil
     ) {
         self.html = html
+        self._htmlForEnvironment = nil
         self.output = output
         self.visibility = visibility
         self.navigation = navigation
@@ -50,9 +53,41 @@ public struct PageTarget: Targetable, MetadataTargetable {
             metadata.exists_or_inits(visibility: visibility)
     }
 
+    /// Explicitly selects the document before HTML serialization.
+    /// Existing environment-independent pages continue to use their original builder.
+    public func document(in environment: BuildEnvironment) throws -> HTMLDocument {
+        if let _htmlForEnvironment {
+            return try _htmlForEnvironment(environment)
+        }
+        return try html()
+    }
+
+    public init(
+        htmlForEnvironment: @Sendable @escaping (BuildEnvironment) throws -> HTMLDocument,
+        output: StandardPath,
+        visibility: Set<BuildEnvironment> = [.local, .test, .public],
+        navigation: NavigationSetting = .none,
+        metadata: TargetMetadata? = nil
+    ) {
+        self.html = {
+            throw PageTargetError.environmentRequired
+        }
+        self._htmlForEnvironment = htmlForEnvironment
+        self.output = output
+        self.visibility = visibility
+        self.navigation = navigation
+        self.metadata = metadata.exists_or_inits(visibility: visibility)
+    }
+
+    /// Retained for existing environment-independent clients.
+    /// Environment-sensitive targets require `document(in:)`.
     public func document() throws -> HTMLDocument {
         try html()
     }
+}
+
+public enum PageTargetError: Error, Sendable {
+    case environmentRequired
 }
 
 // public extension PageTarget {

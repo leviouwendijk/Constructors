@@ -1,8 +1,16 @@
 import HTML
 import CSS
 import JS
+import Primitives
 
 public extension PageTarget {
+    func bundle(in environment: BuildEnvironment) throws -> RenderBundle {
+        RenderBundle(
+            try document(in: environment).render_contribution()
+        )
+    }
+
+    /// Legacy environment-independent adapter.
     func bundle() throws -> RenderBundle {
         RenderBundle(
             try html().render_contribution()

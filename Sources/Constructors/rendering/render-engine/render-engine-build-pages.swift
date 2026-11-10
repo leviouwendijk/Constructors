@@ -37,7 +37,7 @@ extension RenderEngine {
                 continue
             }
 
-            let doc = try target.html()
+            let doc = try target.document(in: context.env)
             let html = doc.render(
                 default: .pretty
             )
