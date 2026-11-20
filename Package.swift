@@ -13,19 +13,12 @@ let package = Package(
             name: "Constructors",
             targets: ["Constructors"]
         ),
-        .executable(
-            name: "constructorstest",
-            targets: [
-                "ConstructorsTestFlows",
-            ]
-        ),
     ],
     dependencies: [
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/DSL.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
 
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
@@ -61,36 +54,6 @@ let package = Package(
 
                 .product(name: "Partition", package: "Partition"),
             ],
-        ),
-        .executableTarget(
-            name: "ConstructorsTestFlows",
-            dependencies: [
-                "Constructors",
-                .product(
-                    name: "Primitives",
-                    package: "Primitives"
-                ),
-                .product(
-                    name: "Path",
-                    package: "Path"
-                ),
-                .product(
-                    name: "CSS",
-                    package: "CSS"
-                ),
-                .product(
-                    name: "HTML",
-                    package: "HTML"
-                ),
-                .product(
-                    name: "JS",
-                    package: "JS"
-                ),
-                .product(
-                    name: "TestFlows",
-                    package: "TestFlows"
-                ),
-            ]
         ),
     ]
 )
