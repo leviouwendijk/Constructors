@@ -452,7 +452,10 @@ private func materializationRenderedSite()
                             [
                                 CSSContribution(
                                     identifier:
-                                        "materialization-style",
+                                        CSSContributionIdentifier(
+                                            rawValue:
+                                                "materialization-style"
+                                        ),
                                     content:
                                         CSSContributionSet(
                                             units:
@@ -466,7 +469,10 @@ private func materializationRenderedSite()
                             [
                                 JSContribution(
                                     identifier:
-                                        "materialization-script",
+                                        JSContributionIdentifier(
+                                            rawValue:
+                                                "materialization-script"
+                                        ),
                                     script:
                                         .inline(
                                             JSSource(

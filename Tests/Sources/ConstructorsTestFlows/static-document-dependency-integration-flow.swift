@@ -508,13 +508,19 @@ private func integrationFixturePlan()
             scripts: [
                 JSContribution(
                     identifier:
-                        "integration-shared",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "integration-shared"
+                        ),
                     script:
                         integrationSharedScript()
                 ),
                 JSContribution(
                     identifier:
-                        "integration-home-external",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "integration-home-external"
+                        ),
                     script:
                         integrationHomeExternalScript()
                 ),
@@ -531,13 +537,19 @@ private func integrationFixturePlan()
             scripts: [
                 JSContribution(
                     identifier:
-                        "integration-contact-inline",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "integration-contact-inline"
+                        ),
                     script:
                         integrationContactScript()
                 ),
                 JSContribution(
                     identifier:
-                        "integration-shared",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "integration-shared"
+                        ),
                     script:
                         integrationSharedScript()
                 ),
@@ -597,7 +609,10 @@ private func integrationDependencies(
                 [
                     CSSContribution(
                         identifier:
-                            "integration-style",
+                            CSSContributionIdentifier(
+                                rawValue:
+                                    "integration-style"
+                            ),
                         content:
                             CSSContributionSet(
                                 units:

@@ -485,7 +485,10 @@ private func serializationDependencies()
     let stylesheet =
         CSSContribution(
             identifier:
-                "serialization-style",
+                CSSContributionIdentifier(
+                    rawValue:
+                        "serialization-style"
+                ),
             content:
                 CSSContributionSet {
                     CSS.rule(
@@ -501,7 +504,10 @@ private func serializationDependencies()
     let inline =
         JSContribution(
             identifier:
-                "serialization-inline",
+                JSContributionIdentifier(
+                    rawValue:
+                        "serialization-inline"
+                ),
             script:
                 .inline(
                     JSSource(
@@ -520,7 +526,10 @@ private func serializationDependencies()
     let external =
         JSContribution(
             identifier:
-                "serialization-external",
+                JSContributionIdentifier(
+                    rawValue:
+                        "serialization-external"
+                ),
             script:
                 .external(
                     JSExternalSource(

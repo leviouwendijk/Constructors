@@ -201,7 +201,10 @@ extension ConstructorsFlowSuite {
                                             [
                                                 JSContribution(
                                                     identifier:
-                                                        "conflict",
+                                                        JSContributionIdentifier(
+                                                            rawValue:
+                                                                "conflict"
+                                                        ),
                                                     script:
                                                         .inline(
                                                             JSSource(
@@ -211,7 +214,10 @@ extension ConstructorsFlowSuite {
                                                 ),
                                                 JSContribution(
                                                     identifier:
-                                                        "conflict",
+                                                        JSContributionIdentifier(
+                                                            rawValue:
+                                                                "conflict"
+                                                        ),
                                                     script:
                                                         .inline(
                                                             JSSource(
@@ -404,7 +410,10 @@ private func orchestrationOutput(
                 [
                     CSSContribution(
                         identifier:
-                            "shared-style",
+                            CSSContributionIdentifier(
+                                rawValue:
+                                    "shared-style"
+                            ),
                         content:
                             CSSContributionSet(
                                 units:

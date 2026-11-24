@@ -696,7 +696,10 @@ private func interactiveScript(
 ) -> JSContribution {
     JSContribution(
         identifier:
-            "component-interactive",
+            JSContributionIdentifier(
+                rawValue:
+                    "component-interactive"
+            ),
         script:
             .inline(
                 JSSource(

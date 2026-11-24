@@ -374,7 +374,10 @@ private func dependencyPackagingFixture()
             [
                 CSSContribution(
                     identifier:
-                        "dependency-base",
+                        CSSContributionIdentifier(
+                            rawValue:
+                                "dependency-base"
+                        ),
                     content:
                         CSSContributionSet(
                             units: [
@@ -394,7 +397,10 @@ private func dependencyPackagingFixture()
                 ),
                 CSSContribution(
                     identifier:
-                        "dependency-page",
+                        CSSContributionIdentifier(
+                            rawValue:
+                                "dependency-page"
+                        ),
                     content:
                         CSSContributionSet(
                             units: [
@@ -419,7 +425,10 @@ private func dependencyPackagingFixture()
                 ),
                 CSSContribution(
                     identifier:
-                        "dependency-admin",
+                        CSSContributionIdentifier(
+                            rawValue:
+                                "dependency-admin"
+                        ),
                     content:
                         CSSContributionSet(
                             units: [
@@ -488,13 +497,19 @@ private func dependencyPackagingFixture()
             [
                 JSContribution(
                     identifier:
-                        "dependency-inline",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "dependency-inline"
+                        ),
                     script:
                         inlineScript
                 ),
                 JSContribution(
                     identifier:
-                        "dependency-external",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "dependency-external"
+                        ),
                     scope:
                         "page",
                     script:
@@ -502,7 +517,10 @@ private func dependencyPackagingFixture()
                 ),
                 JSContribution(
                     identifier:
-                        "dependency-second-inline",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "dependency-second-inline"
+                        ),
                     script:
                         secondInlineScript
                 ),

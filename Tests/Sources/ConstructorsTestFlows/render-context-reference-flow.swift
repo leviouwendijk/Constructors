@@ -653,7 +653,10 @@ private func renderSharedDependencies(
             [
                 CSSContribution(
                     identifier:
-                        "shared-style",
+                        CSSContributionIdentifier(
+                            rawValue:
+                                "shared-style"
+                        ),
                     content:
                         CSSContributionSet(
                             units:
@@ -669,7 +672,10 @@ private func renderSharedDependencies(
             [
                 JSContribution(
                     identifier:
-                        "shared-script",
+                        JSContributionIdentifier(
+                            rawValue:
+                                "shared-script"
+                        ),
                     script:
                         .inline(
                             JSSource(

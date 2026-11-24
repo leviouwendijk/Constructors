@@ -670,7 +670,10 @@ private func endToEndOutput(
                     endToEndSharedScript(),
                     JSContribution(
                         identifier:
-                            "pipeline-home",
+                            JSContributionIdentifier(
+                                rawValue:
+                                    "pipeline-home"
+                            ),
                         script:
                             .inline(
                                 JSSource(
@@ -687,7 +690,10 @@ private func endToEndOutput(
                 [
                     JSContribution(
                         identifier:
-                            "pipeline-contact",
+                            JSContributionIdentifier(
+                                rawValue:
+                                    "pipeline-contact"
+                            ),
                         script:
                             .inline(
                                 JSSource(
@@ -752,7 +758,10 @@ private func endToEndStyle()
 {
     CSSContribution(
         identifier:
-            "pipeline-style",
+            CSSContributionIdentifier(
+                rawValue:
+                    "pipeline-style"
+            ),
         content:
             CSSContributionSet {
                 CSS.rule(
@@ -771,7 +780,10 @@ private func endToEndSharedScript()
 {
     JSContribution(
         identifier:
-            "pipeline-shared",
+            JSContributionIdentifier(
+                rawValue:
+                    "pipeline-shared"
+            ),
         script:
             .inline(
                 JSSource(
