@@ -18,11 +18,11 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/DSL.git", branch: "master"),
+        .package(url: "https://github.com/swift-dsl/DSL.git", branch: "master"),
 
-        .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/JS.git", branch: "master"),
+        .package(url: "https://github.com/swift-dsl/HTML.git", branch: "master"),
+        .package(url: "https://github.com/swift-dsl/CSS.git", branch: "master"),
+        .package(url: "https://github.com/swift-dsl/JS.git", branch: "master"),
 
         .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
