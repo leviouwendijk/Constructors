@@ -1,6 +1,7 @@
 import Foundation
 import Milieu
 import Partition
+import PartitionFrame
 
 public struct DistributionPaths: Sendable {
     public var test: String
@@ -51,14 +52,12 @@ public enum DistributionPathsRoot: Sendable {
     //     return websites_root
     // }
 
+    /// The `websites` location from this machine's partition configuration
+    /// (`~/.config/partition`, see PartitionFrame).
     public static func default_websites_root() throws -> String {
-        try PartitionEnvironment
-            .resolver(
-                fallback: DevelopmentPartitionLayout.main
-            )
-            .resolve(
-                .websites
-            )
+        try PartitionConfiguration
+            .load()
+            .path("websites")
             .render(
                 as: .root,
                 filetype: false

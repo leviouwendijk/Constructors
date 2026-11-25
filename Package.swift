@@ -52,7 +52,7 @@ let package = Package(
                 .product(name: "PathWeb", package: "Path"),
                 .product(name: "ProtocolComponents", package: "ProtocolComponents"),
 
-                .product(name: "Partition", package: "Partition"),
+                .product(name: "PartitionFrame", package: "Partition"),
             ],
         ),
     ]
