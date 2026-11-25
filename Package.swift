@@ -15,22 +15,22 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Primitives.git", branch: "master"),
+        // .package(url: "https://github.com/swift-lco/Methods.git", branch: "master"),
+        // .package(url: "https://github.com/swift-lco/Milieu.git", branch: "master"),
         .package(url: "https://github.com/swift-dsl/DSL.git", branch: "master"),
 
         .package(url: "https://github.com/swift-dsl/HTML.git", branch: "master"),
         .package(url: "https://github.com/swift-dsl/CSS.git", branch: "master"),
         .package(url: "https://github.com/swift-dsl/JS.git", branch: "master"),
 
-        .package(url: "https://github.com/leviouwendijk/Milieu.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Version.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Milieu.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Writers.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Version.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Path.git", branch: "master"),
         .package(url: "https://github.com/swift-webc/ProtocolComponents.git", branch: "master"),
 
-        .package(url: "https://github.com/leviouwendijk/Partition.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Partition.git", branch: "master"),
     ],
     targets: [
         .target(
