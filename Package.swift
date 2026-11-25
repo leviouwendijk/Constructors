@@ -28,7 +28,7 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Version.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/ProtocolComponents.git", branch: "master"),
+        .package(url: "https://github.com/swift-webc/ProtocolComponents.git", branch: "master"),
 
         .package(url: "https://github.com/leviouwendijk/Partition.git", branch: "master"),
     ],
