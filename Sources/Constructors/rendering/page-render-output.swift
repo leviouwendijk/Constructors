@@ -1,4 +1,5 @@
 import CSS
+import DSL
 import HTML
 import JS
 
@@ -22,6 +23,9 @@ public struct PageRenderOutput:
 
     public let scripts:
         JSContributions
+    /// Asset keys the page links to.
+    public let assets:
+        [StructuredContent.AssetKey]
 
     public init(
         document:
@@ -33,8 +37,12 @@ public struct PageRenderOutput:
         scripts:
             JSContributions = JSContributions(
                 []
-            )
+            ),
+        assets:
+            [StructuredContent.AssetKey] = []
     ) {
+        self.assets =
+            assets
         self.document =
             document
 

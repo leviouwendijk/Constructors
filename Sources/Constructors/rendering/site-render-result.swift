@@ -124,7 +124,14 @@ public struct SiteRenderResult<
                 styles:
                     styles,
                 scripts:
-                    scripts
+                    scripts,
+                assets:
+                    documents
+                        .flatMap {
+                            $0
+                                .dependencies
+                                .assets
+                        }
             )
     }
 }

@@ -1,3 +1,4 @@
+import DSL
 public enum RenderContextReferenceError:
     Error,
     Sendable,
@@ -92,5 +93,15 @@ public struct RenderContext<
             try render(
                 projected
             )
+    }
+}
+
+public extension RenderContext {
+    /// The URL of a catalogued asset. Declare the key in the page's
+    /// `assets` as well, so the materializer emits it under `.used`.
+    func href(
+        asset key: StructuredContent.AssetKey
+    ) throws -> String {
+        try policy.assets.href(key)
     }
 }

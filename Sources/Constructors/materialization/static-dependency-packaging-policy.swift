@@ -88,6 +88,40 @@ public struct StaticJavaScriptPackagingPolicy:
     }
 }
 
+/// Which catalogued assets reach the export.
+public struct StaticAssetPackagingPolicy:
+    Sendable
+{
+    public enum Emission:
+        Sendable,
+        Equatable
+    {
+        /// Every asset in the catalog.
+        case all
+        /// Only assets some page declared it uses.
+        case used
+    }
+
+    public let catalog:
+        ArtifactAssetCatalog
+
+    public let emission:
+        Emission
+
+    public init(
+        catalog:
+            ArtifactAssetCatalog = .empty,
+        emission:
+            Emission = .all
+    ) {
+        self.catalog =
+            catalog
+
+        self.emission =
+            emission
+    }
+}
+
 public struct StaticDependencyPackagingPolicy:
     Sendable
 {
@@ -97,14 +131,23 @@ public struct StaticDependencyPackagingPolicy:
     public let scripts:
         StaticJavaScriptPackagingPolicy
 
+    public let assets:
+        StaticAssetPackagingPolicy
+
     public init(
         styles:
             StaticStylesheetPackagingPolicy =
                 .init(),
         scripts:
             StaticJavaScriptPackagingPolicy =
-                .preserve
+                .preserve,
+        assets:
+            StaticAssetPackagingPolicy =
+                .init()
     ) {
+        self.assets =
+            assets
+
         self.styles =
             styles
 

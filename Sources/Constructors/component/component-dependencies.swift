@@ -1,4 +1,5 @@
 import CSS
+import DSL
 import JS
 
 /// Unresolved CSS and JavaScript dependencies authored by one or more
@@ -15,6 +16,10 @@ public struct ComponentDependencies:
 
     public let scripts:
         JSContributions
+    /// Assets the component links to, by key; the site's asset catalog
+    /// supplies them.
+    public let assets:
+        [StructuredContent.AssetKey]
 
     public init(
         styles:
@@ -26,8 +31,12 @@ public struct ComponentDependencies:
             JSContributions =
                 JSContributions(
                     []
-                )
+                ),
+        assets:
+            [StructuredContent.AssetKey] = []
     ) {
+        self.assets =
+            assets
         self.styles =
             styles
 
@@ -61,7 +70,11 @@ public struct ComponentDependencies:
                     + other
                         .scripts
                         .contributions
-                )
+                ),
+            assets:
+                assets
+                + other
+                    .assets
         )
     }
 }

@@ -201,7 +201,14 @@ public extension RenderContext {
                 scripts:
                     try output
                         .scripts
-                        .resolve()
+                        .resolve(),
+                assets:
+                    try output
+                        .assets
+                        .map {
+                            _ = try policy.assets.href($0)
+                            return $0
+                        }
             )
 
         return

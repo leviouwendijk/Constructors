@@ -100,6 +100,11 @@ public struct StaticDependencyPackaging:
     public let scripts:
         [StaticJavaScriptDependency]
 
+    /// Catalogued assets that reach the export, in catalog order.
+    public internal(set) var assets:
+        [ArtifactAssetCatalog.Entry] =
+            []
+
     /// Script files packaging produced, in site order.
     public internal(set) var scriptFiles:
         [StaticScriptArtifactPlan] =

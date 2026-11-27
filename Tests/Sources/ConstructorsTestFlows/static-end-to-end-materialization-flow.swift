@@ -1,5 +1,6 @@
 import CSS
 import Constructors
+import DSL
 import Foundation
 import HTML
 import JS
@@ -579,6 +580,64 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
+                "catalogued assets and bundled scripts reach the tree with derived links"
+            ) {
+                let catalog =
+                    try ArtifactAssetCatalog(
+                        [
+                            (
+                                .init(rawValue: "images/logo"),
+                                .bytes(Data([137, 80, 78, 71]), extension: "png")
+                            ),
+                            (
+                                .init(rawValue: "images/unused"),
+                                .bytes(Data([1]), extension: "png")
+                            ),
+                        ],
+                        profile:
+                            .init(hashesAssetNames: true)
+                    )
+
+                let rendered =
+                    try endToEndRenderedSite(
+                        policy:
+                            .init(assets: catalog)
+                    )
+
+                let prepared =
+                    try StaticSiteMaterializer(
+                        policy:
+                            .init(
+                                paths: .init(hashesAssetNames: true),
+                                scripts: .bundled,
+                                assets: .init(catalog: catalog, emission: .used)
+                            )
+                    )
+                    .prepare(
+                        rendered
+                    )
+
+                let logo = try Expect.notNil(catalog.entry(.init(rawValue: "images/logo")), "static-end-to-end.catalog-logo")
+                let paths = prepared.tree.entries.map { $0.path.rendered(asRootPath: false) }
+
+                try Expect.true(paths.contains(logo.path.rendered(asRootPath: false)), "static-end-to-end.used-asset-emitted")
+                try Expect.true(!paths.contains { $0.contains("unused") }, "static-end-to-end.unused-asset-pruned")
+                try Expect.true(paths.contains("assets/js/site.js"), "static-end-to-end.bundled-script-file")
+
+                let home = try Expect.notNil(
+                    prepared.documents.first { $0.identifier.rawValue == "home" },
+                    "static-end-to-end.home"
+                )
+                try Expect.true(home.contents.contains(try catalog.href(.init(rawValue: "images/logo"))), "static-end-to-end.asset-href-derived")
+                try Expect.true(home.contents.contains("/assets/js/site.js"), "static-end-to-end.script-href-derived")
+                try Expect.equal(
+                    try prepared.tree.bytes(for: .asset(.init(rawValue: "images/logo"))),
+                    Data([137, 80, 78, 71]),
+                    "static-end-to-end.asset-bytes"
+                )
+            }
+
+            Step(
                 "root convenience materialization reaches the same complete static delivery boundary"
             ) {
                 let rendered =
@@ -647,7 +706,10 @@ extension ConstructorsFlowSuite {
         }
 }
 
-private func endToEndRenderedSite()
+private func endToEndRenderedSite(
+    policy:
+        SiteRenderingPolicy = .init()
+)
     throws -> SiteRenderResult<
         EndToEndPage
     >
@@ -663,7 +725,9 @@ private func endToEndRenderedSite()
     let context =
         RenderContext(
             projection:
-                projection
+                projection,
+            policy:
+                policy
         )
 
     let state =
@@ -680,14 +744,16 @@ private func endToEndRenderedSite()
             ) {
                 projectedPage,
                 state,
-                _
+                context
                 in
 
-                endToEndOutput(
+                try endToEndOutput(
                     page:
                         projectedPage,
                     state:
-                        state
+                        state,
+                    context:
+                        context
                 )
             }
 }
@@ -696,8 +762,30 @@ private func endToEndOutput(
     page:
         PageProjection<EndToEndPage>,
     state:
-        EndToEndState
-) -> PageRenderOutput {
+        EndToEndState,
+    context:
+        RenderContext<EndToEndPage>
+) throws -> PageRenderOutput {
+    let logo =
+        StructuredContent.AssetKey(
+            rawValue:
+                "images/logo"
+        )
+
+    let usesLogo =
+        page.identifier.rawValue == "home"
+            && context.policy.assets.entry(logo) != nil
+
+    let logoNodes: HTMLFragment =
+        usesLogo
+            ? [
+                HTML.img(
+                    src: try context.href(asset: logo),
+                    alt: "Logo"
+                ),
+            ]
+            : []
+
     let identifier =
         page
             .identifier
@@ -784,7 +872,7 @@ private func endToEndOutput(
                                 "\(state.markerPrefix)-\(identifier)"
                             )
                         },
-                    ]
+                    ] + logoNodes
                 ),
             styles:
                 CSSContributions(
@@ -793,7 +881,9 @@ private func endToEndOutput(
                     ]
                 ),
             scripts:
-                scripts
+                scripts,
+            assets:
+                usesLogo ? [logo] : []
         )
 }
 

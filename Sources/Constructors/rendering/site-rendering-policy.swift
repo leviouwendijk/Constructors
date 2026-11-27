@@ -22,10 +22,19 @@ public struct SiteRenderingPolicy:
     public let absoluteBaseURL:
         URL?
 
+    /// The site's assets with planned paths; `RenderContext.href(asset:)`
+    /// links to them.
+    public let assets:
+        ArtifactAssetCatalog
+
     public init(
         absoluteBaseURL:
-            URL? = nil
+            URL? = nil,
+        assets:
+            ArtifactAssetCatalog = .empty
     ) {
+        self.assets =
+            assets
         self.absoluteBaseURL =
             absoluteBaseURL
     }

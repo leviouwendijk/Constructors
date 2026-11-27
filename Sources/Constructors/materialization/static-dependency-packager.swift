@@ -114,7 +114,25 @@ public struct StaticDependencyPackager:
                     scripts
             )
         packaging.scriptFiles = files
+        packaging.assets = try assets(dependencies)
         return packaging
+    }
+
+    private func assets(
+        _ dependencies: RenderDependencies
+    ) throws -> [ArtifactAssetCatalog.Entry] {
+        let catalog = policy.assets.catalog
+
+        switch policy.assets.emission {
+        case .all:
+            return catalog.entries
+        case .used:
+            let used = Set(dependencies.assets)
+            for key in dependencies.assets where catalog.entry(key) == nil {
+                throw ArtifactTreeError.unresolvedLink(.asset(key))
+            }
+            return catalog.entries.filter { used.contains($0.key) }
+        }
     }
 
     /// `files`: one per identifier. `bundled`: `site` for classic scripts,

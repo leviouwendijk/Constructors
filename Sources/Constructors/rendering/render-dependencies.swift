@@ -1,4 +1,5 @@
 import CSS
+import DSL
 import JS
 
 /// Resolved dependency state retained across the rendering boundary.
@@ -15,13 +16,23 @@ public struct RenderDependencies:
 
     public let scripts:
         ResolvedJSContributions
+    /// Asset keys in first-use order, each once.
+    public let assets:
+        [StructuredContent.AssetKey]
 
     public init(
         styles:
             ResolvedCSSContributions,
         scripts:
-            ResolvedJSContributions
+            ResolvedJSContributions,
+        assets:
+            [StructuredContent.AssetKey] = []
     ) {
+        var seen: Set<StructuredContent.AssetKey> = []
+        self.assets =
+            assets.filter {
+                seen.insert($0).inserted
+            }
         self.styles =
             styles
 

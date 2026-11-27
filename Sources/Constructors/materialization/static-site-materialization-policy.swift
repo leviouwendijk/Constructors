@@ -25,10 +25,17 @@ public struct StaticSiteMaterializationPolicy:
     public let serialization:
         StaticSerializationPolicy
 
-    /// Documents and the stylesheet placed by one path profile.
+    /// Documents, the stylesheet and script files placed by one path
+    /// profile; assets come with paths already planned in their catalog.
     public init(
         paths:
             ArtifactPathProfile,
+        scripts:
+            StaticJavaScriptPackagingPolicy.Delivery =
+                .preserve,
+        assets:
+            StaticAssetPackagingPolicy =
+                .init(),
         integration:
             StaticDocumentDependencyIntegrationPolicy =
                 .init(),
@@ -48,7 +55,16 @@ public struct StaticSiteMaterializationPolicy:
                         .init(
                             paths:
                                 paths
-                        )
+                        ),
+                    scripts:
+                        .init(
+                            delivery:
+                                scripts,
+                            paths:
+                                paths
+                        ),
+                    assets:
+                        assets
                 ),
             integration:
                 integration,
