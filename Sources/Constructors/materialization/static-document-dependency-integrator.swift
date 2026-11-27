@@ -77,6 +77,8 @@ public struct StaticDocumentDependencyIntegrator:
                 )
             )
 
+        var deliveredFiles: Set<ArtifactBundle> = []
+
         let scripts =
             try artifact
                 .dependencies
@@ -124,11 +126,63 @@ public struct StaticDocumentDependencyIntegrator:
                                 )
                     }
 
-                    integrate(
-                        packaged,
-                        into:
-                            &document
-                    )
+                    if let bundle = packaged.file {
+                        guard
+                            let file =
+                                packaging
+                                    .scriptFiles
+                                    .first(
+                                        where: {
+                                            $0.bundle == bundle
+                                        }
+                                    )
+                        else {
+                            throw
+                                StaticDocumentDependencyIntegrationError
+                                    .missingPackagedScript(
+                                        contribution
+                                            .identifier
+                                            .rawValue
+                                    )
+                        }
+
+                        // One tag per file, at its first member's place.
+                        if deliveredFiles.insert(bundle).inserted {
+                            integrate(
+                                StaticJavaScriptDependency(
+                                    identifier:
+                                        packaged
+                                            .identifier,
+                                    scope:
+                                        packaged
+                                            .scope,
+                                    script:
+                                        .external(
+                                            JSExternalSource(
+                                                file
+                                                    .output
+                                                    .rendered(
+                                                        asRootPath:
+                                                            true
+                                                    )
+                                            ),
+                                            attributes:
+                                                file
+                                                    .loading
+                                                    .attributes
+                                        )
+                                ),
+                                into:
+                                    &document
+                            )
+                        }
+                    } else {
+                        integrate(
+                            packaged,
+                            into:
+                                &document
+                        )
+                    }
 
                     return
                         packaged

@@ -1,3 +1,5 @@
+import JS
+
 public struct StaticDependencyPackager:
     Sendable
 {
@@ -41,37 +43,96 @@ public struct StaticDependencyPackager:
                         )
             )
 
-        let scripts:
-            [StaticJavaScriptDependency]
+        var scripts =
+            dependencies
+                .scripts
+                .contributions
+                .map { contribution in
+                    StaticJavaScriptDependency(
+                        identifier:
+                            contribution
+                                .identifier,
+                        scope:
+                            contribution
+                                .scope,
+                        script:
+                            contribution
+                                .script
+                    )
+                }
 
-        switch policy.scripts {
-        case .preserve:
-            scripts =
-                dependencies
-                    .scripts
-                    .contributions
-                    .map { contribution in
-                        StaticJavaScriptDependency(
-                            identifier:
-                                contribution
-                                    .identifier,
-                            scope:
-                                contribution
-                                    .scope,
-                            script:
-                                contribution
-                                    .script
-                        )
-                    }
+        var files: [StaticScriptArtifactPlan] = []
+
+        if policy.scripts.delivery != .preserve {
+            var order: [ArtifactBundle] = []
+            var members: [ArtifactBundle: (loading: JSScriptLoading, identifiers: [JSContributionIdentifier], sources: [JSSource])] = [:]
+
+            for index in scripts.indices {
+                guard let source = scripts[index].script.source else {
+                    continue
+                }
+
+                let loading = scripts[index].script.loading
+                let bundle = Self.bundle(
+                    for: scripts[index].identifier,
+                    loading: loading,
+                    delivery: policy.scripts.delivery
+                )
+
+                scripts[index].file = bundle
+
+                if members[bundle] == nil {
+                    order.append(bundle)
+                    members[bundle] = (loading, [], [])
+                }
+
+                members[bundle]?.identifiers.append(scripts[index].identifier)
+                members[bundle]?.sources.append(source)
+            }
+
+            files = try order.map { bundle in
+                let member = members[bundle]!
+                return StaticScriptArtifactPlan(
+                    bundle: bundle,
+                    output: try policy.scripts.paths.scriptPath(bundle),
+                    loading: member.loading,
+                    members: member.identifiers,
+                    source: JSSource(
+                        member.sources
+                            .map { $0.render() }
+                            .joined(separator: "\n;\n")
+                    )
+                )
+            }
         }
 
-        return
+        var packaging =
             StaticDependencyPackaging(
                 stylesheet:
                     stylesheet,
                 scripts:
                     scripts
             )
+        packaging.scriptFiles = files
+        return packaging
+    }
+
+    /// `files`: one per identifier. `bundled`: `site` for classic scripts,
+    /// with `-defer` / `-async` for those loadings; modules one per
+    /// identifier.
+    private static func bundle(
+        for identifier: JSContributionIdentifier,
+        loading: JSScriptLoading,
+        delivery: StaticJavaScriptPackagingPolicy.Delivery
+    ) -> ArtifactBundle {
+        if delivery == .files || loading.kind == .module {
+            return .init(rawValue: identifier.rawValue)
+        }
+
+        var name = "site"
+        if loading.defer_loading { name += "-defer" }
+        if loading.async_loading { name += "-async" }
+        return .init(rawValue: name)
     }
 
     public func pack<

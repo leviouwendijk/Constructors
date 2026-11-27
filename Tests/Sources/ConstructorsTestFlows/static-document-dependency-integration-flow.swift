@@ -276,6 +276,73 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
+                "bundled delivery moves authored scripts into files by loading class"
+            ) {
+                let plan =
+                    try integrationFixturePlan(
+                        scripts:
+                            .init(
+                                delivery:
+                                    .bundled
+                            )
+                    )
+
+                try Expect.equal(
+                    plan.dependencies.scriptFiles.map(\.bundle.rawValue),
+                    ["integration-shared", "site"],
+                    "static-integration.bundled.files"
+                )
+                try Expect.equal(
+                    plan.dependencies.scriptFiles.map { $0.output.rendered(asRootPath: false) },
+                    ["assets/js/integration-shared.js", "assets/js/site.js"],
+                    "static-integration.bundled.paths"
+                )
+
+                let integrated =
+                    try StaticDocumentDependencyIntegrator()
+                    .integrate(
+                        plan
+                    )
+
+                func html(_ identifier: String) throws -> String {
+                    let document = try Expect.notNil(
+                        integrated.documents.first { $0.identifier.rawValue == identifier },
+                        "static-integration.bundled.\(identifier)"
+                    )
+                    return document.document.render(options: HTMLRenderOptions.Defaults.minified())
+                }
+
+                let home = try html("home")
+                let contact = try html("contact")
+
+                try Expect.true(home.contains("/assets/js/integration-shared.js"), "static-integration.bundled.home-module-file")
+                try Expect.true(home.contains("/assets/vendor-home.js"), "static-integration.bundled.external-stays")
+                try Expect.true(!home.contains("/assets/js/site.js"), "static-integration.bundled.home-loads-only-its-files")
+                try Expect.true(contact.contains("/assets/js/site.js"), "static-integration.bundled.contact-classic-file")
+                try Expect.true(contact.contains("type=\"module\""), "static-integration.bundled.module-kept")
+                try Expect.true(!contact.contains("window.integrationContact"), "static-integration.bundled.source-moved")
+            }
+
+            Step(
+                "file delivery gives each authored script its own file"
+            ) {
+                let plan =
+                    try integrationFixturePlan(
+                        scripts:
+                            .init(
+                                delivery:
+                                    .files
+                            )
+                    )
+
+                try Expect.equal(
+                    plan.dependencies.scriptFiles.map(\.bundle.rawValue),
+                    ["integration-shared", "integration-contact-inline"],
+                    "static-integration.files.one-per-script"
+                )
+            }
+
+            Step(
                 "inline and external JavaScript placement is policy while JSScript semantics remain unchanged"
             ) {
                 let plan =
@@ -458,7 +525,10 @@ extension ConstructorsFlowSuite {
         }
 }
 
-private func integrationFixturePlan()
+private func integrationFixturePlan(
+    scripts:
+        StaticJavaScriptPackagingPolicy = .preserve
+)
     throws -> StaticSiteMaterializationPlan<
         IntegrationPage
     >
@@ -578,10 +648,16 @@ private func integrationFixturePlan()
             )
 
     return
-        try StaticDependencyPackager()
-            .pack(
-                documents
-            )
+        try StaticDependencyPackager(
+            policy:
+                .init(
+                    scripts:
+                        scripts
+                )
+        )
+        .pack(
+            documents
+        )
 }
 
 private func integrationDependencies(

@@ -31,6 +31,15 @@ public extension StaticIntegratedSiteMaterializationPlan {
         )
         try Self.check(key, planned, stylesheet.output)
 
+        for file in source.dependencies.scriptFiles {
+            let key = ArtifactKey.script(file.bundle)
+            let planned = try tree.add(
+                .script(file.source),
+                as: key
+            )
+            try Self.check(key, planned, file.output)
+        }
+
         return tree
     }
 

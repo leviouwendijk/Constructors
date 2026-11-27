@@ -66,6 +66,12 @@ public struct StaticJavaScriptDependency:
     public let script:
         JSScript
 
+    /// The file this script is delivered in, when packaging moved an
+    /// authored script out of the document.
+    public internal(set) var file:
+        ArtifactBundle? =
+            nil
+
     public init(
         identifier:
             JSContributionIdentifier,
@@ -86,14 +92,18 @@ public struct StaticJavaScriptDependency:
 }
 
 public struct StaticDependencyPackaging:
-    Sendable,
-    Equatable
+    Sendable
 {
     public let stylesheet:
         StaticStylesheetArtifactPlan
 
     public let scripts:
         [StaticJavaScriptDependency]
+
+    /// Script files packaging produced, in site order.
+    public internal(set) var scriptFiles:
+        [StaticScriptArtifactPlan] =
+            []
 
     public init(
         stylesheet:
@@ -107,4 +117,26 @@ public struct StaticDependencyPackaging:
         self.scripts =
             scripts
     }
+}
+
+/// One script file: authored scripts that load the same way, joined in
+/// order.
+public struct StaticScriptArtifactPlan:
+    Sendable,
+    Equatable
+{
+    public let bundle:
+        ArtifactBundle
+
+    public let output:
+        StandardPath
+
+    public let loading:
+        JSScriptLoading
+
+    public let members:
+        [JSContributionIdentifier]
+
+    public let source:
+        JSSource
 }

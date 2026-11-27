@@ -43,17 +43,49 @@ public struct StaticStylesheetPackagingPolicy:
     }
 }
 
-public enum StaticJavaScriptPackagingPolicy:
-    Sendable,
-    Equatable
+/// How authored (inline) scripts are delivered. External scripts are
+/// dependencies by URL and always stay external.
+public struct StaticJavaScriptPackagingPolicy:
+    Sendable
 {
-    /// Preserve every resolved JavaScript contribution as its existing
-    /// structural script value.
-    ///
-    /// Inline/external identity and script attributes remain intact.
-    /// A later materialization policy may introduce generated-file packaging
-    /// only when its semantic constraints are explicit.
-    case preserve
+    public enum Delivery:
+        Sendable,
+        Equatable
+    {
+        /// Every script as written: inline stays inline.
+        case preserve
+        /// Each authored script in its own file, named by its identifier;
+        /// a document loads only its own.
+        case files
+        /// Authored scripts that load the same way (classic or module,
+        /// `defer`, `async`) share one site file per loading class, in site
+        /// order. Module scripts are never combined, since top-level
+        /// bindings of two modules can clash; each gets its own file.
+        case bundled
+    }
+
+    public let delivery:
+        Delivery
+
+    public let paths:
+        ArtifactPathProfile
+
+    public init(
+        delivery:
+            Delivery = .preserve,
+        paths:
+            ArtifactPathProfile = .standard
+    ) {
+        self.delivery =
+            delivery
+
+        self.paths =
+            paths
+    }
+
+    public static var preserve: Self {
+        .init()
+    }
 }
 
 public struct StaticDependencyPackagingPolicy:
