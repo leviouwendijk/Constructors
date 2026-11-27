@@ -26,6 +26,7 @@ let package = Package(
 
         .package(url: "https://github.com/swift-lco/Milieu.git", branch: "master"),
         .package(url: "https://github.com/swift-lco/Writers.git", branch: "master"),
+        .package(url: "https://github.com/swift-lco/Readers.git", branch: "master"),
         .package(url: "https://github.com/swift-lco/Version.git", branch: "master"),
         .package(url: "https://github.com/swift-lco/Path.git", branch: "master"),
         .package(url: "https://github.com/swift-webc/ProtocolComponents.git", branch: "master"),
@@ -47,6 +48,7 @@ let package = Package(
 
                 .product(name: "Milieu", package: "Milieu"),
                 .product(name: "Writers", package: "Writers"),
+                .product(name: "Readers", package: "Readers"),
                 .product(name: "Version", package: "Version"),
                 .product(name: "Path", package: "Path"),
                 .product(name: "PathWeb", package: "Path"),

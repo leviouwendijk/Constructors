@@ -1,5 +1,5 @@
 {
-  "originHash" : "e6b588c45598e0be7d47f2e2eddbfae7c1f59d5876a38e141da6be5bd305362d",
+  "originHash" : "21d28821247bac6e328ab15610300228f0cfff69a81c9df897e441a0cb8145ca",
   "pins" : [
     {
       "identity" : "arguments",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/swift-dsl/CSS.git",
       "state" : {
         "branch" : "master",
-        "revision" : "ba945af15185265762bd823448566cdd7cf0a572"
+        "revision" : "75cda8f36782dc30f8aa50d66827bcc2966d86e1"
       }
     },
     {
@@ -34,7 +34,7 @@
       "location" : "https://github.com/swift-lco/Difference.git",
       "state" : {
         "branch" : "master",
-        "revision" : "37f9a4f9b56bb547b3c3915e664e7e9de927bff0"
+        "revision" : "e1bfbba9d1fbb182083b6a1871d7e3883f3ed091"
       }
     },
     {
@@ -43,7 +43,7 @@
       "location" : "https://github.com/swift-dsl/DSL.git",
       "state" : {
         "branch" : "master",
-        "revision" : "92957f2f62db2627638574ae5eaa055e7b1c4f73"
+        "revision" : "a6620d4e06b267e6c51d0668e6d20a3cf5b9f4d4"
       }
     },
     {
@@ -52,7 +52,7 @@
       "location" : "https://github.com/swift-lco/Errors.git",
       "state" : {
         "branch" : "master",
-        "revision" : "bd29066eccb8425d7a69d52f386a573916f5f9b0"
+        "revision" : "9ecda105df41ef077cc41cb7043b5d44abcd02f9"
       }
     },
     {
@@ -97,7 +97,7 @@
       "location" : "https://github.com/swift-dsl/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "adcf397d51e4ed0475358ff5ad59965865dca553"
+        "revision" : "b61e3bfbf68f17370ce556eba8b01b20477c1a85"
       }
     },
     {
@@ -169,7 +169,7 @@
       "location" : "https://github.com/swift-lco/Partition.git",
       "state" : {
         "branch" : "master",
-        "revision" : "8833ab3464e165d08c9a980dd3bb739c42d7297a"
+        "revision" : "786ec2e830cf3d0340e9a9fc96d2308ffb169023"
       }
     },
     {
@@ -178,7 +178,7 @@
       "location" : "https://github.com/swift-lco/Path.git",
       "state" : {
         "branch" : "master",
-        "revision" : "dd0821ac5bdf9b51089a3456b3d67f2798145ba5"
+        "revision" : "b598acf7b0156c546307d3819b4318ecaf2d3168"
       }
     },
     {
@@ -215,15 +215,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "47030d9a4c38299e040ed8024908e2cf4aa96663"
-      }
-    },
-    {
-      "identity" : "references",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swift-lco/References.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "ca5267a2806c7fdb6cf34f4691fe6d31cba183f4"
       }
     },
     {

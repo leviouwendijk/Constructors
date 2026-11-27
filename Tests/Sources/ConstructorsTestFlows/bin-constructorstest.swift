@@ -41,6 +41,7 @@ enum ConstructorsFlowSuite:
         staticTerminalSerialization,
         staticFileWriter,
         staticEndToEndMaterialization,
+        artifactTree,
     ]
 
     static let logicalRouteResolution =

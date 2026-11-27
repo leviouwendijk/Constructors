@@ -24,6 +24,7 @@ let package = Package(
         .package(url: "https://github.com/swift-dsl/CSS.git", branch: "master"),
         .package(url: "https://github.com/swift-dsl/JS.git", branch: "master"),
         .package(url: "https://github.com/swift-lco/Path.git", branch: "master"),
+        .package(url: "https://github.com/swift-dsl/DSL.git", branch: "master"),
         .package(path: ".."),
     ],
     targets: [
@@ -31,6 +32,7 @@ let package = Package(
             name: "ConstructorsTestFlows",
             dependencies: [
                 .product(name: "Constructors", package: "Constructors"),
+                .product(name: "DSL", package: "DSL"),
                 .product(
                     name: "Primitives",
                     package: "Primitives"
