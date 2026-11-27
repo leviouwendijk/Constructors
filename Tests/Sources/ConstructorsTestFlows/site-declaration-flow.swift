@@ -5,38 +5,38 @@ import Foundation
 import HTML
 import TestFlows
 
-private enum FixtureHome: Site {
+private enum FixtureHome: Site.Declaring {
     static let host = "fixture.example"
 
-    static let home = SitePage(FixtureHome.self, path: [], title: "Fixture")
+    static let home = Site.Page(FixtureHome.self, path: [], title: "Fixture")
 
     enum Offer {
-        static let index = SitePage(FixtureHome.self, path: ["offer"], title: "Offer", summary: "What we offer")
-        static let consult = SitePage(FixtureHome.self, path: ["offer", "consult"], title: "Consult")
+        static let index = Site.Page(FixtureHome.self, path: ["offer"], title: "Offer", summary: "What we offer")
+        static let consult = Site.Page(FixtureHome.self, path: ["offer", "consult"], title: "Consult")
     }
 
-    static var pages: [SitePage] {
+    static var pages: [Site.Page] {
         [home, Offer.index, Offer.consult]
     }
 }
 
-private enum FixtureDocs: Site {
+private enum FixtureDocs: Site.Declaring {
     static let host = "docs.fixture.example"
 
-    static let home = SitePage(FixtureDocs.self, path: [], title: "Docs")
-    static let basics = SitePage(FixtureDocs.self, path: ["basics"], title: "Basics", summary: "Start here")
+    static let home = Site.Page(FixtureDocs.self, path: [], title: "Docs")
+    static let basics = Site.Page(FixtureDocs.self, path: ["basics"], title: "Basics", summary: "Start here")
 
-    static var pages: [SitePage] {
+    static var pages: [Site.Page] {
         [home, basics]
     }
 }
 
-private enum FixtureOrphan: Site {
+private enum FixtureOrphan: Site.Declaring {
     static let host = "orphan.example"
-    static var pages: [SitePage] {
+    static var pages: [Site.Page] {
         [
-            SitePage(FixtureOrphan.self, path: [], title: "Root"),
-            SitePage(FixtureOrphan.self, path: ["a", "b"], title: "Orphan"),
+            Site.Page(FixtureOrphan.self, path: [], title: "Root"),
+            Site.Page(FixtureOrphan.self, path: ["a", "b"], title: "Orphan"),
         ]
     }
 }
@@ -70,7 +70,7 @@ extension ConstructorsFlowSuite {
             Step(
                 "links resolve within a site and across sites"
             ) {
-                let directory = SiteDirectory([FixtureHome.self, FixtureDocs.self])
+                let directory = Site.Directory([FixtureHome.self, FixtureDocs.self])
 
                 try Expect.equal(
                     try directory.href(for: FixtureHome.Offer.consult, from: FixtureHome.host),

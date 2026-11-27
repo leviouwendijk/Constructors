@@ -37,7 +37,7 @@ public struct StaticSiteMaterializationPolicy:
             StaticAssetPackagingPolicy =
                 .init(),
         head:
-            SiteHead? = nil,
+            Site.Head? = nil,
         integration:
             StaticDocumentDependencyIntegrationPolicy =
                 .init(),

@@ -21,7 +21,7 @@ public struct StaticDocumentDependencyIntegrationPolicy:
 
     /// The site's shared head; nil leaves each document's head as written.
     public let head:
-        SiteHead?
+        Site.Head?
 
     public let inlineScriptPlacement:
         StaticJavaScriptDocumentPlacement
@@ -31,7 +31,7 @@ public struct StaticDocumentDependencyIntegrationPolicy:
 
     public init(
         head:
-            SiteHead? = nil,
+            Site.Head? = nil,
         inlineScriptPlacement:
             StaticJavaScriptDocumentPlacement =
                 .bodyEnd,

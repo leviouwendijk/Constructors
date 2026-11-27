@@ -6,7 +6,7 @@ extension StaticDocumentDependencyIntegrator {
     /// The site head plus the page's overrides as nodes at the start of the
     /// head; `lang` on `<html>`. A `<title>` the page wrote itself is kept.
     func integrateHead(
-        _ site: SiteHead,
+        _ site: Site.Head,
         page: DocumentHead,
         route: SiteRoute,
         packaging: StaticDependencyPackaging,

@@ -655,7 +655,7 @@ extension ConstructorsFlowSuite {
                             .init(
                                 paths: .standard,
                                 assets: .init(catalog: catalog, emission: .used),
-                                head: SiteHead(
+                                head: Site.Head(
                                     siteName: "Fixture",
                                     description: "A fixture site.",
                                     canonicalBase: URL(string: "https://example.com/"),

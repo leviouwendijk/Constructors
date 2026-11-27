@@ -1,72 +1,76 @@
 import Path
 import Primitives
 
-public enum SiteDeclarationError:
-    Error,
-    Sendable,
-    Equatable
-{
-    case missingRoot(host: String)
-    case duplicatePath(host: String, path: String)
-    /// A page whose parent path has no page.
-    case orphan(host: String, path: String)
-    case foreignPage(host: String, page: String)
-    case unknownSite(String)
-    case unknownPage(String)
-}
-
-/// A declared page in the page graph: the bridge from `Site` to
-/// Constructors' resolution and rendering.
-public struct SitePageNode:
-    PageGraphNode
-{
-    public let page: SitePage
-    public let children: [SitePageNode]
-
-    public var identifier: SitePageIdentifier {
-        page.identifier
-    }
-
-    public var slug: PathSegment? {
-        page.path.last.map { PathSegment($0) }
-    }
-
-    public var title: String {
-        page.title
-    }
-
-    public var visibility: Set<BuildEnvironment> {
-        page.visibility
+public extension Site {
+    enum DeclarationError:
+        Error,
+        Sendable,
+        Equatable
+    {
+        case missingRoot(host: String)
+        case duplicatePath(host: String, path: String)
+        /// A page whose parent path has no page.
+        case orphan(host: String, path: String)
+        case foreignPage(host: String, page: String)
+        case unknownSite(String)
+        case unknownPage(String)
     }
 }
 
 public extension Site {
+    /// A declared page in the page graph: the bridge from `Site.Declaring` to
+    /// Constructors' resolution and rendering.
+    struct PageNode:
+        PageGraphNode
+    {
+        public let page: Site.Page
+        public let children: [Site.PageNode]
+
+        public var identifier: Site.PageIdentifier {
+            page.identifier
+        }
+
+        public var slug: PathSegment? {
+            page.path.last.map { PathSegment($0) }
+        }
+
+        public var title: String {
+            page.title
+        }
+
+        public var visibility: Set<BuildEnvironment> {
+            page.visibility
+        }
+    }
+}
+
+public extension Site.Declaring {
     /// The page tree, nested by path.
-    static func pageTree() throws -> SitePageNode {
-        var byPath: [[String]: SitePage] = [:]
+    static func pageTree() throws -> Site.PageNode {
+        var byPath: [[String]: Site.Page] = [:]
 
         for page in pages {
             guard page.host == host else {
-                throw SiteDeclarationError.foreignPage(host: host, page: page.pageKey.rawValue)
+                throw Site.DeclarationError.foreignPage(host: host, page: page.pageKey.rawValue)
             }
             guard byPath[page.path] == nil else {
-                throw SiteDeclarationError.duplicatePath(host: host, path: page.href)
+                throw Site.DeclarationError.duplicatePath(host: host, path: page.href)
             }
             byPath[page.path] = page
         }
 
         guard let root = byPath[[]] else {
-            throw SiteDeclarationError.missingRoot(host: host)
+            throw Site.DeclarationError.missingRoot(host: host)
         }
 
         for page in pages where !page.path.isEmpty {
             guard byPath[Array(page.path.dropLast())] != nil else {
-                throw SiteDeclarationError.orphan(host: host, path: page.href)
+                throw Site.DeclarationError.orphan(host: host, path: page.href)
             }
         }
 
-        func node(_ page: SitePage) -> SitePageNode {
-            SitePageNode(
+        func node(_ page: Site.Page) -> Site.PageNode {
+            Site.PageNode(
                 page: page,
                 children: pages
                     .filter { $0.path.count == page.path.count + 1 && Array($0.path.dropLast()) == page.path }
@@ -77,18 +81,18 @@ public extension Site {
         return node(root)
     }
 
-    static func pageGraph() throws -> PageGraph<SitePageNode> {
+    static func pageGraph() throws -> PageGraph<Site.PageNode> {
         PageGraph(roots: [try pageTree()])
     }
 }
 
-public extension Site {
+public extension Site.Declaring {
     /// Renders every page visible in `environment` with `body`.
     static func render(
         in environment: BuildEnvironment = .public,
         policy: SiteRenderingPolicy = .init(),
-        body: (SitePage, RenderContext<SitePageNode>) throws -> PageRenderOutput
-    ) throws -> SiteRenderResult<SitePageNode> {
+        body: (Site.Page, RenderContext<Site.PageNode>) throws -> PageRenderOutput
+    ) throws -> SiteRenderResult<Site.PageNode> {
         let projection = try pageGraph()
             .resolve()
             .project(in: environment)
@@ -107,7 +111,7 @@ public extension Site {
         in environment: BuildEnvironment = .public,
         rendering: SiteRenderingPolicy = .init(),
         materialization: StaticSiteMaterializationPolicy = .init(),
-        body: (SitePage, RenderContext<SitePageNode>) throws -> PageRenderOutput
+        body: (Site.Page, RenderContext<Site.PageNode>) throws -> PageRenderOutput
     ) throws -> ArtifactTree {
         try StaticSiteMaterializer(policy: materialization)
             .prepare(
