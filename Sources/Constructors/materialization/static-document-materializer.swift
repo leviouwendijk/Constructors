@@ -51,7 +51,10 @@ public struct StaticDocumentMaterializer:
                     .document,
             dependencies:
                 document
-                    .dependencies
+                    .dependencies,
+            head:
+                document
+                    .head
         )
     }
 

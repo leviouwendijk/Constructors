@@ -51,6 +51,22 @@ public struct StaticDocumentDependencyIntegrator:
             artifact
                 .document
 
+        if let head = policy.head {
+            try integrateHead(
+                head,
+                page:
+                    artifact
+                        .head,
+                route:
+                    artifact
+                        .route,
+                packaging:
+                    packaging,
+                into:
+                    &document
+            )
+        }
+
         let stylesheet =
             StaticStylesheetDocumentReference(
                 output:

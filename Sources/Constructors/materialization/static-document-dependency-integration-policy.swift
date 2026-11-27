@@ -19,6 +19,10 @@ public struct StaticDocumentDependencyIntegrationPolicy:
     Equatable
 {
 
+    /// The site's shared head; nil leaves each document's head as written.
+    public let head:
+        SiteHead?
+
     public let inlineScriptPlacement:
         StaticJavaScriptDocumentPlacement
 
@@ -26,6 +30,8 @@ public struct StaticDocumentDependencyIntegrationPolicy:
         StaticJavaScriptDocumentPlacement
 
     public init(
+        head:
+            SiteHead? = nil,
         inlineScriptPlacement:
             StaticJavaScriptDocumentPlacement =
                 .bodyEnd,
@@ -33,6 +39,9 @@ public struct StaticDocumentDependencyIntegrationPolicy:
             StaticJavaScriptDocumentPlacement =
                 .bodyEnd
     ) {
+
+        self.head =
+            head
 
         self.inlineScriptPlacement =
             inlineScriptPlacement

@@ -25,14 +25,27 @@ public struct RenderedDocument<
     public let dependencies:
         RenderDependencies
 
+    /// The page's head, its title defaulting to the page graph's title.
+    public let head:
+        DocumentHead
+
     public init(
         projectedPage:
             PageProjection<Page>,
         document:
             HTMLDocument,
         dependencies:
-            RenderDependencies
+            RenderDependencies,
+        head:
+            DocumentHead? = nil
     ) {
+        var head = head ?? DocumentHead()
+        if head.title == nil {
+            head.title = projectedPage.page.title
+        }
+        self.head =
+            head
+
         self.projectedPage =
             projectedPage
 

@@ -638,6 +638,62 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
+                "the site head is declared once and every URL in it is derived"
+            ) {
+                let icon = StructuredContent.AssetKey(rawValue: "images/icon")
+                let catalog =
+                    try ArtifactAssetCatalog(
+                        [
+                            (icon, .bytes(Data([1, 2]), extension: "png")),
+                            (.init(rawValue: "images/logo"), .bytes(Data([3]), extension: "png")),
+                        ]
+                    )
+
+                let prepared =
+                    try StaticSiteMaterializer(
+                        policy:
+                            .init(
+                                paths: .standard,
+                                assets: .init(catalog: catalog, emission: .used),
+                                head: SiteHead(
+                                    siteName: "Fixture",
+                                    description: "A fixture site.",
+                                    canonicalBase: URL(string: "https://example.com/"),
+                                    language: "nl",
+                                    icon: icon,
+                                    themeColor: ThemeColor(css: "#0a63c9")
+                                )
+                            )
+                    )
+                    .prepare(
+                        try endToEndRenderedSite(
+                            policy: .init(assets: catalog)
+                        )
+                    )
+
+                let contact = try Expect.notNil(
+                    prepared.documents.first { $0.identifier.rawValue == "contact" },
+                    "static-end-to-end.head.contact"
+                ).contents
+
+                try Expect.true(contact.contains("https://example.com/contact/"), "static-end-to-end.head.canonical")
+                try Expect.true(contact.contains("og:url"), "static-end-to-end.head.open-graph")
+                try Expect.true(contact.contains(try catalog.href(icon)), "static-end-to-end.head.icon-href")
+                try Expect.true(contact.contains("lang=\"nl\""), "static-end-to-end.head.lang")
+                try Expect.true(contact.contains("A fixture site."), "static-end-to-end.head.description")
+                try Expect.true(contact.contains("#0a63c9"), "static-end-to-end.head.theme-color")
+                try Expect.equal(
+                    contact.components(separatedBy: "<title").count - 1,
+                    1,
+                    "static-end-to-end.head.page-title-kept-once"
+                )
+                try Expect.true(
+                    prepared.tree.entries.contains { $0.key == .asset(icon) },
+                    "static-end-to-end.head.icon-exported-under-used"
+                )
+            }
+
+            Step(
                 "root convenience materialization reaches the same complete static delivery boundary"
             ) {
                 let rendered =

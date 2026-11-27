@@ -203,8 +203,7 @@ public extension RenderContext {
                         .scripts
                         .resolve(),
                 assets:
-                    try output
-                        .assets
+                    try (output.assets + output.head.assets)
                         .map {
                             _ = try policy.assets.href($0)
                             return $0
@@ -218,7 +217,9 @@ public extension RenderContext {
                 document:
                     output.document,
                 dependencies:
-                    dependencies
+                    dependencies,
+                head:
+                    output.head
             )
     }
 }

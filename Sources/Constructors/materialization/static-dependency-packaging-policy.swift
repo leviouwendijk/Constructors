@@ -108,12 +108,22 @@ public struct StaticAssetPackagingPolicy:
     public let emission:
         Emission
 
+    /// Exported under `.used` as well: assets every page links to without
+    /// declaring them (the site head's icons, manifest, default image).
+    public let required:
+        [StructuredContent.AssetKey]
+
     public init(
         catalog:
             ArtifactAssetCatalog = .empty,
         emission:
-            Emission = .all
+            Emission = .all,
+        required:
+            [StructuredContent.AssetKey] = []
     ) {
+        self.required =
+            required
+
         self.catalog =
             catalog
 

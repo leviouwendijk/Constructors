@@ -35,6 +35,9 @@ public struct StaticDocumentArtifact<
     public let dependencies:
         RenderDependencies
 
+    public let head:
+        DocumentHead
+
     public init(
         identifier:
             Identifier,
@@ -45,10 +48,15 @@ public struct StaticDocumentArtifact<
         document:
             HTMLDocument,
         dependencies:
-            RenderDependencies
+            RenderDependencies,
+        head:
+            DocumentHead = .init()
     ) {
         self.identifier =
             identifier
+
+        self.head =
+            head
 
         self.route =
             route

@@ -23,6 +23,10 @@ public struct PageRenderOutput:
 
     public let scripts:
         JSContributions
+    /// Head overrides for this page (title, description, image).
+    public let head:
+        DocumentHead
+
     /// Asset keys the page links to.
     public let assets:
         [StructuredContent.AssetKey]
@@ -39,8 +43,12 @@ public struct PageRenderOutput:
                 []
             ),
         assets:
-            [StructuredContent.AssetKey] = []
+            [StructuredContent.AssetKey] = [],
+        head:
+            DocumentHead = .init()
     ) {
+        self.head =
+            head
         self.assets =
             assets
         self.document =

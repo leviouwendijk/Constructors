@@ -36,6 +36,8 @@ public struct StaticSiteMaterializationPolicy:
         assets:
             StaticAssetPackagingPolicy =
                 .init(),
+        head:
+            SiteHead? = nil,
         integration:
             StaticDocumentDependencyIntegrationPolicy =
                 .init(),
@@ -43,6 +45,22 @@ public struct StaticSiteMaterializationPolicy:
             StaticSerializationPolicy =
                 .init()
     ) {
+        let integration =
+            head.map {
+                StaticDocumentDependencyIntegrationPolicy(
+                    head: $0,
+                    inlineScriptPlacement: integration.inlineScriptPlacement,
+                    externalScriptPlacement: integration.externalScriptPlacement
+                )
+            } ?? integration
+
+        let assets =
+            StaticAssetPackagingPolicy(
+                catalog: assets.catalog,
+                emission: assets.emission,
+                required: assets.required + (head?.assets ?? [])
+            )
+
         self.init(
             documents:
                 .init(
