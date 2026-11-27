@@ -14,6 +14,9 @@ public enum ArtifactTreeError:
     case invalidAssetKey(String)
     /// A document links to an artifact the tree doesn't have.
     case unresolvedLink(ArtifactKey)
+    /// A materialization step placed an artifact somewhere other than the
+    /// tree's profile does (two profiles in one build).
+    case pathMismatch(ArtifactKey, planned: String, materialized: String)
 }
 
 /// The low-level IR: every artifact of a site by key, each with its planned

@@ -58,8 +58,13 @@ public struct StaticDocumentDependencyIntegrator:
                         .stylesheet
                         .output,
                 href:
-                    policy
-                        .stylesheetHref
+                    packaging
+                        .stylesheet
+                        .output
+                        .rendered(
+                            asRootPath:
+                                true
+                        )
             )
 
         document

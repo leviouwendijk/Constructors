@@ -149,6 +149,12 @@ public struct StaticSerializedSiteMaterialization<
     public let stylesheet:
         StaticSerializedStylesheetArtifact
 
+    /// The same site as an `ArtifactTree` (W2): structured leaves, planned
+    /// paths, bytes on demand. Set by `StaticSiteMaterializer.prepare`.
+    public internal(set) var tree:
+        ArtifactTree =
+            ArtifactTree()
+
     public init(
         source:
             StaticIntegratedSiteMaterializationPlan<Page>,

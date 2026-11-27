@@ -8,9 +8,9 @@ public enum StaticJavaScriptDocumentPlacement:
 
 /// Policy for connecting already-packaged static dependencies to documents.
 ///
-/// The public stylesheet reference is deliberately distinct from the physical
-/// `StandardPath` owned by `StaticStylesheetArtifactPlan`. Static deployment
-/// may later place an artifact beneath a different public base path or origin.
+/// The stylesheet `href` is derived from the stylesheet's planned path (W2),
+/// so the two can't disagree. A different public base or origin belongs to
+/// the path profile, not to a second string here.
 ///
 /// Inline and external scripts may also choose different structural placement
 /// without changing the script values or their attributes.
@@ -18,8 +18,6 @@ public struct StaticDocumentDependencyIntegrationPolicy:
     Sendable,
     Equatable
 {
-    public let stylesheetHref:
-        String
 
     public let inlineScriptPlacement:
         StaticJavaScriptDocumentPlacement
@@ -28,8 +26,6 @@ public struct StaticDocumentDependencyIntegrationPolicy:
         StaticJavaScriptDocumentPlacement
 
     public init(
-        stylesheetHref:
-            String = "/assets/css/site.css",
         inlineScriptPlacement:
             StaticJavaScriptDocumentPlacement =
                 .bodyEnd,
@@ -37,8 +33,6 @@ public struct StaticDocumentDependencyIntegrationPolicy:
             StaticJavaScriptDocumentPlacement =
                 .bodyEnd
     ) {
-        self.stylesheetHref =
-            stylesheetHref
 
         self.inlineScriptPlacement =
             inlineScriptPlacement

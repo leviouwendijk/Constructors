@@ -59,7 +59,7 @@ extension ConstructorsFlowSuite {
                     "console.log(1)",
                     "artifact-tree.bytes.script"
                 )
-                try Expect.true(tree.pathTree.contains(path: StandardPath(rawPath: "assets/css/site.css")), "artifact-tree.path-tree")
+                try Expect.true(tree.pathTree.contains(path: try Expect.notNil(tree.path(for: .stylesheet(.site)), "artifact-tree.stylesheet-path")), "artifact-tree.path-tree")
             }
 
             Step(
@@ -85,6 +85,31 @@ extension ConstructorsFlowSuite {
                 try Expect.throwsError("artifact-tree.duplicate-path") {
                     try colliding.add(.stylesheet(CSSStyleSheet(rules: [CSSRule]())), as: .stylesheet(.site))
                 }
+            }
+
+            Step(
+                "write a tree's bytes, binary assets included"
+            ) {
+                let root = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("artifact-tree-\(UUID().uuidString)", isDirectory: true)
+                defer { try? FileManager.default.removeItem(at: root) }
+
+                var tree = ArtifactTree()
+                try tree.add(.stylesheet(CSSStyleSheet(rules: [CSSRule]())), as: .stylesheet(.site))
+                try tree.add(.asset(.bytes(Data([0, 255, 7]), extension: "png")), as: .asset(.init(rawValue: "logo")))
+
+                let written = try StaticFileWriter(root: root).write(tree)
+
+                try Expect.equal(
+                    written.map { $0.path.replacingOccurrences(of: root.standardizedFileURL.path + "/", with: "") },
+                    ["assets/css/site.css", "assets/logo.png"],
+                    "artifact-tree.write.destinations"
+                )
+                try Expect.equal(
+                    FileManager.default.contents(atPath: written[1].path),
+                    Data([0, 255, 7]),
+                    "artifact-tree.write.binary"
+                )
             }
 
             Step(

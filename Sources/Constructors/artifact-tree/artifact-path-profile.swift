@@ -1,3 +1,4 @@
+import FileTypes
 import Foundation
 import Path
 
@@ -53,15 +54,15 @@ public struct ArtifactPathProfile:
         switch key {
         case .document(let route):
             values.set(route.segments.map(\.rawValue), for: Self.route)
-            return try document.render(values)
+            return Self.typed(try document.render(values), .text(.html))
 
         case .stylesheet(let bundle):
             values.set(bundle.rawValue, for: Self.bundle)
-            return try stylesheet.render(values)
+            return Self.typed(try stylesheet.render(values), .text(.css))
 
         case .script(let bundle):
             values.set(bundle.rawValue, for: Self.bundle)
-            return try script.render(values)
+            return Self.typed(try script.render(values), .code(.js))
 
         case .asset(let asset):
             guard case .asset(let source) = artifact else {
@@ -80,15 +81,70 @@ public struct ArtifactPathProfile:
             let hash = hashesAssetNames ? "." + Self.shortHash(try bytes()) : ""
             let name = stem + hash + (ext.isEmpty ? "" : "." + ext)
 
-            return StandardPath(
-                segments: assetDirectory.segments
-                    + segments.map { PathSegment($0) }
-                    + [PathSegment(name, .file)]
+            return Self.typed(
+                StandardPath(
+                    segments: assetDirectory.segments
+                        + segments.map { PathSegment($0) }
+                        + [PathSegment(name, .file)]
+                ),
+                nil
             )
 
         case .text(let path):
             return path
         }
+    }
+
+    /// `{route}/index.html` for a route.
+    public func documentPath(
+        _ route: SiteRoute
+    ) throws -> StandardPath {
+        try path(for: .document(route), artifact: .text(""), bytes: { Data() })
+    }
+
+    /// `assets/css/{bundle}.css` for a bundle.
+    public func stylesheetPath(
+        _ bundle: ArtifactBundle
+    ) throws -> StandardPath {
+        try path(for: .stylesheet(bundle), artifact: .text(""), bytes: { Data() })
+    }
+
+    /// `assets/js/{bundle}.js` for a bundle.
+    public func scriptPath(
+        _ bundle: ArtifactBundle
+    ) throws -> StandardPath {
+        try path(for: .script(bundle), artifact: .text(""), bytes: { Data() })
+    }
+
+    /// Paths in the usual `StandardPath` form: the last segment's
+    /// extension moves into `filetype` (`index` + `.html`), so planned paths
+    /// compare equal to hand-built ones. An extension FileTypes doesn't know
+    /// stays in the name.
+    static func typed(
+        _ path: StandardPath,
+        _ preferred: AnyFileType?
+    ) -> StandardPath {
+        guard path.filetype == nil,
+              let last = path.segments.last,
+              let dot = last.value.lastIndex(of: "."),
+              dot != last.value.startIndex
+        else {
+            return path
+        }
+
+        let name = String(last.value[last.value.startIndex..<dot])
+        let ext = String(last.value[last.value.index(after: dot)...])
+        let filetype = preferred.flatMap { $0.component == "." + ext ? $0 : nil }
+            ?? (try? AnyFileType(filename: last.value))
+
+        guard let filetype else {
+            return path
+        }
+
+        return StandardPath(
+            segments: path.segments.dropLast() + [PathSegment(name)],
+            filetype: filetype
+        )
     }
 
     /// 8 hex digits of FNV-1a over the bytes: a cache key, not a checksum.

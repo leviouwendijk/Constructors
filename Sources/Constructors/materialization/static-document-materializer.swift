@@ -32,16 +32,16 @@ public struct StaticDocumentMaterializer:
     >(
         _ document:
             RenderedDocument<Page>
-    ) -> StaticDocumentArtifact<
+    ) throws -> StaticDocumentArtifact<
         Page.PageIdentifier
     > {
-        StaticDocumentArtifact(
+        try StaticDocumentArtifact(
             identifier:
                 document.identifier,
             route:
                 document.route,
             output:
-                policy
+                try policy
                     .documentOutput(
                         for:
                             document.route
@@ -61,15 +61,15 @@ public struct StaticDocumentMaterializer:
     >(
         _ site:
             SiteRenderResult<Page>
-    ) -> StaticSiteDocumentMaterialization<Page> {
-        StaticSiteDocumentMaterialization(
+    ) throws -> StaticSiteDocumentMaterialization<Page> {
+        try StaticSiteDocumentMaterialization(
             projection:
                 site.projection,
             documents:
                 site
                     .documents
                     .map {
-                        materialize(
+                        try materialize(
                             $0
                         )
                     },

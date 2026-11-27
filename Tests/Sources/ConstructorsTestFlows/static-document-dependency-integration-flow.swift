@@ -198,19 +198,13 @@ extension ConstructorsFlowSuite {
             }
 
             Step(
-                "public stylesheet href remains distinct from physical stylesheet output"
+                "stylesheet href is derived from the planned stylesheet path"
             ) {
                 let plan =
                     try integrationFixturePlan()
 
                 let integrated =
-                    try StaticDocumentDependencyIntegrator(
-                        policy:
-                            StaticDocumentDependencyIntegrationPolicy(
-                                stylesheetHref:
-                                    "/static/v2/application.css"
-                            )
-                    )
+                    try StaticDocumentDependencyIntegrator()
                     .integrate(
                         plan
                     )
@@ -239,8 +233,8 @@ extension ConstructorsFlowSuite {
                     home
                         .stylesheet
                         .href,
-                    "/static/v2/application.css",
-                    "static-integration.custom-public-stylesheet-reference"
+                    "/assets/css/site.css",
+                    "static-integration.derived-stylesheet-reference"
                 )
 
                 try Expect.equal(
@@ -274,19 +268,10 @@ extension ConstructorsFlowSuite {
                 try Expect.equal(
                     html
                         .contains(
-                            "/static/v2/application.css"
-                        ),
-                    true,
-                    "static-integration.custom-href-lowered-structurally"
-                )
-
-                try Expect.equal(
-                    html
-                        .contains(
                             "/assets/css/site.css"
                         ),
-                    false,
-                    "static-integration.no-implicit-output-to-href-coupling"
+                    true,
+                    "static-integration.derived-href-lowered-structurally"
                 )
             }
 
@@ -587,13 +572,13 @@ private func integrationFixturePlan()
         )
 
     let documents =
-        StaticDocumentMaterializer()
+        try StaticDocumentMaterializer()
             .materialize(
                 rendered
             )
 
     return
-        StaticDependencyPackager()
+        try StaticDependencyPackager()
             .pack(
                 documents
             )

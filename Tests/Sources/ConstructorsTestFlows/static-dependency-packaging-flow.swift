@@ -28,7 +28,7 @@ extension ConstructorsFlowSuite {
                     try dependencyPackagingFixture()
 
                 let packaged =
-                    StaticDependencyPackager()
+                    try StaticDependencyPackager()
                         .pack(
                             fixture
                                 .dependencies
@@ -91,7 +91,7 @@ extension ConstructorsFlowSuite {
                     try dependencyPackagingFixture()
 
                 let packaged =
-                    StaticDependencyPackager()
+                    try StaticDependencyPackager()
                         .pack(
                             fixture
                                 .dependencies
@@ -120,7 +120,7 @@ extension ConstructorsFlowSuite {
                     try dependencyPackagingFixture()
 
                 let packaged =
-                    StaticDependencyPackager()
+                    try StaticDependencyPackager()
                         .pack(
                             fixture
                                 .dependencies
@@ -213,7 +213,7 @@ extension ConstructorsFlowSuite {
                     try dependencyPackagingFixture()
 
                 let packaged =
-                    StaticDependencyPackager()
+                    try StaticDependencyPackager()
                         .pack(
                             fixture
                                 .dependencies
@@ -252,17 +252,10 @@ extension ConstructorsFlowSuite {
                     StaticDependencyPackagingPolicy(
                         styles:
                             StaticStylesheetPackagingPolicy(
-                                output:
-                                    StandardPath(
-                                        [
-                                            "assets",
-                                            "css",
-                                            "page",
-                                        ],
-                                        filetype:
-                                            .text(
-                                                .css
-                                            )
+                                bundle:
+                                    .init(
+                                        rawValue:
+                                            "page"
                                     ),
                                 selection:
                                     .scoped(
@@ -272,7 +265,7 @@ extension ConstructorsFlowSuite {
                     )
 
                 let packaged =
-                    StaticDependencyPackager(
+                    try StaticDependencyPackager(
                         policy:
                             customPolicy
                     )

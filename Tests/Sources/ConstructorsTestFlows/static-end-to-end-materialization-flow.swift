@@ -418,15 +418,26 @@ extension ConstructorsFlowSuite {
 
                 let policy =
                     StaticSiteMaterializationPolicy(
-                        documents:
-                            StaticDocumentMaterializationPolicy(
-                                indexBasename:
-                                    "page"
-                            ),
-                        integration:
-                            StaticDocumentDependencyIntegrationPolicy(
-                                stylesheetHref:
-                                    "/static/application.css"
+                        paths:
+                            ArtifactPathProfile(
+                                document:
+                                    .init(
+                                        .remainder(
+                                            ArtifactPathProfile.route
+                                        ),
+                                        .literal(
+                                            "page.html"
+                                        )
+                                    ),
+                                stylesheet:
+                                    .init(
+                                        .literal(
+                                            "static"
+                                        ),
+                                        .literal(
+                                            "application.css"
+                                        )
+                                    )
                             ),
                         serialization:
                             StaticSerializationPolicy(
@@ -474,12 +485,45 @@ extension ConstructorsFlowSuite {
                             .path,
                         root
                             .appendingPathComponent(
-                                "assets/css/site.css"
+                                "static/application.css"
                             )
                             .standardizedFileURL
                             .path,
                     ],
                     "static-end-to-end.document-policy-forwarded"
+                )
+
+                try Expect.equal(
+                    prepared
+                        .tree
+                        .entries
+                        .map {
+                            $0
+                                .path
+                                .rendered(
+                                    asRootPath:
+                                        false
+                                )
+                        },
+                    [
+                        "page.html",
+                        "contact/page.html",
+                        "static/application.css",
+                    ],
+                    "static-end-to-end.tree-matches-materialized-paths"
+                )
+
+                try Expect.equal(
+                    try prepared
+                        .tree
+                        .href(
+                            for:
+                                .stylesheet(
+                                    .site
+                                )
+                        ),
+                    "/static/application.css",
+                    "static-end-to-end.tree-href"
                 )
 
                 for document in prepared

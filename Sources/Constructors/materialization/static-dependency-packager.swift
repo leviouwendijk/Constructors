@@ -16,13 +16,13 @@ public struct StaticDependencyPackager:
     public func pack(
         _ dependencies:
             RenderDependencies
-    ) -> StaticDependencyPackaging {
+    ) throws -> StaticDependencyPackaging {
         let stylesheet =
             StaticStylesheetArtifactPlan(
                 output:
-                    policy
+                    try policy
                         .styles
-                        .output,
+                        .output(),
                 selection:
                     policy
                         .styles
@@ -80,8 +80,8 @@ public struct StaticDependencyPackager:
     >(
         _ site:
             StaticSiteDocumentMaterialization<Page>
-    ) -> StaticSiteMaterializationPlan<Page> {
-        StaticSiteMaterializationPlan(
+    ) throws -> StaticSiteMaterializationPlan<Page> {
+        try StaticSiteMaterializationPlan(
             site:
                 site,
             dependencies:

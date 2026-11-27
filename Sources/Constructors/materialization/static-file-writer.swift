@@ -209,6 +209,66 @@ public struct StaticFileWriter:
             )
     }
 
+    /// Write every artifact of `tree` as bytes (binary assets included).
+    /// Destinations are checked against the root before the first write.
+    public func write(
+        _ tree:
+            ArtifactTree
+    ) throws -> [URL] {
+        let destinations =
+            try tree
+                .entries
+                .map { entry in
+                    (
+                        entry,
+                        try destination(
+                            for:
+                                entry
+                                    .path
+                        )
+                    )
+                }
+
+        for (entry, destination) in destinations {
+            do {
+                _ =
+                    try FileWriter(
+                        destination
+                    )
+                    .write(
+                        try tree
+                            .bytes(
+                                for:
+                                    entry
+                                        .key
+                            ),
+                        options:
+                            Self
+                                .writeOptions
+                    )
+            } catch {
+                throw
+                    StaticFileWriterError
+                        .writeFailed(
+                            destination:
+                                destination
+                                    .path,
+                            reason:
+                                String(
+                                    describing:
+                                        error
+                                )
+                        )
+            }
+        }
+
+        return
+            destinations
+                .map(
+                    \.1
+                )
+    }
+
     private static let writeOptions =
         SafeWriteOptions(
             existingFilePolicy:
@@ -229,9 +289,19 @@ public struct StaticFileWriter:
         for artifact:
             StaticTextArtifact
     ) throws -> URL {
+        try destination(
+            for:
+                artifact
+                    .output
+        )
+    }
+
+    private func destination(
+        for output:
+            StandardPath
+    ) throws -> URL {
         let resolved =
-            artifact
-                .output
+            output
                 .url(
                     base:
                         root
@@ -249,8 +319,7 @@ public struct StaticFileWriter:
                 StaticFileWriterError
                     .destinationOutsideRoot(
                         output:
-                            artifact
-                                .output,
+                            output,
                         root:
                             root
                                 .path,

@@ -25,6 +25,38 @@ public struct StaticSiteMaterializationPolicy:
     public let serialization:
         StaticSerializationPolicy
 
+    /// Documents and the stylesheet placed by one path profile.
+    public init(
+        paths:
+            ArtifactPathProfile,
+        integration:
+            StaticDocumentDependencyIntegrationPolicy =
+                .init(),
+        serialization:
+            StaticSerializationPolicy =
+                .init()
+    ) {
+        self.init(
+            documents:
+                .init(
+                    paths:
+                        paths
+                ),
+            dependencies:
+                .init(
+                    styles:
+                        .init(
+                            paths:
+                                paths
+                        )
+                ),
+            integration:
+                integration,
+            serialization:
+                serialization
+        )
+    }
+
     public init(
         documents:
             StaticDocumentMaterializationPolicy =

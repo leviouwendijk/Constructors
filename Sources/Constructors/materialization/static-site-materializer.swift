@@ -43,7 +43,7 @@ public struct StaticSiteMaterializer:
             SiteRenderResult<Page>
     ) throws -> StaticSerializedSiteMaterialization<Page> {
         let documents =
-            StaticDocumentMaterializer(
+            try StaticDocumentMaterializer(
                 policy:
                     policy
                         .documents
@@ -53,7 +53,7 @@ public struct StaticSiteMaterializer:
             )
 
         let packaged =
-            StaticDependencyPackager(
+            try StaticDependencyPackager(
                 policy:
                     policy
                         .dependencies
@@ -72,7 +72,7 @@ public struct StaticSiteMaterializer:
                 packaged
             )
 
-        return
+        var serialized =
             StaticSiteSerializer(
                 policy:
                     policy
@@ -81,6 +81,34 @@ public struct StaticSiteMaterializer:
             .serialize(
                 integrated
             )
+
+        serialized.tree =
+            try integrated
+                .artifactTree(
+                    paths:
+                        policy
+                            .documents
+                            .paths,
+                    render:
+                        ArtifactRenderProfile(
+                            html:
+                                policy
+                                    .serialization
+                                    .html,
+                            stylesheet:
+                                policy
+                                    .serialization
+                                    .stylesheet
+                        ),
+                    stylesheet:
+                        policy
+                            .dependencies
+                            .styles
+                            .bundle
+                )
+
+        return
+            serialized
     }
 
     /// Prepare and deliver a rendered site through a caller-owned writer.

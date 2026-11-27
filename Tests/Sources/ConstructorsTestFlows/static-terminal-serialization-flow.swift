@@ -461,13 +461,13 @@ private func serializationIntegratedFixture()
         )
 
     let documentPlan =
-        StaticDocumentMaterializer()
+        try StaticDocumentMaterializer()
             .materialize(
                 rendered
             )
 
     let packaged =
-        StaticDependencyPackager()
+        try StaticDependencyPackager()
             .pack(
                 documentPlan
             )

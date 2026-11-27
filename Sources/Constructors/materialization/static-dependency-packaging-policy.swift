@@ -2,39 +2,44 @@ import DSL
 import FileTypes
 import Path
 
+/// The site stylesheet: which bundle it is and where bundles go.
 public struct StaticStylesheetPackagingPolicy:
-    Sendable,
-    Equatable
+    Sendable
 {
-    public let output:
-        StandardPath
+    public let bundle:
+        ArtifactBundle
+
+    public let paths:
+        ArtifactPathProfile
 
     public let selection:
         ScopeSelection
 
     public init(
-        output:
-            StandardPath =
-                StandardPath(
-                    [
-                        "assets",
-                        "css",
-                        "site",
-                    ],
-                    filetype:
-                        .text(
-                            .css
-                        )
-                ),
+        bundle:
+            ArtifactBundle = .site,
+        paths:
+            ArtifactPathProfile = .standard,
         selection:
             ScopeSelection =
                 .all
     ) {
-        self.output =
-            output
+        self.bundle =
+            bundle
+
+        self.paths =
+            paths
 
         self.selection =
             selection
+    }
+
+    /// The stylesheet's planned path: the profile's stylesheet template.
+    public func output() throws -> StandardPath {
+        try paths
+            .stylesheetPath(
+                bundle
+            )
     }
 }
 
@@ -52,8 +57,7 @@ public enum StaticJavaScriptPackagingPolicy:
 }
 
 public struct StaticDependencyPackagingPolicy:
-    Sendable,
-    Equatable
+    Sendable
 {
     public let styles:
         StaticStylesheetPackagingPolicy

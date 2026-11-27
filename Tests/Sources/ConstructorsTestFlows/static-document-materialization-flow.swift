@@ -27,7 +27,7 @@ extension ConstructorsFlowSuite {
                     try materializationRenderedSite()
 
                 let materialized =
-                    StaticDocumentMaterializer()
+                    try StaticDocumentMaterializer()
                         .materialize(
                             rendered
                         )
@@ -117,7 +117,7 @@ extension ConstructorsFlowSuite {
                     try materializationRenderedSite()
 
                 let materialized =
-                    StaticDocumentMaterializer()
+                    try StaticDocumentMaterializer()
                         .materialize(
                             rendered
                         )
@@ -182,7 +182,7 @@ extension ConstructorsFlowSuite {
                 try Expect.equal(
                     materializedHome
                         .output,
-                    StaticDocumentMaterializationPolicy()
+                    try StaticDocumentMaterializationPolicy()
                         .documentOutput(
                             for:
                                 renderedHome
@@ -199,7 +199,7 @@ extension ConstructorsFlowSuite {
                     try materializationRenderedSite()
 
                 let materialized =
-                    StaticDocumentMaterializer()
+                    try StaticDocumentMaterializer()
                         .materialize(
                             rendered
                         )
@@ -258,7 +258,7 @@ extension ConstructorsFlowSuite {
                     try materializationRenderedSite()
 
                 let materialized =
-                    StaticDocumentMaterializer()
+                    try StaticDocumentMaterializer()
                         .materialize(
                             rendered
                         )
@@ -364,12 +364,22 @@ extension ConstructorsFlowSuite {
 
                 let customPolicy =
                     StaticDocumentMaterializationPolicy(
-                        indexBasename:
-                            "document"
+                        paths:
+                            ArtifactPathProfile(
+                                document:
+                                    .init(
+                                        .remainder(
+                                            ArtifactPathProfile.route
+                                        ),
+                                        .literal(
+                                            "document.html"
+                                        )
+                                    )
+                            )
                     )
 
                 try Expect.equal(
-                    defaultPolicy
+                    try defaultPolicy
                         .documentOutput(
                             for:
                                 route
@@ -389,7 +399,7 @@ extension ConstructorsFlowSuite {
                 )
 
                 try Expect.equal(
-                    customPolicy
+                    try customPolicy
                         .documentOutput(
                             for:
                                 route
